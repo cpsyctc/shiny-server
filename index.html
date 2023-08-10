@@ -64,7 +64,8 @@
       float: left;
     }
     #main{
-      margin-right: 350px;
+      margin-left: 35px;
+      margin-right: 35px;
       float: left;
       line-height: 24px;
     }
@@ -99,9 +100,13 @@
       <h1>Welcome to the PSYCTC/CORE shiny server!</h1>
     </div>
   </div>
-  This is the start of the server.  At the moment it is aesthetically crude (as you can see!) and only contains one very simple app, but it's a start!</body>
-<h2>Apps (OK, app!)</h1>
+  <div id = "main">
+  This is the start of the server.  At the moment it is aesthetically crude (as you can see!) and only contains two very simple apps, but it's a start!</body>
+<h2>Apps</h1>
 <ul>
-  <li><a href="./apps/Cronbach1Feldt/">App that gives you a confidence interval around an observed Cronbach alpha value</a> given that value, the width of CI you want (usually .95, i.e. 95%) and the sample size of the dataset from which the alpha was obtained.  The maths is paametric but fairly robust to non-Gaussian distributions.</li>
+  <li><a href="./apps/Cronbach1Feldt/">App that gives you a confidence interval (CI) around an observed Cronbach alpha value</a> given that value, the width of CI you want (usually .95, i.e. 95%) and the sample size of the dataset from which the alpha was obtained.  The maths is paametric but fairly robust to non-Gaussian distributions.</li>
+  <li><a href="./apps/CIproportion/">App that gives you a confidence interval around an observed proportion</a> given the total n, x the (smaller) number of interest within that n and the width of CI you want (usually .95, i.e. 95%).  Uses the binconf() function from the Hmisc R library which uses the Wilson method to get the CI.</li>
   </ul>
+  <p><i>Last updated 10.viii.23</i></p>
+  </div>
 </html>
