@@ -23,12 +23,6 @@ ui <- fluidPage(
     )
   ),
   tags$div(class="title", titlePanel("Confidence interval for a simple proportion\n\n")),
-
-
-# ui <- fluidPage(
-#   setBackgroundColor("#ffff99"),
-#   # Application title
-#   titlePanel("Parametric confidence interval for Cronbach alpha"),
   
   # Get input values
   sidebarLayout(
@@ -46,7 +40,7 @@ ui <- fluidPage(
                    value=100,
                    width="100%"),
       numericInput("x",
-                   "Number of of those n that were counted as positive/important/interesting (positive integer)",
+                   "Number of of those n that were counted as positive/important/interesting (x, a positive integer)",
                    value=34,
                    width="100%"),
       numericInput("ci",
@@ -59,7 +53,6 @@ ui <- fluidPage(
                    width="100%")
     ),
     
-    # Show a plot of the generated distribution
     mainPanel(
       h3("Your input and results",align="center"),
       verbatimTextOutput("res"),
@@ -98,7 +91,6 @@ server <- function(input, output) {
     }
     return(TRUE)
   }  
-  
   ### 
   ### now the functions from Hmisc
   ###
@@ -109,12 +101,12 @@ server <- function(input, output) {
     LCL <- CI[2]
     UCL <- CI[3]
     retText <- paste0("Given:\n",
-    "   x = ", x,"\n",
-    "   n = ", n,"\n",
-    "   observed proportion = ", round(CI[1], dp),
-    "\n",
-    "   ", ci.perc, "% confidence interval from ", round(LCL, dp),
-    " to ", round(UCL, dp),"\n\n")
+                      "   x = ", x,"\n",
+                      "   n = ", n,"\n",
+                      "   observed proportion = ", round(CI[1], dp),
+                      "\n",
+                      "   ", ci.perc, "% confidence interval from ", round(LCL, dp),
+                      " to ", round(UCL, dp),"\n\n")
     return(retText)
   }
   
@@ -122,17 +114,17 @@ server <- function(input, output) {
     validate(
       need(checkForPosInt(input$n, minInt = 0), 
            "n must be a positive integer > 10 and < 10^9"),
-      need(checkForPosInt(input$x, minInt = 3, maxInt = 500), 
-           "x must be a positive integer > 2 and < 500"),
+      need(checkNumRange(input$x, minx = 0, maxx = input$n), 
+           "x must be a positive integer >= 2 and <= n"),
       need(checkNumRange(input$ci, minx = .69999, maxx = 1, incEq = FALSE),
            "ci must be a value > .7 and < .99"),
       need(checkForPosInt(input$dp, minInt = 1, maxInt = 5),
-           "dp must be a value between 1 and 5")
+           "dp must be a value between 1 and 5"),
     )
     getCI(input$x,
-           input$n,
-           input$ci,
-           input$dp)
+          input$n,
+          input$ci,
+          input$dp)
   })
 }
 

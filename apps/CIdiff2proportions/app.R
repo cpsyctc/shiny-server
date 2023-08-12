@@ -1,0 +1,203 @@
+#
+# This is a Shiny web application. You can run the application by clicking
+# the 'Run App' button above.
+#
+# Find out more about building applications with Shiny here:
+#
+#    http://shiny.rstudio.com/
+#
+
+library(shiny)
+library(shinyWidgets)
+library(tidyverse)
+# library(plotly)
+
+# Define UI for application that does the work
+ui <- fluidPage(
+  setBackgroundColor("#ffff99"),
+  ### this is from
+  ### https://stackoverflow.com/questions/51298177/how-to-centre-the-titlepanel-in-shiny
+  ### and centers the first title across the whole page by tweaking the css
+  ### I confess I don't understand why the tweak achieves the centring
+  tags$head(
+    tags$style(
+      ".title {margin: auto; align: center}"
+    )
+  ),
+  tags$div(class="title", titlePanel("Confidence interval for a simple proportion\n\n")),
+  # Get input values
+  sidebarLayout(
+    sidebarPanel(
+      p("This shiny app is part of a number from my shiny server linked with at",
+        a("PSYCTC.org",href="https://www.psyctc.org/psyctc/"),
+        "There is a form if you want to",
+        a("contact me",href="https://www.psyctc.org/psyctc/contact-me/"),
+        " so do please use that if you think there is anything wrong here,",
+        " or anything that could be improved."),
+      h3("Put your values in here, replacing the existing ones",
+         align="center"),
+      numericInput("n1",
+                   "Total n in first set of data, (n1, zero or positive integer)",
+                   value=100,
+                   width="100%"),
+      numericInput("x1",
+                   "Number of of those n1 that were counted as positive/important/interesting (x1, a positive integer)",
+                   value=34,
+                   width="100%"),
+      numericInput("n2",
+                   "Total n in second set of data, (n2, zero or positive integer)",
+                   value=50,
+                   width="100%"),
+      numericInput("x2",
+                   "Number of of those n2 that were counted as positive/important/interesting (x2, a positive integer)",
+                   value=17,
+                   width="100%"),
+      numericInput("ci",
+                   "Width of CI (usually .95, i.e. 95% CI, <=.99)",
+                   value=.95,
+                   width="100%"),
+      numericInput("dp",
+                   "Number of decimal places",
+                   value=2,
+                   width="100%")
+    ),
+    mainPanel(
+      h3("Your input and results",align="center"),
+      verbatimTextOutput("res"),
+      plotOutput("CIplot", height = 270),
+      p(" "),
+      p("I think most modern browsers will let you save/download that image."),
+      p(" "),
+      p(" "),
+      p("App created by Chris Evans",
+        a("PSYCTC.org",href="https://shiny.psyctc.org/CIproportion/"),
+        "licenced under a ",
+        a("Creative Commons, Attribution Licence-ShareAlike",
+          href="http://creativecommons.org/licenses/by-sa/1.0/"),
+        " Please respect that and put an acknowledgement and link back to here if re-using anything from here.")
+    )
+  )
+)
+
+# Define server logic required
+server <- function(input, output) {
+  ### 
+  ### start with validation functions
+  ###
+  checkForPosInt <- function(int, minInt = 0, maxInt = 10^9){
+    ### function to check integer input
+    if (is.na(int) | is.null(int)) {return(FALSE)}
+    if (int < max(0, minInt)) {return(FALSE)}
+    if (int > maxInt) {return(FALSE)}
+    if (!isTRUE(all.equal(int,round(int)))) {return(FALSE)}
+    return(TRUE)
+  }
+  checkNumRange <- function(x, minx = 1, maxx = 1, incEq = TRUE){
+    ### function to check numeric input within range
+    if (is.na(x) | is.null(x)) {return(FALSE)}
+    if (incEq) {
+      if (x < minx) {return(FALSE)}
+      if (x > maxx) {return(FALSE)}
+    } else {
+      if (x <= minx) {return(FALSE)}
+      if (x >= maxx) {return(FALSE)}  
+    }
+    return(TRUE)
+  }  
+  ### 
+  ### now the functions from https://www.statology.org/confidence-interval-in-r/
+  ###
+  getCI <- function(n1, x1, n2, x2, ci = 0.95, dp = 2) {
+    CI1 <- Hmisc::binconf(x1, n1, 1 - ci)[1, ]
+    CI2 <- Hmisc::binconf(x2, n2, 1 - ci)[1, ]
+    p1 <- CI1[1]
+    p2 <- CI2[1]
+    diffp <- p1 - p2
+    ci.perc <- round(100 * ci)
+    normVal <- 1 - (1 - ci)/2
+    margin <- qnorm(normVal) * sqrt(p1 * (1 - p1) / n1 + p2 * (1 -p2 ) / n2)
+    LCL <- diffp - margin
+    UCL <- diffp + margin
+
+    retText <- paste0("Given x1 = ", x1, " and n1 = ", n1," proportion in first dataset is ",
+                      round(p1, dp),
+                      "\n with ", ci.perc, "% confidence interval from ", round(CI1[2], dp),
+                      " to ", round(CI1[3], dp),"\n\n",
+                      "and given x2 = ", x2, " and n2 = ", n2," proportion in second dataset is ",
+                      round(p2, dp),
+                      "\n with ", ci.perc, "% confidence interval from ", round(CI2[2], dp),
+                      " to ", round(CI2[3], dp),"\n\n",
+                      "so the difference p1 - p2 is ",
+                      round(diffp, dp),
+                      "\n with ", ci.perc, "% confidence interval from  ",
+                      round(LCL, dp), " to ", round(UCL, dp))
+    return(retText)
+  }
+  
+  makePlot <- function(n1, x1, n2, x2, ci, dp) {
+    CI1 <- Hmisc::binconf(x1, n1, 1 - ci)[1, ]
+    CI2 <- Hmisc::binconf(x2, n2, 1 - ci)[1, ]
+    p1 <- CI1[1]
+    p2 <- CI2[1]
+    diffp <- p1 - p2
+    ci.perc <- round(100 * ci)
+    normVal <- 1 - (1 - ci)/2
+    margin <- qnorm(normVal) * sqrt(p1 * (1 - p1) / n1 + p2 * (1 -p2 ) / n2)
+    LCL <- diffp - margin
+    UCL <- diffp + margin
+    n <- n1 + n2
+    x <- x1 + x2
+    pAll <- x / n
+    ci.perc <- round(100 * ci)
+    titleText <- paste0("Biplane plot of proportions")
+    subTitleText <- paste0("Vertical lines mark ",
+                           ci.perc, " confidence intervals for proportions, ",
+                           "\nhorizontal reference line is overall proportion across both datasets.")
+    tribble(~dataSet, ~p, ~LCL, ~UCL,
+            "Dataset 1", CI1[1], CI1[2], CI1[3],
+            "Dataset 2", CI2[1], CI2[2], CI2[3]) -> tmpTib
+    ggplot(data = tmpTib,
+           aes(x = dataSet, y = p)) +
+      geom_point() +
+      geom_linerange(aes(ymin = LCL, ymax = UCL )) +
+      geom_hline(yintercept = pAll) +
+      ylim(c(0, 1)) +
+      xlab("Groups") + 
+      ylab("Proportion") +
+      ggtitle(titleText,
+              subTitleText) +
+      theme_bw() +
+      theme(plot.title = element_text(hjust = .5),
+            plot.subtitle = element_text(hjust = .5)) -> p
+    return(p)
+  }
+  
+  output$res <- renderText({
+    validate(
+      need(checkForPosInt(input$n1, minInt = 0), 
+           "n must be a positive integer > 10 and < 10^9"),
+      need(checkNumRange(input$x1, minx = 0, maxx = input$n1), 
+           "x must be a positive integer >= 2 and <= n"),
+      need(checkForPosInt(input$n2, minInt = 0), 
+           "n must be a positive integer > 10 and < 10^9"),
+      need(checkNumRange(input$x2, minx = 0, maxx = input$n2), 
+           "x must be a positive integer >= 2 and <= n"),
+      need(checkNumRange(input$ci, minx = .69999, maxx = 1, incEq = FALSE),
+           "ci must be a value > .7 and < .99"),
+      need(checkForPosInt(input$dp, minInt = 1, maxInt = 5),
+           "dp must be a value between 1 and 5"),
+    )
+    getCI(input$n1,
+          input$x1,
+          input$n2,
+          input$x2,
+          input$ci,
+          input$dp)
+  })
+  output$CIplot <- renderPlot({
+    makePlot(input$n1, input$x1, input$n2, input$x2, input$ci, input$dp)
+  })
+}
+
+# Run the application (ends all shiny apps in the one file, app.R format)
+shinyApp(ui = ui, server = server)
