@@ -1,4 +1,5 @@
-### CIcorrelation
+### CImean
+
 library(shiny)
 library(shinyWidgets)
 
@@ -8,20 +9,13 @@ ui <- fluidPage(
   ### this is from
   ### https://stackoverflow.com/questions/51298177/how-to-centre-the-titlepanel-in-shiny
   ### and centers the first title across the whole page by tweaking the css
-  ### I confess I don't understand why the tweak achieves the centring
   tags$head(
     tags$style(
       ".title {margin: auto; align: center}"
     )
   ),
-  tags$div(class="title", titlePanel("Confidence interval for a Pearson or Spearman correlation\n\n")),
+  tags$div(class="title", titlePanel("Confidence interval for a mean given only mean, n and SD (or SE)\n\n")),
 
-
-# ui <- fluidPage(
-#   setBackgroundColor("#ffff99"),
-#   # Application title
-#   titlePanel("Parametric confidence interval for Cronbach alpha"),
-  
   # Get input values
   sidebarLayout(
     sidebarPanel(
@@ -35,31 +29,37 @@ ui <- fluidPage(
          align="center"),
       numericInput("n",
                    "Total n, (zero or positive integer)",
-                   value=100,
-                   width="100%"),
-      numericInput("R",
-                   "Observed correlation",
-                   value=.7,
-                   width="100%"),
+                   value = 100,
+                   width = "100%"),
+      numericInput("mean",
+                   "Observed mean",
+                   value = .7,
+                   width = "100%"),
+      numericInput("SD",
+                   "Observed standard deviation (SD)\nEnter this or SE",
+                   value = .1,
+                   width = "100%"),
+      numericInput("SE",
+                   "Observed standard error (SE),\nput in correct value for one and leave other blank",
+                   value = NA,
+                   width = "100%"),
       numericInput("ci",
                    "Width of CI (usually .95, i.e. 95% CI, <=.99)",
-                   value=.95,
-                   width="100%"),
+                   value = .95,
+                   width = "100%"),
       numericInput("dp",
                    "Number of decimal places",
-                   value=2,
-                   width="100%")
+                   value = 2,
+                   width = "100%")
     ),
     
     mainPanel(
       h3("Your input and results",align="center"),
       verbatimTextOutput("res"),
-      p("This uses parametric assumptions, i.e. that distributions of the variables in the population are Gaussiann\n
-        always dodgy.  The assumption that this CI is OK for Spearman's rho as well as for the Pearson R because, is\n
-        based on the fact that, if there were no ties and underlying Gaussian distributions, then rho is the\n
-        Pearson R of the ranks of the two variables.  That's a lot of assumptions but if all you have is the observed\n
-        correlations and the <i>n</i> it's as good as you can get.  If you have the raw data I recommend you use the \n
-        bootstrap CI of the Pearson correlation.  I'll put up an app to do that when I can.\n\n"),
+      p("This uses parametric assumptions, i.e. that the population distribution is Gaussian. That's unlikely to be\n
+      the case for typical MH/therapy data but if all you have is the observed mean, dataset size (n) and the SD\n
+      (or the SE) then it is as good as you can get.  If you have the raw data I recommend you use the \n
+      bootstrap CI for the mean.  I'll put up an app to do that when I can.\n\n"),
       p("App created by Chris Evans",
         a("PSYCTC.org",href="https://shiny.psyctc.org/CIproportion/"),
         "licenced under a ",
@@ -95,26 +95,42 @@ server <- function(input, output) {
     }
     return(TRUE)
   }  
+  checkOneOnly <- function(x, y) {
+    if(sum(is.na(c(x, y))) != 1) {
+      return(FALSE)
+    }
+    return(TRUE)
+  }
   
   ### 
   ### now the functions from CECPfuns plotCIcorrelation
   ###
-  getCI <- function(R, n, ci = 0.95, dp = 2) {
-    z <- atanh(R)
-    norm <- qnorm((1 - ci)/2)
-    den <- sqrt(n - 3)
-    zl <- z + norm/den
-    zu <- z - norm/den
-    rl <- tanh(zl)
-    ru <- tanh(zu)
+  getCI <- function(n, mean, SD, SE, ci = 0.95, dp = 2) {
+    # computes CI mean from given n, mean, and s.d.
+    # default CI is 95%
+    # check data are from p.21 of Gardner & Altman (1989) Statistics with confidence BMA:London
+    # (c) Chris Evans <chris@psyctc.org> 2001 but so trite it's not worth saying that!
+    # I'm no programmer or statistician so use this entirely at your own risk.
+    # you are free to copy and use, let me know if you improve it please!
     ci.perc <- round(100 * ci)
+    if (is.na(SE)) {
+      SE <- SD / sqrt(n)
+    }
+    conf.level <- (1 - ci) / 2 # since you need the t value for .975 to get 95% CI
+    df <- n - 1
+    q <- abs(qt(conf.level, df))
+    half.int <- SE * q
+    lwr <- mean - half.int
+    upr <- mean + half.int
+    lwr <- round(lwr, dp)
+    upr <- round(upr, dp)
     retText <- paste0("Given:\n",
-                      "   R = ", R,"\n",
                       "   n = ", n,"\n",
-                      "   observed correlation = ", round(R, dp),
+                      "   mean = ", mean,"\n",
+                      "   SE (input or computed) = ", round(SE, dp),
                       "\n",
-                      "   ", ci.perc, "% confidence interval from ", round(rl, dp),
-                      " to ", round(ru, dp),"\n\n")
+                      "   ", ci.perc, "% confidence interval from ", round(lwr, dp),
+                      " to ", round(upr, dp),"\n\n")
     return(retText)
   }
   
@@ -122,17 +138,19 @@ server <- function(input, output) {
     validate(
       need(checkForPosInt(input$n, minInt = 0), 
            "n must be a positive integer > 10 and < 10^9"),
-      need(checkNumRange(input$R, minx = -1, maxx = 1, incEq = TRUE),
-           "R must be a value >= -1.0 and <= 1.0"),
+      need(checkOneOnly(input$SE, input$SD),
+           "You must enter one of SD or SE, not both. (To avoid confusion!)"),
       need(checkNumRange(input$ci, minx = .69999, maxx = 1, incEq = FALSE),
            "ci must be a value > .7 and < .99"),
       need(checkForPosInt(input$dp, minInt = 1, maxInt = 5),
            "dp must be a value between 1 and 5")
     )
-    getCI(input$R,
-           input$n,
-           input$ci,
-           input$dp)
+    getCI(input$n,
+          input$mean,
+          input$SD,
+          input$SE,
+          input$ci,
+          input$dp)
   })
 }
 
