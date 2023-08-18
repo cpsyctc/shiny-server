@@ -4,11 +4,11 @@ library(shinyWidgets)
 
 # Define UI for application that does the work
 ui <- fluidPage(
+  ### setBackgroundColor() is from shinyWidgets
   setBackgroundColor("#ffff99"),
   ### this is from
   ### https://stackoverflow.com/questions/51298177/how-to-centre-the-titlepanel-in-shiny
   ### and centers the first title across the whole page by tweaking the css
-  ### I confess I don't understand why the tweak achieves the centring
   tags$head(
     tags$style(
       ".title {margin: auto; align: center}"
@@ -16,19 +16,13 @@ ui <- fluidPage(
   ),
   tags$div(class="title", titlePanel("Parametric confidence interval for Cronbach alpha\n\n")),
 
-
-# ui <- fluidPage(
-#   setBackgroundColor("#ffff99"),
-#   # Application title
-#   titlePanel("Parametric confidence interval for Cronbach alpha"),
-  
   # Get input values
   sidebarLayout(
     sidebarPanel(
       p("This shiny app is part of a number from my site at",
-        a("PSYCTC.org",href="https://www.psyctc.org/psyctc/"),
+        a("PSYCTC.org", href="https://www.psyctc.org/psyctc/"),
         "There is a form there to",
-        a("contact me",href="https://www.psyctc.org/psyctc/contact-me/"),
+        a("contact me", href="https://www.psyctc.org/psyctc/contact-me/"),
         " so do please use that if you think there is anything wrong here,",
         " or anything that could be improved."),
       h3("Put your values in here, replacing the existing ones",
@@ -36,35 +30,47 @@ ui <- fluidPage(
       numericInput("n",
                    "Sample size (n), positive integer",
                    value = 100,
+                   min = 10,
+                   max = 10^9,
                    width = "100%"),
       numericInput("k",
                    "Number of items (k), positive integer",
                    value = 34,
+                   min = 3,
+                   max = 500,
                    width = "100%"),
       numericInput("alpha",
                    "Observed/reported Cronbach alpha value (<=1.0)",
                    value = .94,
+                   min = -.2,
+                   max = 1,
                    width = "100%"),
       numericInput("altAlpha",
                    "A referential alpha (if you need this)",
                    value = 0,
+                   min = 0,
+                   max = 1,
                    width = "100%"),
       numericInput("ci",
                    "Width of CI (usually .95, i.e. 95% CI, <=.99)",
                    value = .95,
+                   min = .699999,
+                   max = .999,
                    width = "100%"),
       numericInput("dp",
                    "Number of decimal places",
                    value = 2,
+                   min = 0,
+                   max = 5,
                    width = "100%")
     ),
     
     # Show a plot of the generated distribution
     mainPanel(
-      h3("Your input and results",align = "center"),
+      h3("Your input and results", align = "center"),
       verbatimTextOutput("res"),
       p("App created by Chris Evans",
-        a("PSYCTC.org",href = "https://www.psyctc.org/psyctc/"),
+        a("PSYCTC.org", href = "https://www.psyctc.org/psyctc/"),
         "licenced under a ",
         a("Creative Commons, Attribution Licence-ShareAlike",
           href = "http://creativecommons.org/licenses/by-sa/1.0/"),
@@ -78,7 +84,7 @@ server <- function(input, output) {
   ### 
   ### start with validation functions
   ###
-  checkForPosInt <- function(int,minInt = 10,maxInt = 10^9){
+  checkForPosInt <- function(int,minInt = 10, maxInt = 10^9){
     ### function to check integer input
     if (is.na(int) | is.null(int)) {return(FALSE)}
     if (int < max(0,minInt)) {return(FALSE)}

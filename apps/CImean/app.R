@@ -20,16 +20,18 @@ ui <- fluidPage(
   sidebarLayout(
     sidebarPanel(
       p("This shiny app is part of a number from my shiny server linked with at",
-        a("PSYCTC.org",href="https://www.psyctc.org/psyctc/"),
+        a("PSYCTC.org", href="https://www.psyctc.org/psyctc/"),
         "There is a form if you want to",
-        a("contact me",href="https://www.psyctc.org/psyctc/contact-me/"),
+        a("contact me", href="https://www.psyctc.org/psyctc/contact-me/"),
         " so do please use that if you think there is anything wrong here,",
         " or anything that could be improved."),
       h3("Put your values in here, replacing the existing ones",
-         align="center"),
+         align = "center"),
       numericInput("n",
                    "Total n, (zero or positive integer)",
                    value = 100,
+                   min = 5,
+                   max = 10^9,
                    width = "100%"),
       numericInput("mean",
                    "Observed mean",
@@ -46,22 +48,26 @@ ui <- fluidPage(
       numericInput("ci",
                    "Width of CI (usually .95, i.e. 95% CI, <=.99)",
                    value = .95,
+                   min = .7,
+                   max = .999,
                    width = "100%"),
       numericInput("dp",
                    "Number of decimal places",
                    value = 2,
+                   min = 0,
+                   max = 5,
                    width = "100%")
     ),
     
     mainPanel(
-      h3("Your input and results",align="center"),
+      h3("Your input and results", align = "center"),
       verbatimTextOutput("res"),
       p("This uses parametric assumptions, i.e. that the population distribution is Gaussian. That's unlikely to be\n
       the case for typical MH/therapy data but if all you have is the observed mean, dataset size (n) and the SD\n
       (or the SE) then it is as good as you can get.  If you have the raw data I recommend you use the \n
       bootstrap CI for the mean.  I'll put up an app to do that when I can.\n\n"),
       p("App created by Chris Evans",
-        a("PSYCTC.org",href="https://shiny.psyctc.org/CIproportion/"),
+        a("PSYCTC.org", href = "https://shiny.psyctc.org/CIproportion/"),
         "licenced under a ",
         a("Creative Commons, Attribution Licence-ShareAlike",
           href="http://creativecommons.org/licenses/by-sa/1.0/"),

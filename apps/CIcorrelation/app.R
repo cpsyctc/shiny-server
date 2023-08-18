@@ -7,20 +7,13 @@ ui <- fluidPage(
   setBackgroundColor("#ffff99"),
   ### this is from
   ### https://stackoverflow.com/questions/51298177/how-to-centre-the-titlepanel-in-shiny
-  ### and centers the first title across the whole page by tweaking the css
-  ### I confess I don't understand why the tweak achieves the centring
+  ### and centers the first title across the whole page by tweaking the css for head blocks
   tags$head(
     tags$style(
       ".title {margin: auto; align: center}"
     )
   ),
   tags$div(class="title", titlePanel("Confidence interval for a Pearson or Spearman correlation\n\n")),
-
-
-# ui <- fluidPage(
-#   setBackgroundColor("#ffff99"),
-#   # Application title
-#   titlePanel("Parametric confidence interval for Cronbach alpha"),
   
   # Get input values
   sidebarLayout(
@@ -35,19 +28,27 @@ ui <- fluidPage(
          align="center"),
       numericInput("n",
                    "Total n, (zero or positive integer)",
-                   value=100,
+                   value = 100,
+                   min = 0,
+                   max = 10^9,
                    width="100%"),
       numericInput("R",
                    "Observed correlation",
-                   value=.7,
+                   value = .7,
+                   min = -1,
+                   max = 1,
                    width="100%"),
       numericInput("ci",
                    "Width of CI (usually .95, i.e. 95% CI, <=.99)",
-                   value=.95,
+                   value = .95,
+                   min = .699999,
+                   max = .999,
                    width="100%"),
       numericInput("dp",
                    "Number of decimal places",
-                   value=2,
+                   value = 2,
+                   min = 0,
+                   max = 5,
                    width="100%")
     ),
     
@@ -70,10 +71,13 @@ ui <- fluidPage(
   )
 )
 
+
 # Define server logic required
+### this is the standard shiny server constructor
 server <- function(input, output) {
   ### 
   ### start with validation functions
+  ### I don't think I actually need these as I've now used numericInput() to set the ranges
   ###
   checkForPosInt <- function(int, minInt = 0, maxInt = 10^9){
     ### function to check integer input
@@ -97,7 +101,7 @@ server <- function(input, output) {
   }  
   
   ### 
-  ### now the functions from CECPfuns plotCIcorrelation
+  ### now the functions adapted from CECPfuns plotCIcorrelation
   ###
   getCI <- function(R, n, ci = 0.95, dp = 2) {
     z <- atanh(R)
@@ -130,9 +134,9 @@ server <- function(input, output) {
            "dp must be a value between 1 and 5")
     )
     getCI(input$R,
-           input$n,
-           input$ci,
-           input$dp)
+          input$n,
+          input$ci,
+          input$dp)
   })
 }
 

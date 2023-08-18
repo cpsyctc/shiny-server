@@ -9,7 +9,6 @@ ui <- fluidPage(
   ### this is from
   ### https://stackoverflow.com/questions/51298177/how-to-centre-the-titlepanel-in-shiny
   ### and centers the first title across the whole page by tweaking the css
-  ### I confess I don't understand why the tweak achieves the centring
   tags$head(
     tags$style(
       ".title {margin: auto; align: center}"
@@ -21,36 +20,44 @@ ui <- fluidPage(
   sidebarLayout(
     sidebarPanel(
       p("This shiny app is part of a number from my shiny server linked with at",
-        a("PSYCTC.org",href="https://www.psyctc.org/psyctc/"),
+        a("PSYCTC.org", href="https://www.psyctc.org/psyctc/"),
         "There is a form if you want to",
-        a("contact me",href="https://www.psyctc.org/psyctc/contact-me/"),
+        a("contact me", href="https://www.psyctc.org/psyctc/contact-me/"),
         " so do please use that if you think there is anything wrong here,",
         " or anything that could be improved."),
       h3("Put your values in here, replacing the existing ones",
-         align="center"),
+         align = "center"),
       numericInput("n",
                    "Total n, (zero or positive integer)",
-                   value=100,
+                   value = 100,
+                   min = 3,
+                   max = 10^9,
                    width="100%"),
       numericInput("x",
                    "Number of of those n that were counted as positive/important/interesting (x, a positive integer)",
-                   value=34,
+                   value = 34,
+                   min = 0,
+                   max = 10^9,
                    width="100%"),
       numericInput("ci",
                    "Width of CI (usually .95, i.e. 95% CI, <=.99)",
-                   value=.95,
+                   value = .95,
+                   min = .7,
+                   max = .999,
                    width="100%"),
       numericInput("dp",
                    "Number of decimal places",
-                   value=2,
+                   value = 2,
+                   min = 0,
+                   max = 5,
                    width="100%")
     ),
     
     mainPanel(
-      h3("Your input and results",align="center"),
+      h3("Your input and results", align="center"),
       verbatimTextOutput("res"),
       p("App created by Chris Evans",
-        a("PSYCTC.org",href="https://shiny.psyctc.org/CIproportion/"),
+        a("PSYCTC.org", href="https://shiny.psyctc.org/CIproportion/"),
         "licenced under a ",
         a("Creative Commons, Attribution Licence-ShareAlike",
           href="http://creativecommons.org/licenses/by-sa/1.0/"),
