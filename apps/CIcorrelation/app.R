@@ -18,57 +18,67 @@ ui <- fluidPage(
   # Get input values
   sidebarLayout(
     sidebarPanel(
-      p("This shiny app is part of a number from my shiny server linked with at",
-        a("PSYCTC.org",href="https://www.psyctc.org/psyctc/"),
-        "There is a form if you want to",
-        a("contact me",href="https://www.psyctc.org/psyctc/contact-me/"),
+      p("This shiny app is one of a growing number in ",
+        a("my shiny server", href = "https://shiny.psyctc.org/"),
+        "They complement (1) ",
+        a("my Rblog", href = "https://www.psyctc.org/Rblog/index.html"),
+        "of posts about using R, (2) the ",
+        a("glossary", href = "https://www.psyctc.org/psyctc/book/glossary/"),
+        "linked with ",
+        a("the OMbook, ", href = "https://www.psyctc.org/psyctc/book/"),
+        " and it's all part of the resources of (3)",
+        a("PSYCTC.org", href = "https://www.psyctc.org/psyctc/"),
+        " and linked with (4)",
+        a("the CORE system web site", href = "https://www.coresystemtrust.org.uk"),
+        ""),
+      p("There is a form if you want to ",
+        a("contact me", href = "https://www.psyctc.org/psyctc/contact-me/"),
         " so do please use that if you think there is anything wrong here,",
         " or anything that could be improved."),
-      h3("Put your values in here, replacing the existing ones",
-         align="center"),
-      numericInput("n",
-                   "Total n, (zero or positive integer)",
-                   value = 100,
-                   min = 0,
-                   max = 10^9,
-                   width="100%"),
-      numericInput("R",
-                   "Observed correlation",
-                   value = .7,
-                   min = -1,
-                   max = 1,
-                   width="100%"),
-      numericInput("ci",
-                   "Width of CI (usually .95, i.e. 95% CI, <=.99)",
-                   value = .95,
-                   min = .699999,
-                   max = .999,
-                   width="100%"),
-      numericInput("dp",
-                   "Number of decimal places",
-                   value = 2,
-                   min = 0,
-                   max = 5,
-                   width="100%")
-    ),
-    
-    mainPanel(
-      h3("Your input and results",align="center"),
-      verbatimTextOutput("res"),
-      p("This uses parametric assumptions, i.e. that distributions of the variables in the population are Gaussiann\n
+      h3("Put your values in here, replacing the existing ones", align="center"),
+    numericInput("n",
+                 "Total n, (zero or positive integer)",
+                 value = 100,
+                 min = 0,
+                 max = 10^9,
+                 width="100%"),
+    numericInput("R",
+                 "Observed correlation",
+                 value = .7,
+                 min = -1,
+                 max = 1,
+                 width="100%"),
+    numericInput("ci",
+                 "Width of CI (usually .95, i.e. 95% CI, <=.99)",
+                 value = .95,
+                 min = .699999,
+                 max = .999,
+                 width="100%"),
+    numericInput("dp",
+                 "Number of decimal places",
+                 value = 2,
+                 min = 0,
+                 max = 5,
+                 width="100%")
+  ),
+  
+  mainPanel(
+    h3("Your input and results",align="center"),
+    verbatimTextOutput("res"),
+    p("This uses parametric assumptions, i.e. that distributions of the variables in the population are Gaussiann\n
         always dodgy.  The assumption that this CI is OK for Spearman's rho as well as for the Pearson R because, is\n
         based on the fact that, if there were no ties and underlying Gaussian distributions, then rho is the\n
         Pearson R of the ranks of the two variables.  That's a lot of assumptions but if all you have is the observed\n
         correlations and the <i>n</i> it's as good as you can get.  If you have the raw data I recommend you use the \n
         bootstrap CI of the Pearson correlation.  I'll put up an app to do that when I can.\n\n"),
-      p("App created by Chris Evans",
-        a("PSYCTC.org",href="https://shiny.psyctc.org/CIproportion/"),
-        "licenced under a ",
-        a("Creative Commons, Attribution Licence-ShareAlike",
-          href="http://creativecommons.org/licenses/by-sa/1.0/"),
-        " Please respect that and put an acknowledgement and link back to here if re-using anything from here.")
-    )
+    p("App created by Chris Evans",
+      a("PSYCTC.org",href="https://shiny.psyctc.org/CIproportion/"),
+      "licenced under a ",
+      a("Creative Commons, Attribution Licence-ShareAlike",
+        href="http://creativecommons.org/licenses/by-sa/1.0/"),
+      " Please respect that and put an acknowledgement and link back to here if re-using anything from here.")
   )
+)
 )
 
 
