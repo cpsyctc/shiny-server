@@ -112,15 +112,19 @@
       <li><a href="./apps/CImean/">App that gives you a confidence interval (CI) around an observed mean</a> given that value, either the observed SD or SE, the width of CI you want (usually .95, i.e. 95%) and the <i>n</i> of the dataset from which the alpha was obtained.  The maths is parametric and can be sensitive to non-Gaussian distributions, bootstrap CI definitely preferred if you have the raw data.</li>
       <li><a href="./apps/CIcorrelation/">App that gives you a confidence interval around an observed correlation</a> given the total <i>n</i>, R the correlation (Pearson or Spearman) and the width of CI you want (usually .95, i.e. 95%). Uses basic parametric theory so treat the CI as indicative rather than definitive, particularly for Spearman correlations.  However, if all you have is the <i>n</i> and correlation, it's the best you can do!</li>
       <li><a href="./apps/Cronbach1Feldt/">App that gives you a confidence interval (CI) around an observed Cronbach alpha value</a> given that value, the width of CI you want (usually .95, i.e. 95%) and the <i>n</i> of the dataset from which the alpha was obtained.  The maths is parametric but fairly robust to non-Gaussian distributions.</li>
+      <li><a href="./apps/ECDFplot/">App that gives you a confidence interval (CI) around observed quantiles of a distribution</a> given the data, the quantiles you want and the width of CI you want (usually .95, i.e. 95%) and the <i>n</i> of the dataset from which the alpha was obtained.  Uses Nyblom's method to get robust CIs for the quantiles.</li>
   </ul>
     <li><i><b>Apps to give bootstrap based confidence intervals from raw data</b></i></li>  Still to come: I need to work out good ways for users to upload raw data into shiny apps first.</li>
   </ul>
     <li><i><b>Apps to give plots</b></i></li>
       <ul>
         <li><i><b>From population parameters or sample statistics</b></i></li> Still to come!
-        <li><i><b>From raw data</b></i></li> Still to come: again, I need to work out good ways for users to upload raw data into shiny apps first!
+        <li><i><b>From raw data</b></i></li> 
+        <ul>
+          <li><a href="./apps/ECDFplot/">App that gives you a confidence interval (CI) around observed quantiles of a distribution</a> given the data, the quantiles you want and the width of CI you want (usually .95, i.e. 95%) and the <i>n</i> of the dataset from which the alpha was obtained.  Uses Nyblom's method to get robust CIs for the quantiles.</li>
+        </ul>
       </ul>
   </ul>
-  <p><i>Last updated 13.viii.23</i></p>
+  <p><i>Last updated 19.viii.23</i></p>
   </div>
 </html>

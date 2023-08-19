@@ -2,6 +2,8 @@
 
 library(shiny)
 library(shinyWidgets)
+library(tidyverse)
+# library(plotly)
 library(CECPfuns)
 set.seed(12345)
 vecDat <- round(rnorm(2000), 3)
