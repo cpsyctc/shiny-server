@@ -129,7 +129,7 @@ server <- function(input, output, session) {
            `Tested negative` = c(reacNTestTrueNeg, reacNTestFalsNeg, reacNTestTrueNeg + reacNTestFalsNeg),
            `Tested positive` = c(reacNTestFalsPos, reacNTestTruePos, reacNTestFalsPos + reacNTestTruePos),
            Total = c(reacNTestTrueNeg + reacNTestFalsPos,
-                     reacNTestTrueNeg + reacNTestTruePos,
+                     reacNTestFalsNeg + reacNTestTruePos,
                      reacNTestTrueNeg + reacNTestFalsNeg + reacNTestFalsPos + reacNTestTruePos)) %>%
       mutate(across(`Tested negative`:Total, round))
     
