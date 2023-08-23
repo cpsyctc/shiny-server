@@ -104,8 +104,9 @@
   This is the start of the server.  At the moment it is aesthetically crude (as you can see!) and only a few very simple apps, but it's a start!</body>
 <h2>Apps</h1>
 <ul>
-  <ul><b>Confidence interval apps</b></li>
-    <li><i><b>Apps given confidence intervals from observed counts or statistics and dataset sizes</b></i></li>  These can be useful if you have these counts and/or stats from your own data or if you are looking at reports that give those but don't give confidence intervals.
+  <li><b>Confidence interval apps</b></li>
+  <ul>
+    <li><i><b>Apps given confidence intervals from observed counts or statistics and dataset sizes</b></i>  These can be useful if you have these counts and/or stats from your own data or if you are looking at reports that give those but don't give confidence intervals.</li>
     <ul>
       <li><a href="./apps/CIproportion/">App that gives you a confidence interval around an observed proportion</a> given the total <i>n</i>, x the (smaller) number of interest within that <i>n</i> and the width of CI you want (usually .95, i.e. 95%).  Uses the binconf() function from the Hmisc R library which uses the Wilson method to get the CI.</li>
       <li><a href="./apps/CIdiff2proportions/">App that gives you a confidence interval around the difference between two independent proportions</a> given the total <i>n</i>, x in each dataset/group, the numbers of interest within each group <i>n</i> and the width of CI you want (usually .95, i.e. 95%).  Gives what I call a "biplane plot" of the two CIs.</li>
@@ -116,13 +117,17 @@
   </ul>
     <li><i><b>Apps to give bootstrap based confidence intervals from raw data</b></i></li>  Still to come: I need to work out good ways for users to upload raw data into shiny apps first.</li>
   </ul>
-    <li><i><b>Apps to give plots</b></i></li>
+    <li><b>Apps to give plots</b></li>
       <ul>
         <li><i><b>From population parameters or sample statistics</b></i></li> Still to come!
         <li><i><b>From raw data</b></i></li> 
         <ul>
           <li><a href="./apps/ECDFplot/">App that gives you a confidence interval (CI) around observed quantiles of a distribution</a> given the data, the quantiles you want and the width of CI you want (usually .95, i.e. 95%) and the <i>n</i> of the dataset from which the alpha was obtained.  Uses Nyblom's method to get robust CIs for the quantiles.</li>
         </ul>
+      </ul>
+      <li><b>Didactic and modelling apps</b></li>
+      <ul>
+        <li><a href="./apps/Screening/">Model of a simple screening design taking the n, prevalence and the sensitivity and specificity of the screening test.</a>  Gives full screening table and the PPV and NPV.  Changing the prevalence allows you to see how much this affects PPV and NPV.</li>
       </ul>
   </ul>
   <p><i>Last updated 19.viii.23</i></p>
