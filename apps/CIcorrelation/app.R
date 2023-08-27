@@ -1,6 +1,6 @@
 ### CIcorrelation
-library(shiny)
-library(shinyWidgets)
+suppressMessages(library(shiny))
+suppressMessages(library(shinyWidgets))
 
 # Define UI for application that does the work
 ui <- fluidPage(
@@ -35,6 +35,14 @@ ui <- fluidPage(
         a("contact me", href = "https://www.psyctc.org/psyctc/contact-me/"),
         " so do please use that if you think there is anything wrong here,",
         " or anything that could be improved."),
+      br(),
+      p("There is now an Email announcement list, never updating more than monthly, where I will put up developments of new apps here,",
+        " a summary of updates to the",
+        a("online glossary", href = "https://www.psyctc.org/psyctc/book/glossary/"),
+        "and new posts in the ",
+        a("Rblog.", href = "https://www.psyctc.org/Rblog/index.html"),
+        "You can sign up for that ",
+        a("here", href = "https://ombook.psyctc.org/signup")),
       h3("Put your values in here, replacing the existing ones", align="center"),
     numericInput("n",
                  "Total n, (zero or positive integer)",
@@ -84,32 +92,11 @@ ui <- fluidPage(
 
 # Define server logic required
 ### this is the standard shiny server constructor
-server <- function(input, output) {
+server <- function(input, output, session) {
   ### 
   ### start with validation functions
-  ### I don't think I actually need these as I've now used numericInput() to set the ranges
-  ###
-  checkForPosInt <- function(int, minInt = 0, maxInt = 10^9){
-    ### function to check integer input
-    if (is.na(int) | is.null(int)) {return(FALSE)}
-    if (int < max(0, minInt)) {return(FALSE)}
-    if (int > maxInt) {return(FALSE)}
-    if (!isTRUE(all.equal(int,round(int)))) {return(FALSE)}
-    return(TRUE)
-  }
-  checkNumRange <- function(x, minx = -1, maxx = 1, incEq = TRUE){
-    ### function to check numeric input within range
-    if (is.na(x) | is.null(x)) {return(FALSE)}
-    if (incEq) {
-      if (x < minx) {return(FALSE)}
-      if (x > maxx) {return(FALSE)}
-    } else {
-      if (x <= minx) {return(FALSE)}
-      if (x >= maxx) {return(FALSE)}  
-    }
-    return(TRUE)
-  }  
-  
+  ### I don't think I actually use any these as I've now used numericInput() to set the ranges
+
   ### 
   ### now the functions adapted from CECPfuns plotCIcorrelation
   ###
@@ -133,16 +120,16 @@ server <- function(input, output) {
   }
   
   output$res <- renderText({
-    validate(
-      need(checkForPosInt(input$n, minInt = 0), 
-           "n must be a positive integer > 10 and < 10^9"),
-      need(checkNumRange(input$R, minx = -1, maxx = 1, incEq = TRUE),
-           "R must be a value >= -1.0 and <= 1.0"),
-      need(checkNumRange(input$ci, minx = .69999, maxx = 1, incEq = FALSE),
-           "ci must be a value > .7 and < .99"),
-      need(checkForPosInt(input$dp, minInt = 1, maxInt = 5),
-           "dp must be a value between 1 and 5")
-    )
+    # validate(
+    #   need(checkForPosInt(input$n, minInt = 0), 
+    #        "n must be a positive integer > 10 and < 10^9"),
+    #   need(checkNumRange(input$R, minx = -1, maxx = 1, incEq = TRUE),
+    #        "R must be a value >= -1.0 and <= 1.0"),
+    #   need(checkNumRange(input$ci, minx = .69999, maxx = 1, incEq = FALSE),
+    #        "ci must be a value > .7 and < .99"),
+    #   need(checkForPosInt(input$dp, minInt = 1, maxInt = 5),
+    #        "dp must be a value between 1 and 5")
+    # )
     getCI(input$R,
           input$n,
           input$ci,

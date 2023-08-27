@@ -89,7 +89,7 @@ ui <- fluidPage(
 )
 
 # Define server logic required
-server <- function(input, output) {
+server <- function(input, output, session) {
   ### 
   ### start with validation functions
   ###

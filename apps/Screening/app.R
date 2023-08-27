@@ -2,9 +2,9 @@
 
 ### shiny app to model the basic screening situation
 
-library(tidyverse)
-library(shiny)
-library(shinyWidgets)
+suppressMessages(library(tidyverse))
+suppressMessages(library(shiny))
+suppressMessages(library(shinyWidgets))
 
 # Define UI for application that does the work
 ui <- fluidPage(
@@ -45,6 +45,14 @@ ui <- fluidPage(
         " Glossary",
         a("entry about screening.", href = "https://www.psyctc.org/psyctc/glossary2/screening/"),
         "Do go to that entry to get more about screening and the nomenclature."),
+      br(),
+      p("There is now an Email announcement list, never updating more than monthly, where I will put up developments of new apps here,",
+        " a summary of updates to the",
+        a("online glossary", href = "https://www.psyctc.org/psyctc/book/glossary/"),
+        "and new posts in the ",
+        a("Rblog.", href = "https://www.psyctc.org/Rblog/index.html"),
+        "You can sign up for that ",
+        a("here", href = "https://ombook.psyctc.org/signup")),
       h3("Put your values in here, replacing the existing ones",
          align = "center"),
       numericInput("n",

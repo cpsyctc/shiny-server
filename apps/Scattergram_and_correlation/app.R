@@ -1,10 +1,10 @@
 ### Scattergram and correlation
 
-library(shiny)
-library(shinyWidgets)
-library(DT)
-library(tidyverse)
-library(CECPfuns)
+suppressMessages(library(shiny))
+suppressMessages(library(shinyWidgets))
+suppressMessages(library(DT))
+suppressMessages(library(tidyverse))
+suppressMessages(library(CECPfuns))
 set.seed(12345)
 n <- 200
 vecDat1 <- round(rnorm(n), 3)
@@ -43,6 +43,14 @@ ui <- fluidPage(
         a("contact me", href = "https://www.psyctc.org/psyctc/contact-me/"),
         " so do please use that if you think there is anything wrong here,",
         " or anything that could be improved."),
+      br(),
+      p("There is now an Email announcement list, never updating more than monthly, where I will put up developments of new apps here,",
+        " a summary of updates to the",
+        a("online glossary", href = "https://www.psyctc.org/psyctc/book/glossary/"),
+        "and new posts in the ",
+        a("Rblog.", href = "https://www.psyctc.org/Rblog/index.html"),
+        "You can sign up for that ",
+        a("here", href = "https://ombook.psyctc.org/signup")),
       h3("Put your values in here, replacing the existing ones",
          align = "center"),
       p("The data starts off with 2000 rounded numbers from a Gaussian distribution, replace that with your data."),
