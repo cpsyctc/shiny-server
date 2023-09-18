@@ -13,7 +13,7 @@ ui <- fluidPage(
       ".title {margin: auto; align: center}"
     )
   ),
-  tags$div(class="title", titlePanel("Confidence interval for a Pearson or Spearman correlation\n\n")),
+  tags$div(class="title", titlePanel("Compute RCI from SD and reliability (and inclusion interval if not 95%)\n\n")),
   
   # Get input values
   sidebarLayout(
@@ -82,7 +82,8 @@ ui <- fluidPage(
       "licenced under a ",
       a("Creative Commons, Attribution Licence-ShareAlike",
         href="http://creativecommons.org/licenses/by-sa/1.0/"),
-      " Please respect that and put an acknowledgement and link back to here if re-using anything from here.")
+      " Please respect that and put an acknowledgement and link back to here if re-using anything from here."),
+    verbatimTextOutput("boilerplate"),
   )
 )
 )
@@ -95,6 +96,10 @@ server <- function(input, output, session) {
   ### start with validation functions
   ### I don't think I actually use any these as I've now used numericInput() to set the ranges
 
+  ### read standard text
+  getBoilerPlate <- function(){
+    readr::read_file("../../boilerplate.txt") 
+  }
   ### 
   ### now the functions adapted from CECPfuns plotCIcorrelation
   ###
@@ -124,6 +129,9 @@ server <- function(input, output, session) {
           input$rel,
           input$ci,
           input$dp)
+  })
+  output$boilerplate <- renderPrint({
+    HTML(getBoilerPlate())
   })
 }
 
