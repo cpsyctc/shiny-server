@@ -1,4 +1,4 @@
-### RCI
+### RCI1
 suppressMessages(library(shiny))
 suppressMessages(library(shinyWidgets))
 
@@ -18,31 +18,6 @@ ui <- fluidPage(
   # Get input values
   sidebarLayout(
     sidebarPanel(
-      p("This shiny app is one of a growing number in ",
-        a("my shiny server", href = "https://shiny.psyctc.org/"),
-        "They complement (1) ",
-        a("my Rblog", href = "https://www.psyctc.org/Rblog/index.html"),
-        "of posts about using R, (2) the ",
-        a("glossary", href = "https://www.psyctc.org/psyctc/book/glossary/"),
-        "linked with ",
-        a("the OMbook, ", href = "https://www.psyctc.org/psyctc/book/"),
-        " and it's all part of the resources of (3)",
-        a("PSYCTC.org", href = "https://www.psyctc.org/psyctc/"),
-        " and linked with (4)",
-        a("the CORE system web site", href = "https://www.coresystemtrust.org.uk"),
-        ""),
-      p("There is a form if you want to ",
-        a("contact me", href = "https://www.psyctc.org/psyctc/contact-me/"),
-        " so do please use that if you think there is anything wrong here,",
-        " or anything that could be improved."),
-      br(),
-      p("There is now an Email announcement list, never updating more than monthly, where I will put up developments of new apps here,",
-        " a summary of updates to the",
-        a("online glossary", href = "https://www.psyctc.org/psyctc/book/glossary/"),
-        "and new posts in the ",
-        a("Rblog.", href = "https://www.psyctc.org/Rblog/index.html"),
-        "You can sign up for that ",
-        a("here", href = "https://ombook.psyctc.org/signup")),
       h3("Put your values in here, replacing the existing ones", align="center"),
     numericInput("SD",
                  "This is your baseline score standard deviation (must be positive))",
@@ -51,7 +26,7 @@ ui <- fluidPage(
                  max = 10^9,
                  width="100%"),
     numericInput("rel",
-                 "Appropriate reliability, generally this should be the Cronback alpha from your data but may be a referential value.",
+                 "Appropriate reliability, generally this should be the Cronbach's alpha from your data but may be a referential value.",
                  value = .9,
                  min = 0,
                  max = 1,
@@ -83,7 +58,7 @@ ui <- fluidPage(
       a("Creative Commons, Attribution Licence-ShareAlike",
         href="http://creativecommons.org/licenses/by-sa/1.0/"),
       " Please respect that and put an acknowledgement and link back to here if re-using anything from here."),
-    verbatimTextOutput("boilerplate"),
+    htmlTemplate("boilerplate.html")
   )
 )
 )
@@ -96,10 +71,6 @@ server <- function(input, output, session) {
   ### start with validation functions
   ### I don't think I actually use any these as I've now used numericInput() to set the ranges
 
-  ### read standard text
-  getBoilerPlate <- function(){
-    readr::read_file("../../boilerplate.txt") 
-  }
   ### 
   ### now the functions adapted from CECPfuns plotCIcorrelation
   ###
@@ -129,9 +100,6 @@ server <- function(input, output, session) {
           input$rel,
           input$ci,
           input$dp)
-  })
-  output$boilerplate <- renderPrint({
-    HTML(getBoilerPlate())
   })
 }
 

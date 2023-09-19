@@ -26,31 +26,6 @@ ui <- fluidPage(
   # Get input values
   sidebarLayout(
     sidebarPanel(
-      p("This shiny app is one of a growing number in ",
-        a("my shiny server", href = "https://shiny.psyctc.org/"),
-        "They complement (1) ",
-        a("my Rblog", href = "https://www.psyctc.org/Rblog/index.html"),
-        "of posts about using R, (2) the ",
-        a("glossary", href = "https://www.psyctc.org/psyctc/book/glossary/"),
-        "linked with ",
-        a("the OMbook, ", href = "https://www.psyctc.org/psyctc/book/"),
-        " and it's all part of the resources of (3)",
-        a("PSYCTC.org", href = "https://www.psyctc.org/psyctc/"),
-        " and linked with (4)",
-        a("the CORE system web site", href = "https://www.coresystemtrust.org.uk"),
-        ""),
-      p("There is a form if you want to ",
-        a("contact me", href = "https://www.psyctc.org/psyctc/contact-me/"),
-        " so do please use that if you think there is anything wrong here,",
-        " or anything that could be improved."),
-      br(),
-      p("There is now an Email announcement list, never updating more than monthly, where I will put up developments of new apps here,",
-        " a summary of updates to the",
-        a("online glossary", href = "https://www.psyctc.org/psyctc/book/glossary/"),
-        "and new posts in the ",
-        a("Rblog.", href = "https://www.psyctc.org/Rblog/index.html"),
-        "You can sign up for that ",
-        a("here", href = "https://ombook.psyctc.org/signup")),
       h3("Put your values in here, replacing the existing ones",
          align = "center"),
       p("The data starts off with 2000 rounded numbers from a Gaussian distribution, replace that with your data."),
@@ -101,7 +76,8 @@ ui <- fluidPage(
         "licenced under a ",
         a("Creative Commons, Attribution Licence-ShareAlike",
           href = "http://creativecommons.org/licenses/by-sa/1.0/"),
-        " Please respect that and put an acknowledgement and link back to here if re-using anything from here.")
+        " Please respect that and put an acknowledgement and link back to here if re-using anything from here."),
+      htmlTemplate("boilerplate.html")
     )
   )
 )
