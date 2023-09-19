@@ -1,6 +1,7 @@
 ### CSC1
 suppressMessages(library(shiny))
 suppressMessages(library(shinyWidgets))
+suppressMessages(library(tidyverse))
 
 # Define UI for application that does the work
 ui <- fluidPage(
@@ -82,7 +83,8 @@ ui <- fluidPage(
         a("Creative Commons, Attribution Licence-ShareAlike",
           href="http://creativecommons.org/licenses/by-sa/1.0/"),
         " Please respect that and put an acknowledgement and link back to here if re-using anything from here."),
-      htmlTemplate("boilerplate.html")
+      hr(),
+      includeHTML("https://shiny.psyctc.org/boilerplate.html")
     )
   )
 )
