@@ -2,9 +2,15 @@
 
 suppressMessages(library(shiny))
 suppressMessages(library(shinyWidgets))
+suppressMessages(library(shiny.telemetry))
+
+### trying to get telemetry working
+telemetry <- Telemetry$new() # 1. Initialize telemetry with default options
 
 # Define UI for application that does the work
 ui <- fluidPage(
+  ### next bit of telemetry
+  use_telemetry(), # 2. Add necessary Javascript to Shiny
   setBackgroundColor("#ffff99"),
   ### this is from
   ### https://stackoverflow.com/questions/51298177/how-to-centre-the-titlepanel-in-shiny
@@ -74,6 +80,8 @@ ui <- fluidPage(
 
 # Define server logic required
 server <- function(input, output, session) {
+  ### final bit of telemetry
+  telemetry$start_session() # 3. Minimal setup to track events
   ### 
   ### start with validation functions
   ###
