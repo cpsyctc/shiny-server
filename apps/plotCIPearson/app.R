@@ -69,7 +69,6 @@ ui <- fluidPage(
     ),
     
     mainPanel(
-      h3("Your input and results", align = "center"),
       plotOutput("CIplot", height = 500),
       p("App created by Chris Evans",
         a("PSYCTC.org", href = "https://shiny.psyctc.org/CIproportion/"),
@@ -105,32 +104,23 @@ server <- function(input, output, session) {
   
   makePlot <- function(R, minN, maxN, step, conf, minY, maxY) {
     suppressWarnings(suppressMessages(plotCIPearson(corr = input$R, 
-                                                             minN = input$minN,
-                                                             maxN = input$maxN, 
-                                                             step = input$step,
-                                                             conf = input$conf, 
-                                                             minY = input$minY, 
-                                                             maxY = input$maxY))) -> p
+                                                    minN = input$minN,
+                                                    maxN = input$maxN, 
+                                                    step = input$step,
+                                                    conf = input$conf, 
+                                                    minY = input$minY, 
+                                                    maxY = input$maxY))) -> p
     return(p)
   }
   
-  output$res <- renderText({
+  output$CIplot <- renderPlot({
     validate(
       need(checkNvalues(input$minN, input$maxN), 
            "maxN must be greater than minN"),
       need(checkYvalues(input$minY, input$maxY), 
            "maxY must be greater than minY"),
     )
-    getData(input$R,
-            input$minN,
-            input$maxN,
-            input$step,
-            input$conf,
-            input$minY,
-            input$maxY)
-  })
-  output$CIplot <- renderPlot({
-    makePlot(input$data, input$quartiles, input$ci)
+    makePlot(input$R, input$minN, input$maxN, input$step, input$conf, input$minY, input$maxY)
   })
 }
 # Run the application (ends all shiny apps in the one file, app.R format)
