@@ -13,7 +13,7 @@ ui <- fluidPage(
       ".title {margin: auto; align: center}"
     )
   ),
-  tags$div(class="title", titlePanel("Confidence interval for a Pearson or Spearman correlation\n\n")),
+  tags$div(class="title", titlePanel("Confidence interval for a Pearson correlation\n\n")),
   
   # Get input values
   sidebarLayout(
@@ -49,11 +49,10 @@ ui <- fluidPage(
     h3("Your input and results",align="center"),
     verbatimTextOutput("res"),
     p("This uses parametric assumptions, i.e. that distributions of the variables in the population are Gaussiann\n
-        always dodgy.  The assumption that this CI is OK for Spearman's rho as well as for the Pearson R because, is\n
-        based on the fact that, if there were no ties and underlying Gaussian distributions, then rho is the\n
-        Pearson R of the ranks of the two variables.  That's a lot of assumptions but if all you have is the observed\n
-        correlations and the <i>n</i> it's as good as you can get.  If you have the raw data I recommend you use the \n
-        bootstrap CI of the Pearson correlation.  I'll put up an app to do that when I can.\n\n"),
+        always dodgy.  If distributions are not Gaussian the CI can have coverage considerably off from what you want\n
+        but if all you have is the observed correlations and the <i>n</i> it's as good as you can get.\n
+        If you have the raw data I recommend you use the bootstrap CI of the Pearson correlation.\n
+      I'll put up an app to do that when I can.\n\n"),
     p("App created by Chris Evans",
       a("PSYCTC.org",href="https://shiny.psyctc.org/CIproportion/"),
       "licenced under a ",
