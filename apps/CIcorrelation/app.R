@@ -50,7 +50,7 @@ ui <- fluidPage(
     verbatimTextOutput("res"),
     p("This uses parametric assumptions, i.e. that distributions of the variables in the population are Gaussiann\n
         always dodgy.  If distributions are not Gaussian the CI can have coverage considerably off from what you want\n
-        but if all you have is the observed correlations and the <i>n</i> it's as good as you can get.\n
+        but if all you have is the observed correlations and the n it's as good as you can get.\n
         If you have the raw data I recommend you use the bootstrap CI of the Pearson correlation.\n
       I'll put up an app to do that when I can.\n\n"),
     p("App created by Chris Evans",
