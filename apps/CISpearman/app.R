@@ -68,7 +68,7 @@ ui <- fluidPage(
     n > 25 and abs(rs) < .9 and if all you have is the observed correlation and the n it's as good as you can get.\n
     If you have the raw data I recommend you use a bootstrap CI of the correlation.  I'll put up an app to do that when I can.\n\n"),
       p("App created by Chris Evans",
-        a("PSYCTC.org",href="https://shiny.psyctc.org/CIproportion/"),
+        a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/"),
         "licenced under a ",
         a("Creative Commons, Attribution Licence-ShareAlike",
           href="http://creativecommons.org/licenses/by-sa/1.0/"),

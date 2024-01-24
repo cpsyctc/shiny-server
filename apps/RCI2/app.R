@@ -65,7 +65,7 @@ ui <- fluidPage(
     "to use some 'referential' RCI is an interesting challenge.  I'll do some modelling to",
     "address that soon.\n\n"),
     p("App created by Chris Evans",
-      a("PSYCTC.org",href="https://shiny.psyctc.org/RCI1/"),
+      a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/"),
       "licenced under a ",
       a("Creative Commons, Attribution Licence-ShareAlike",
         href="http://creativecommons.org/licenses/by-sa/1.0/"),

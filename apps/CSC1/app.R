@@ -78,7 +78,7 @@ ui <- fluidPage(
         a("https://doi.org/10.1192/bjp.180.1.51", href="https://doi.org/10.1192/bjp.180.1.51"),
         "\n\n"),
       p("App created by Chris Evans",
-        a("PSYCTC.org",href="https://shiny.psyctc.org/RCI1/"),
+        a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/"),
         "licenced under a ",
         a("Creative Commons, Attribution Licence-ShareAlike",
           href="http://creativecommons.org/licenses/by-sa/1.0/"),
