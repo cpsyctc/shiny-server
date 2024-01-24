@@ -58,7 +58,7 @@ ui <- fluidPage(
       "non-Gaussian distributions in various R packages.  I may add an app for them later.\n\n"),
     p("This is a bit of a niche CI but it's important when thinking about the RCI (Reliable Change Index)\n\n"),
     p("App created by Chris Evans",
-      a("PSYCTC.org",href="https://shiny.psyctc.org/CISD/"),
+      a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/"),
       "licenced under a ",
       a("Creative Commons, Attribution Licence-ShareAlike",
         href="http://creativecommons.org/licenses/by-sa/1.0/"),

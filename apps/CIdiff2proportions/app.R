@@ -65,7 +65,7 @@ ui <- fluidPage(
       p(" "),
       p(" "),
       p("App created by Chris Evans",
-        a("PSYCTC.org",href="https://shiny.psyctc.org/CIproportion/"),
+        a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/"),
         "licenced under a ",
         a("Creative Commons, Attribution Licence-ShareAlike",
           href="http://creativecommons.org/licenses/by-sa/1.0/"),

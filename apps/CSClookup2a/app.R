@@ -121,7 +121,7 @@ ui <- fluidPage(
         ".  This trivial app should be complemented by one using the full power of the lookupCSCgenderAndAge() to ",
         "handle datasets of age, gender and score data ... however, I need to sort out data uploading to achieve that!"),
       p("App created by Chris Evans",
-        a("PSYCTC.org",href="https://shiny.psyctc.org/CIproportion/"),
+        a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/"),
         "licenced under a ",
         a("Creative Commons, Attribution Licence-ShareAlike",
           href="http://creativecommons.org/licenses/by-sa/1.0/"),

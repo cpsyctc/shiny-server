@@ -67,7 +67,7 @@ ui <- fluidPage(
       (or the SE) then it is as good as you can get.  If you have the raw data I recommend you use the \n
       bootstrap CI for the mean.  I'll put up an app to do that when I can.\n\n"),
       p("App created by Chris Evans",
-        a("PSYCTC.org", href = "https://shiny.psyctc.org/CIproportion/"),
+        a("PSYCTC.org", href = "https://www.psyctc.org/psyctc/about-me/"),
         "licenced under a ",
         a("Creative Commons, Attribution Licence-ShareAlike",
           href="http://creativecommons.org/licenses/by-sa/1.0/"),
