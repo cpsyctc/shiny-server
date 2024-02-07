@@ -5,7 +5,7 @@ suppressMessages(library(shiny.telemetry))
 
 ### 1. Initialize telemetry with default options (store to a local logfile)
 telemetry <- Telemetry$new(app_name = "CIcorrelation",
-                           data_storage = DataStorageSQLite$new(db_path = file.path("telemetry.sqlite")))
+                           data_storage = DataStorageSQLite$new(db_path = file.path("../../telemetry.sqlite")))
 
 # Define UI for application that does the work
 ui <- fluidPage(
