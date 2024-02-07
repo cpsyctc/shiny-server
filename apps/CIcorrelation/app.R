@@ -3,7 +3,7 @@ suppressMessages(library(shiny))
 suppressMessages(library(shinyWidgets))
 suppressMessages(library(shiny.telemetry))
 
-### 1. Initialize telemetry with default options (store to a local logfile)
+### 1. Initialize telemetry storing, I hope, to sqlite db in shiny server root
 telemetry <- Telemetry$new(app_name = "CIcorrelation",
                            data_storage = DataStorageSQLite$new(db_path = file.path("../../telemetry.sqlite")))
 
