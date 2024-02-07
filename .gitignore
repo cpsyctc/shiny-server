@@ -2,3 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
+telemetry.sqlite
+tmp*
+*in_progress*

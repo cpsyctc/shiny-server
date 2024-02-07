@@ -6,10 +6,17 @@ suppressMessages(library(tidyverse))
 suppressMessages(library(shiny))
 suppressMessages(library(shinyWidgets))
 suppressMessages(library(pwr)) # for power calculation
+suppressMessages(library(shiny.telemetry))
 # suppressMessages(library(shinyvalidate)) # input validation
+
+### 1. Initialize telemetry with default options (store to a local logfile)
+telemetry <- Telemetry$new(app_name = "Bonferroni1",
+                           data_storage = DataStorageSQLite$new(db_path = file.path("../../telemetry.sqlite"))) 
+
 
 # Define UI for application that does the work
 ui <- fluidPage(
+  use_telemetry(), # 2. Add necessary Javascript to Shiny
   setBackgroundColor("#ffff99"),
   ### this is from
   ### https://stackoverflow.com/questions/51298177/how-to-centre-the-titlepanel-in-shiny
@@ -33,7 +40,7 @@ ui <- fluidPage(
   # Get input values
   sidebarLayout(
     sidebarPanel(
-      h3("Put your values in here, adjust with the adjuster arrows to replace the existing ones",
+      h3("Put your values in here, for reasons I don't understand, best to delete existing values to change them, rather than using the arrows",
          align = "center"),
       numericInput("overallAlpha",
                    "The overall, experimentwise, reportwise, alpha you want",
@@ -127,6 +134,7 @@ retInputs <- function(overallAlpha, effectSize, yourK, maxK, minN, maxN) {
 
 # Define server logic required
 server <- function(input, output, session) {
+  telemetry$start_session(track_inputs = TRUE, track_values = TRUE) # 3. Track basics and inputs and input values
   ### input validation #1. Create an InputValidator object (from shinyvalidate)
   ### see https://rstudio.github.io/shinyvalidate/articles/shinyvalidate.html
   # iv <- InputValidator$new()
