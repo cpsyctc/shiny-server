@@ -5,6 +5,12 @@ suppressMessages(library(shinyWidgets))
 suppressMessages(library(DT))
 suppressMessages(library(tidyverse))
 suppressMessages(library(CECPfuns))
+suppressMessages(library(shiny.telemetry))
+
+### 1. Initialize telemetry with default options (store to a local logfile)
+telemetry <- Telemetry$new(app_name = "Scattergram and correlation",
+                           data_storage = DataStorageSQLite$new(db_path = file.path("../../telemetry.sqlite"))) 
+
 set.seed(12345)
 n <- 200
 vecDat1 <- round(rnorm(n), 3)
@@ -12,6 +18,9 @@ vecDat2 <- vecDat1 + round(rnorm(n), 3)
 
 # Define UI for application that does the work
 ui <- fluidPage(
+  
+  use_telemetry(), # 2. Add necessary Javascript to Shiny
+  
   setBackgroundColor("#ffff99"),
   ### this is from
   ### https://stackoverflow.com/questions/51298177/how-to-centre-the-titlepanel-in-shiny
@@ -85,6 +94,14 @@ ui <- fluidPage(
 
 # Define server logic required
 server <- function(input, output, session) {
+  
+  ### from https://community.rstudio.com/t/r-crashes-when-closing-shiny-app-window-instead-of-clicking-red-stop-button-in-rstudio/131951
+  session$onSessionEnded(function() {
+    stopApp()
+  })
+  
+  telemetry$start_session(track_inputs = TRUE, track_values = TRUE) # 3. Track basics and inputs and input values
+  
   ### 
   ### start with validation functions
   ###
@@ -138,6 +155,7 @@ server <- function(input, output, session) {
                       100 * input$ci, 
                       "%")
   })
+  
   reacDP <- reactive({
     input$dp
   })
@@ -166,11 +184,11 @@ server <- function(input, output, session) {
       left_join(tmpTibY, by = "statistic")
   })
   
-  makePlot <- function(tibDat) {
+  makePlot <- function(tibDat, ci = input$ci) {
     ggplot(data = reacTibDat(),
-           aes(x = x, y = y)) +
-      geom_point() +
-      geom_smooth() -> p
+                            aes(x = x, y = y)) +
+                       geom_point() +
+                       geom_smooth(level = ci, method = "loess") -> p
     return(p)
   }
   

@@ -1,9 +1,17 @@
 ### Cronbach1Feldt
-library(shiny)
-library(shinyWidgets)
+suppressMessages(library(shiny))
+suppressMessages(library(shinyWidgets))
+suppressMessages(library(shiny.telemetry))
+
+### 1. Initialize telemetry with default options (store to a local logfile)
+telemetry <- Telemetry$new(app_name = "Cronbach1Feldt",
+                           data_storage = DataStorageSQLite$new(db_path = file.path("../../telemetry.sqlite"))) 
 
 # Define UI for application that does the work
 ui <- fluidPage(
+  
+  use_telemetry(), # 2. Add necessary Javascript to Shiny
+  
   ### setBackgroundColor() is from shinyWidgets
   setBackgroundColor("#ffff99"),
   ### this is from
@@ -77,6 +85,14 @@ ui <- fluidPage(
 
 # Define server logic required
 server <- function(input, output, session) {
+  
+  ### from https://community.rstudio.com/t/r-crashes-when-closing-shiny-app-window-instead-of-clicking-red-stop-button-in-rstudio/131951
+  session$onSessionEnded(function() {
+    stopApp()
+  })
+  
+  telemetry$start_session(track_inputs = TRUE, track_values = TRUE) # 3. Track basics and inputs and input values
+  
   ### 
   ### start with validation functions
   ###

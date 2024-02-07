@@ -75,7 +75,13 @@ ui <- fluidPage(
 # Define server logic required
 ### this is the standard shiny server constructor
 server <- function(input, output, session) {
-  telemetry$start_session(track_inputs = FALSE, track_values = FALSE) # 3. Minimal setup to track events, not even inputs
+  
+  ### from https://community.rstudio.com/t/r-crashes-when-closing-shiny-app-window-instead-of-clicking-red-stop-button-in-rstudio/131951
+  session$onSessionEnded(function() {
+    stopApp()
+  })
+  
+  telemetry$start_session(track_inputs = TRUE, track_values = TRUE) # 3. Minimal setup to track events, not even inputs
   ### 
   ### start with validation functions
   ### I don't think I actually use any these as I've now used numericInput() to set the ranges
