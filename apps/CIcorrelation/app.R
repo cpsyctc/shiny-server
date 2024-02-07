@@ -4,12 +4,12 @@ suppressMessages(library(shinyWidgets))
 suppressMessages(library(shiny.telemetry))
 
 ### 1. Initialize telemetry with default options (store to a local logfile)
-# telemetry <- Telemetry$new(app_name = apt install sqlite3"CIcorrelation",
-#                            data_storage = DataStorageSQLite$new(db_path = file.path("../../telemetry.sqlite"))) 
+telemetry <- Telemetry$new(app_name = "CIcorrelation",
+                           data_storage = DataStorageSQLite$new(db_path = file.path("../../telemetry.sqlite")))
 
 # Define UI for application that does the work
 ui <- fluidPage(
-  # use_telemetry(), # 2. Add necessary Javascript to Shiny
+  use_telemetry(), # 2. Add necessary Javascript to Shiny
   setBackgroundColor("#ffff99"),
   ### this is from
   ### https://stackoverflow.com/questions/51298177/how-to-centre-the-titlepanel-in-shiny
@@ -75,7 +75,7 @@ ui <- fluidPage(
 # Define server logic required
 ### this is the standard shiny server constructor
 server <- function(input, output, session) {
-  # telemetry$start_session(track_inputs = FALSE, track_values = FALSE) # 3. Minimal setup to track events, not even inputs
+  telemetry$start_session(track_inputs = FALSE, track_values = FALSE) # 3. Minimal setup to track events, not even inputs
   ### 
   ### start with validation functions
   ### I don't think I actually use any these as I've now used numericInput() to set the ranges
