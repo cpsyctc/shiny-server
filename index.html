@@ -101,21 +101,19 @@
     </div>
   </div>
   <div id = "main">
-  This is the start of the server.  It is aesthetically crude (as you can see!) and has only a few fairly simple apps, but it's a start!</body>
+  The current list of apps follows, click on one you want, allow a second or so for it to open.</body>
 <h2>Apps</h1>
 <ul>
-  <li><b>Simple apps to get useful values from a few inputs</b></li>
+  <li><b>Apps giving useful values from a few inputs</b>
   <ul>
+  <li><b><i>Apps saving you from looking up formulae or using a calculator</i></b></li>
     <li><a href="./apps/RCI1/">App that gives you the RCI (Reliable Change Index) for given baseline score SD, reliability and the inclusion interval you want (usually .95, i.e. 95%)</a>.  Uses the <i></i>getRCIfromSDandAlpha()</i> function from the <a href="https://cecpfuns.psyctc.org/">CECPfuns R library</a> but the maths is trivial.</li>
     <li><a href="./apps/RCI2/">App which extends that to give you a plausible interval around that RCI</a> using the confidence interval for the SD given your n.</li>
     <li><a href="./apps/CSC1/">App that gives you the CSC (Clinically Significant Change)</a> method c cut off value for given referential help-seeking and non-help-seeking means and SDs.  The maths is trivial for the CSC but this does show the plot of the probabilities underpinning the CSC and that it balances the misclassification rates (given truly Gaussian distributions!).</li>
     <li><a href="./apps/g_from_d_and_n/">App that gives you Hedges's g effect size measure</a> given reported Cohen's d and the n.  See also my <a href="https://www.psyctc.org/Rblog/">Rblog</a> post: <a href="https://www.psyctc.org/Rblog/posts/2024-01-19-hedgess-g/">Hedges's g</a>.</li>
     <li><a href="./apps/CSClookup2a/">App that gives you the appropriate CSC (and hence CSC classification)</a> given a YP-CORE score, age and gender.  It allows use of lookup tables for the CSC for the UK and Ireland and for Italy.  See also my <a href="https://www.psyctc.org/Rblog/">Rblog</a> post: <a href="https://www.psyctc.org/Rblog/posts/2024-01-21-lookupcsc2/">CSC by gender and age</a> for more on this.</li>
-  </ul>
-  <li><b>Confidence interval apps</b></li>
-  <ul>
-    <li><i><b>Apps given confidence intervals from observed counts or statistics and dataset sizes</b></i>  These can be useful if you have these counts and/or stats from your own data or if you are looking at reports that give those but don't give confidence intervals.</li>
-    <ul>
+
+    <li><i><b>Apps giving confidence intervals from observed counts or statistics and dataset sizes</b></i><br>These can be useful if you have these statistics from a report that doesn't give the confidence intervals.</li>
       <li><a href="./apps/CIproportion/">App that gives you a confidence interval around an observed proportion</a> given the total <i>n</i>, x the (smaller) number of interest within that <i>n</i> and the width of CI you want (usually .95, i.e. 95%).  Uses the binconf() function from the Hmisc R library which uses the Wilson method to get the CI.</li>
       <li><a href="./apps/CIdiff2proportions/">App that gives you a confidence interval around the difference between two independent proportions</a> given the total <i>n</i>, x in each dataset/group, the numbers of interest within each group <i>n</i> and the width of CI you want (usually .95, i.e. 95%).  Gives what I call a "biplane plot" of the two CIs.</li>
       <li><a href="./apps/CImean/">App that gives you a confidence interval (CI) around an observed mean</a> given that value, either the observed SD or SE, the width of CI you want (usually .95, i.e. 95%) and the <i>n</i> of the dataset from which the alpha was obtained.  The maths is parametric and can be sensitive to non-Gaussian distributions, bootstrap CI definitely preferred if you have the raw data.</li>
@@ -124,31 +122,28 @@
       <li><a href="./apps/CISpearman/">App that gives you a confidence interval around an observed Spearman correlation</a> given the total <i>n</i>, Rs the correlation and the width of CI you want (usually .95, i.e. 95%). I used to say the Pearson CI could be used but that is a very poor approximation, this is better.</li>
       <li><a href="./apps/Cronbach1Feldt/">App that gives you a confidence interval (CI) around an observed Cronbach alpha value</a> given that value, the width of CI you want (usually .95, i.e. 95%) and the <i>n</i> of the dataset from which the alpha was obtained.  The maths is parametric but fairly robust to non-Gaussian distributions.</li>
       <li><a href="./apps/ECDFplot/">App that gives you a confidence interval (CI) around observed quantiles of a distribution</a> given the data, the quantiles you want and the width of CI you want (usually .95, i.e. 95%) and the <i>n</i> of the dataset from which the alpha was obtained.  Uses Nyblom's method to get robust CIs for the quantiles.</li>
-  </ul>
-    <li><i><b>Apps to give bootstrap based confidence intervals from raw data</b></i></li>  Still to come: I need to work out good ways for users to upload raw data into shiny apps first.</li>
-  </ul>
-    <li><b>Apps to give plots</b></li>
-      <ul>
-        <li><i><b>From population parameters or sample statistics</b></i>
-        <ul>
+
+    <li><b><i>Apps to give plots from population parameters or sample statistics</b></i></li>
           <li><a href="./apps/plotCIPearson/">App that gives a plot of the CIs around an observed Pearson correlation</a> for a range of dataset sizes (n).  The CI can be anything from .7 to .999 but defaults to .95, i.e. 95%.  Parametric CI as it assumes you only have an R value of interest to you, not data. Probably mainly for teaching/illustration.</li>
-        </ul>
-        <li><i><b>From raw data</b></i></li> 
+          <li><b><i>Illustrative and modelling apps</i></b></li>
+        <li><a href="./apps/Screening/">Model of a simple screening design taking the n, prevalence and the sensitivity and specificity of the screening test.</a>  Gives full screening table and the PPV and NPV.  Changing the prevalence allows you to see how much this affects PPV and NPV. Created to complement <a href="https://ombook.psyctc.org/book/">OMbook</a> <a hef = "https://www.psyctc.org/psyctc/glossary2/screening/">glossary</a> entry about screening</a>.</li>
+        <li><a href="./apps/Bonferroni/">Model of how the statistical power to detect an effect is affected by using the Bonferroni correction for multiple tests.</a> Created to complement <a href="https://ombook.psyctc.org/book/">OMbook</a> <a hef = "https://www.psyctc.org/psyctc/glossary2/screening/">glossary</a> entry about the Bonferroni correction</a>.</li>
+          </ul>
+        <li><b>Apps using uploaded data pasted in directly</b></li> 
         <ul>
           <li><a href="./apps/ECDFplot/">App that gives you a confidence interval (CI) around observed quantiles of a distribution</a> given the data, the quantiles you want and the width of CI you want (usually .95, i.e. 95%) and the <i>n</i> of the dataset from which the alpha was obtained.  Uses Nyblom's method to get robust CIs for the quantiles.</li>
         </ul>
-      </ul>
-      <li><b>Didactic and modelling apps</b></li>
-      <ul>
-        <li><a href="./apps/Screening/">Model of a simple screening design taking the n, prevalence and the sensitivity and specificity of the screening test.</a>  Gives full screening table and the PPV and NPV.  Changing the prevalence allows you to see how much this affects PPV and NPV. Created to complement <a href="https://ombook.psyctc.org/book/">OMbook</a> <a hef = "https://www.psyctc.org/psyctc/glossary2/screening/">glossary</a> entry about screening</a>.</li>
-        <li><a href="./apps/Bonferroni/">Model of how the statistical power to detect an effect is affected by using the Bonferroni correction for multiple tests.</a> Created to complement <a href="https://ombook.psyctc.org/book/">OMbook</a> <a hef = "https://www.psyctc.org/psyctc/glossary2/screening/">glossary</a> entry about the Bonferroni correction</a>.</li>
-      </ul>
+        <li><b>Apps using uploaded file data</b></li>
+        <ul>
+          <li>Coming shortly</li>
+        </ul>
+      
   </ul>
   <h2>Email update list</h2>
   <p>There is now an Email announcement list, never updating more than monthly, where I will put up developments of new apps here but also a summary of updates to the 
   <a href="https://www.psyctc.org/psyctc/book/glossary/">online glossary</a> and new posts in 
   <a href="https://www.psyctc.org/Rblog/index.html">the Rblog</a>. You can sign up for the update list 
   <a href="https://ombook.psyctc.org/signup">here</a> to be alerted to new things.</p>
-  <p><i>Last updated 27.viii.23</i></p>
+  <p><i>Last updated 9.ii.24</i></p>
   </div>
 </html>
