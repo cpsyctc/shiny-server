@@ -1,0 +1,17 @@
+{"app_name":["myApp"],"type":["login"],"session":["19b1543ece780c535bb53fadb50b972a"],"details":["{\"username\":[\"5596f830-eef5-4a72-bdcf-8028bddcdf14\"]}"],"time":[1707597575.3133]}
+{"app_name":["myApp"],"type":["browser"],"session":["19b1543ece780c535bb53fadb50b972a"],"details":["{\"value\":[\"Chrome 110\"]}"],"time":[1707597575.3969]}
+{"app_name":["myApp"],"type":["input"],"session":["19b1543ece780c535bb53fadb50b972a"],"details":["{\"id\":[\"n\"],\"value\":{}}"],"time":[1707597579.145]}
+{"app_name":["myApp"],"type":["input"],"session":["19b1543ece780c535bb53fadb50b972a"],"details":["{\"id\":[\"n\"],\"value\":{}}"],"time":[1707597579.5797]}
+{"app_name":["myApp"],"type":["input"],"session":["19b1543ece780c535bb53fadb50b972a"],"details":["{\"id\":[\"n\"],\"value\":{}}"],"time":[1707597581.0551]}
+{"app_name":["myApp"],"type":["input"],"session":["19b1543ece780c535bb53fadb50b972a"],"details":["{\"id\":[\"n\"],\"value\":{}}"],"time":[1707597582.5159]}
+{"app_name":["myApp"],"type":["logout"],"session":["19b1543ece780c535bb53fadb50b972a"],"details":["{\"username\":{}}"],"time":[1707597589.346]}
+{"app_name":["myApp"],"type":["login"],"session":["9aa8d7931a0511d06212daf32f8444a0"],"details":["{\"username\":[\"7ee2bb43-4c20-4fc3-9cb6-b882b4d3f71f\"]}"],"time":[1707597615.5658]}
+{"app_name":["myApp"],"type":["browser"],"session":["9aa8d7931a0511d06212daf32f8444a0"],"details":["{\"value\":[\"Chrome 110\"]}"],"time":[1707597615.6099]}
+{"app_name":["myApp"],"type":["input"],"session":["9aa8d7931a0511d06212daf32f8444a0"],"details":["{\"id\":[\"n\"],\"value\":{}}"],"time":[1707597618.4048]}
+{"app_name":["myApp"],"type":["input"],"session":["9aa8d7931a0511d06212daf32f8444a0"],"details":["{\"id\":[\"n\"],\"value\":{}}"],"time":[1707597621.6336]}
+{"app_name":["myApp"],"type":["input"],"session":["9aa8d7931a0511d06212daf32f8444a0"],"details":["{\"id\":[\"n\"],\"value\":{}}"],"time":[1707597622.6444]}
+{"app_name":["myApp"],"type":["logout"],"session":["9aa8d7931a0511d06212daf32f8444a0"],"details":["{\"username\":{}}"],"time":[1707597641.0819]}
+{"app_name":["myApp"],"type":["login"],"session":["ffec603851986c5a72114431316e3bda"],"details":["{\"username\":[\"d3d61658-bc73-4a07-a36e-55f0cce79679\"]}"],"time":[1707597713.41]}
+{"app_name":["myApp"],"type":["browser"],"session":["ffec603851986c5a72114431316e3bda"],"details":["{\"value\":[\"Chrome 110\"]}"],"time":[1707597713.4542]}
+{"app_name":["myApp"],"type":["input"],"session":["ffec603851986c5a72114431316e3bda"],"details":["{\"id\":[\"n\"],\"value\":{}}"],"time":[1707597716.2592]}
+{"app_name":["myApp"],"type":["logout"],"session":["ffec603851986c5a72114431316e3bda"],"details":["{\"username\":{}}"],"time":[1707597720.4618]}

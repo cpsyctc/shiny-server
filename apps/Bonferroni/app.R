@@ -6,17 +6,17 @@ suppressMessages(library(tidyverse))
 suppressMessages(library(shiny))
 suppressMessages(library(shinyWidgets))
 suppressMessages(library(pwr)) # for power calculation
-# suppressMessages(library(shiny.telemetry))
+suppressMessages(library(shiny.telemetry))
 # suppressMessages(library(shinyvalidate)) # input validation
 
 ### 1. Initialize telemetry with default options (store to a local logfile)
-# telemetry <- Telemetry$new(app_name = "Bonferroni1",
-#                            data_storage = DataStorageSQLite$new(db_path = file.path("../../telemetry.sqlite"))) 
+telemetry <- Telemetry$new(app_name = "Bonferroni1",
+                           data_storage = DataStorageSQLite$new(db_path = file.path("../../telemetry.sqlite")))
 
 
 # Define UI for application that does the work
 ui <- fluidPage(
-  # use_telemetry(), # 2. Add necessary Javascript to Shiny
+  use_telemetry(), # 2. Add necessary Javascript to Shiny
   setBackgroundColor("#ffff99"),
   ### this is from
   ### https://stackoverflow.com/questions/51298177/how-to-centre-the-titlepanel-in-shiny
@@ -134,7 +134,7 @@ retInputs <- function(overallAlpha, effectSize, yourK, maxK, minN, maxN) {
 
 # Define server logic required
 server <- function(input, output, session) {
-  # telemetry$start_session(track_inputs = TRUE, track_values = TRUE) # 3. Track basics and inputs and input values
+  telemetry$start_session(track_inputs = TRUE, track_values = TRUE) # 3. Track basics and inputs and input values
   
   ### from https://community.rstudio.com/t/r-crashes-when-closing-shiny-app-window-instead-of-clicking-red-stop-button-in-rstudio/131951
   session$onSessionEnded(function() {
