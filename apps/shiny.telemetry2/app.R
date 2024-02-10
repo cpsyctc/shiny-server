@@ -1,7 +1,8 @@
 library(shiny)
-library(shinyjs)
+library(shinyjs) # for the javascript bits
 library(shiny.telemetry)
 
+### create javascript code, I've set expiry time to 5 days not the .5 they suggested
 jsCode <- "
  shinyjs.bindcookie = function(params) {
    var cookie = Cookies.get(params[0]);
@@ -10,7 +11,7 @@ jsCode <- "
 
 
  shinyjs.setcookie = function(params) {
-   Cookies.set(params[1], escape(params[0]), { expires: 0.5 });
+   Cookies.set(params[1], escape(params[0]), { expires: 5 });
  }
 "
 
@@ -46,6 +47,7 @@ shinyApp(
       uid }) |>
       bindEvent(input$jscookie, ignoreNULL = FALSE)
     
+    ### their example is just logging logins
     observe({
       telemetry$log_login(username = proxy_user_id())
     })
