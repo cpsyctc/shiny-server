@@ -13,6 +13,9 @@ ui <- fluidPage(
   
   use_telemetry(), # 2. Add necessary Javascript to Shiny
   
+  ### fix things so that we can use Mathjax
+  # withMathJax(),
+
   setBackgroundColor("#ffff99"),
   ### this is from
   ### https://stackoverflow.com/questions/51298177/how-to-centre-the-titlepanel-in-shiny
@@ -78,9 +81,10 @@ ui <- fluidPage(
       verbatimTextOutput("missClassHS"),
       plotOutput("plot", height = 500),
       p(" "),
-      p("This uses the trivial maths of method c straight out of the original work on the CSC.",
-        "The starting values before you put yours in are from:\n"),
-      p("Evans, C., Connell, J., Barkham, M., Margison, F., McGrath, G., Mellor-Clark, J., & Audin, K. (2002).\n",
+      p("This uses the trivial maths of method c straight out of the original work on the CSC.  That's to say that the equation is:"),
+      uiOutput('formula'),
+      p(" "),
+      p("The starting values in that input box, before you put your values in, are from:\nEvans, C., Connell, J., Barkham, M., Margison, F., McGrath, G., Mellor-Clark, J., & Audin, K. (2002).\n",
         "Towards a standardised brief outcome measure: Psychometric properties and utility of the CORE-OM.\n",
         "British Journal of Psychiatry, 180(1), 51–60. Scopus.",
         a("https://doi.org/10.1192/bjp.180.1.51", href="https://doi.org/10.1192/bjp.180.1.51"),
@@ -209,6 +213,13 @@ output$plot <- renderPlot({
           input$minPoss, 
           input$maxPoss)
 })
+
+### and now the Mathjax formula
+output$formula <- renderUI({
+  # withMathJax(renderText('Dynamic output 1:  $$\\alpha^2$$'))
+  withMathJax(renderText('$$ \\frac{mean_{nhs}*sd_{hs}+mean_{hs}*sd_{nhs}}{sd_{nhs}+sd_{hs}} $$ where nhs = non-help-seeking and hs = help-seeking.'))
+})
+
 }
 
 # Run the application (ends all shiny apps in the one file, app.R format)
