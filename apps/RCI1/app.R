@@ -13,8 +13,8 @@ ui <- fluidPage(
   use_telemetry(), # telemetry 2. Add necessary Javascript to Shiny
   
   setBackgroundColor("#ffff99"),
-  # h1(HTML("<center>Compute RCI from SD and reliability (and inclusion interval if not 95%)</center>")),
-  h1(HTML("Compute RCI from SD and reliability<br>(and inclusion interval if not 95%)"), align = "center"),
+  h1(HTML("Compute RCI from SD and reliability<br>(and inclusion interval if not 95%)"), 
+     align = "center"),
   
   # Get input values
   sidebarLayout(
@@ -69,6 +69,9 @@ ui <- fluidPage(
                          h3("Maths of the RCI "),
                          p("Ignore this next bit if you don't like equations!"),
                          p("The full equation is:"),
+                         p("The equation is:"),
+                         pre("SD * sqrt(2) * sqrt(1 - rel) * qnorm(1 - (1 - ci) / 2)"),
+                         p("The MathJax typesetting of the equation is a bit ugly:"),
                          withMathJax("$$SD*\\sqrt{2}*\\sqrt{1-rel}*qnorm(1 - \\frac{(1 - ci)}{2})$$"),
                          p("where 'SD' is the SD you input, 'rel' the reliability you input and 'ci' the inclusion interval you wanted, usually .95, i.e. 95% and 'qnorm' is the quantile of the standard Gaussian/Normal distribution for that ci."),
                          p("So if you asked for the usual 95% interval that simplifies to this:"),
