@@ -1,7 +1,19 @@
 ### file_upload_and_download
 
+### Done:
+# checked inputs, started on tabset
+# got very simple ggplot working
+# got DT::datatable working
+# added background tab
+
+### To do:
+# work out how to allow interactive control of plot
+# add statistics tab
+
 suppressMessages(library(shiny))
 suppressMessages(library(shiny.telemetry))
+suppressMessages(library(tidyverse))
+suppressMessages(library(DT))
 
 ### 1. Initialize telemetry with default options (store to a local logfile)
 telemetry <- Telemetry$new(app_name = "file_upload_and_download",
@@ -12,8 +24,8 @@ ui <- fluidPage(
   
   use_telemetry(), # 2. Add necessary Javascript to Shiny
   
-  # App title ----
-  titlePanel("Uploading Files"),
+  setBackgroundColor("#ffff99"),
+  h1(HTML("Skeleton data upload app")),
   
   # Sidebar layout with input and output definitions ----
   sidebarLayout(
@@ -22,7 +34,8 @@ ui <- fluidPage(
     sidebarPanel(
       
       # Input: file type ----
-      radioButtons("fileType", "What type of file do you want to use?",
+      radioButtons("fileType", 
+                   "What type of file do you want to use?",
                    choices = c("R data (usually stored with  'save()'" = "rda",
                                "Excel xls file" = "xls",
                                "Excel xlsx file" = "xlsx",
@@ -33,10 +46,12 @@ ui <- fluidPage(
                    selected = "csv"),
                    
       # Input: Select a file ----
-      fileInput("file1", "Choose a file in the format you chose above"),
+      fileInput("file1", "Choose the file"),
       
       # Input: Checkbox if file has header ----
-      checkboxInput("header", "If format is not R or SPSS you probably have variable names in the first row", TRUE),
+      checkboxInput("header", 
+                    "Check this if first row of data gives variable names",
+                    TRUE),
 
       numericInput("sheetNum", "If you are inputting a spreadsheet give the number of the worksheet",
                    value = 1,
@@ -48,7 +63,8 @@ ui <- fluidPage(
       tags$p("If you are inputting a csv file you have to define the separator"),
       
       # Input: Select separator ----
-      radioButtons("sep", "Separator",
+      radioButtons("sep", 
+                   "Separator",
                    choices = c(Comma = ",",
                                Semicolon = ";"),
                    selected = ","),
@@ -56,39 +72,48 @@ ui <- fluidPage(
       tags$p("And if you are inputting a tsv or csv file you have to define the quote character"),
       
       # Input: Select quotes ----
-      radioButtons("quote", "Quote",
+      radioButtons("quote", 
+                   "Quote",
                    choices = c(None = "",
                                "Double Quote" = '"',
                                "Single Quote" = "'"),
                    selected = '"'),
-      # 
-      # selectInput("idVar", "Choose ID variable (optional)", character(0)),
-      # 
-      # selectInput("genderVar", "Choose gender variable", character(0)),
-      # 
-      # selectInput("ageVar", "Choose age variable", character(0)),
-      # 
-      # selectInput("scoreVar", "Choose variable for score to classify", character(0))
-      
     ),
     
     # Main panel for displaying outputs ----
     mainPanel(
-      
-      # textOutput("fileName"),
-      # 
-      textOutput("variableName"),
-      
-      uiOutput('dropdownID'),
-      uiOutput('dropdownGender'),
-      uiOutput('dropdownAge'),
-      uiOutput('dropdownScore'),
-      
-      # Output: Data file ----
-      tableOutput("contents")
-      
+      # Output: Tabset w/ plot, summary, and table ----
+      tabsetPanel(type = "tabs",
+                  tabPanel("Select variable", 
+                           textOutput("variableName"),
+                           
+                           uiOutput('dropdownID'),
+                           # uiOutput('dropdownGender'),
+                           # uiOutput('dropdownAge'),
+                           # uiOutput('dropdownScore'),
+                           
+                           # Output: Data file ----
+                           tableOutput("top20")),
+                  tabPanel("Histogram", plotOutput("plot")),
+                  tabPanel("Summary", verbatimTextOutput("summary")),
+                  tabPanel("Table", 
+                           p(" "),
+                           p("This shows all the data for the selected variable.  Buttons at the bottom allow you to export the data."),
+                           p(" "),
+                           p(" "),
+                           DT::dataTableOutput("contents")),
+                  
+                  tabPanel("Background", 
+                           p("App created 22.iii.24 by Chris Evans",
+                             a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/")),
+                           p("Last updated 22.iii.24."),
+                           p("Licenced under a ",
+                             a("Creative Commons, Attribution Licence-ShareAlike",
+                               href="http://creativecommons.org/licenses/by-sa/1.0/"),
+                             " Please respect that and put an acknowledgement and link back to here if re-using anything from here."),
+                           includeHTML("https://shiny.psyctc.org/boilerplate.html"))
+      ),
     )
-    
   )
 )
 
@@ -166,18 +191,41 @@ server <- function(input, output, session) {
   
   output$dropdownID <- renderUI({
     req(input$file1)
-    selectInput('var', 'Select variable to analyse', names(fullData()))
+    selectInput("var", 
+                "Select the variable to analyse", 
+                names(fullData()))
   })
   
-    selectedData <- reactive({
+  selectedData <- reactive({
     req(input$var)
-    
     fullData() %>%
       select(input$var)
   })
+  
+  output$top20 <- renderTable({ 
+    selectedData() %>%
+      filter(row_number() < 21)
+    })
 
-  # output$contents <- renderTable({ fullData()[c(input$idVar, input$genderVar)] })
-  output$contents <- renderTable({ selectedData() })
+  output$contents <- DT::renderDataTable(
+    DT::datatable({selectedData()},
+                  extensions = "Buttons",
+                  options = list(                                                     
+                    fixedColumns = TRUE,
+                    autoWidth = TRUE,
+                    ordering = TRUE,
+                    dom = 'frtipB',
+                    editable = FALSE,
+                    buttons = c('copy', 'csv', 'excel', "pdf")
+                  ),
+    )
+  )
+  
+  output$plot <- renderPlot({
+    ggplot(data = fullData(),
+           aes_string(x = input$var)) +
+      geom_histogram() 
+  })
 
 }
 
