@@ -122,6 +122,11 @@ server <- function(input, output, session) {
   })
   
   getCIaroundSD <- function(SD, SDorVar, n, ci, dp) {
+    req(input$SD,
+        input$SDorVar,
+        input$n,
+        input$ci,
+        input$dp)
     k <- n - 1 # df for the chisq values for the probabilities at the ends of the CI
     ### confidence limits are just the SD multiplied by those values
     UCL <- SD * sqrt(k) / sqrt(qchisq((1 - ci) / 2, k))
@@ -164,18 +169,6 @@ server <- function(input, output, session) {
   }
   
   output$res <- renderText({
-    # validate(
-    #   need(checkForPosInt(input$n, minInt = 0), 
-    #        "n must be a positive integer > 10 and < 10^9"),
-    #   need(checkNumRange(input$R, minx = -1, maxx = 1, incEq = TRUE),
-    #        "R must be a value >= -1.0 and <= 1.0"),
-    #   need(checkNumRange(input$ci, minx = .69999, maxx = 1, incEq = FALSE),
-    #        "ci must be a value > .7 and < .99"),
-    #   need(checkForPosInt(input$dp, minInt = 1, maxInt = 5),
-    #        "dp must be a value between 1 and 5")
-    # )
-    # require(input$SD)
-    # require(input$SDorVar)
         getCIaroundSD(reactiveSD(),
                   input$SDorVar,
                   input$n,
