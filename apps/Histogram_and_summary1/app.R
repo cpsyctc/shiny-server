@@ -112,7 +112,10 @@ ui <- fluidPage(
                            uiOutput("xLab"),
                            uiOutput("yLab"),
                            plotOutput("plot"),
-                           downloadGGPlotButtonUI("plotDownload", "this-plot")),
+                           downloadGGPlotButtonUI("plotDownload", "this-plot"),
+                           p(" "),
+                           p("Thanks to Keith Newman for the download handler: ",
+                             a("shinyDownload", href="https://github.com/keithnewman/shinyDownload/?tab=readme-ov-file"))),
                   
                   tabPanel("Summary", 
                            p("The table below gives some simple descriptive statistics for your data"),
