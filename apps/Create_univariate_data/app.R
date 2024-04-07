@@ -115,7 +115,7 @@ ui <- fluidPage(
                    max = 9,
                    step = 1,
                    width = "100%"),
-      helpText("Must be NA or between 0 and 9 inclusive, setting 0 rounds to nearest integer"),
+      helpText("Must be NA or between 0 and 9 inclusive, setting 0 rounds to nearest integer (simple way to get discrete integer data)"),
       
       actionButton("generate", "Generate the data!"),
       
