@@ -5,7 +5,7 @@ suppressMessages(library(shiny.telemetry))
 suppressMessages(library(tidyverse))
 
 ### telemetry 1. Initialize telemetry with default options (store to a local sqlite database)
-telemetry <- Telemetry$new(app_name = "RCI1",
+telemetry <- Telemetry$new(app_name = "Create_univariate_data",
                            data_storage = DataStorageSQLite$new(db_path = file.path("../../telemetry.sqlite"))) 
 
 # Define UI for application that does the work
