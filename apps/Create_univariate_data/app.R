@@ -28,7 +28,7 @@ ui <- fluidPage(
   # Get input values
   sidebarLayout(
     sidebarPanel(
-      h4("Define what you want and hit the generate button", align="center"),
+      h4("Define what you want and then hit the generate button", align="center"),
       
       radioButtons("dist", "Distribution type:",
                    c("Gaussian ('Normal')" = "Gauss",
@@ -127,22 +127,15 @@ ui <- fluidPage(
       # Output: Tabset w/ plot, summary, and table ----
       tabsetPanel(type = "tabs",
                   tabPanel("Data vector", 
-                           verbatimTextOutput("rawDat")
-                           # verbatimTextOutput("outputMessage"),
-                           # p(" "),
-                           # p("As raw numbers that you can copy and paste elsewhere, first space separated:"),
-                           # verbatimTextOutput("resSpace"),
-                           # p("As raw numbers that you can copy and paste elsewhere, next comma separated:"),
-                           # verbatimTextOutput("resComma"),
-                           # p("As raw numbers that you can copy and paste elsewhere, semicolon separated:"),
-                           # verbatimTextOutput("resSemicolon"),
-                           # p("As raw numbers that you can copy and paste elsewhere, finally tab separated:"),
-                           # verbatimTextOutput("resTab"),
+                           verbatimTextOutput("rawDat1"),
+                           uiOutput("dataSeparator"),
+                           p(" "),
+                           verbatimTextOutput("rawDat2")
                   ), 
                   
                   tabPanel("Data table",
                            p("If you have generated your sample this shows the same as a long table with two variables, the row number and then the values.  ",
-                           "The buttons at the bottom allow you to export the data."),
+                             "The buttons at the bottom allow you to export the data."),
                            p(" "),
                            DT::dataTableOutput("dataTable")),
                   
@@ -188,9 +181,6 @@ server <- function(input, output, session) {
   telemetry$start_session(track_inputs = TRUE, track_values = TRUE) # telemetry 3. Track basics and inputs and input values
   
   data <- eventReactive(input$generate, {
-    # validate(
-    #   need(input$dist == "contUnif" & (input$max > input$min), "Your population maximum must be bigger than the population minimum!")
-    # )
     if (input$dist == "contUnif" & (input$max <= input$min)) {
       validate("If chosen distribution is continuous uniform then the population maximum must be bigger than the population minimum ")
     }
@@ -210,20 +200,46 @@ server <- function(input, output, session) {
     length(data())
   })
   
-  output$rawDat <- renderText({
+  output$dataSeparator <- renderUI({
+    ### breakthrough!!!! - make new input conditional on earlier reactive result
+    if (!is.na(nRowData()) & nRowData() > 0) {
+      radioButtons("charSeparator", "You can chose an alternative data separator:",
+                   c("Leave it as space" = " ",
+                     "Comma" = ", ",
+                     "Semicolon" = "; ",
+                     "Tab" = "\t"),
+                   selected = "Comma")
+    } else {
+      return(NULL)
+    }
+  })
+  
+  newSeparator <- reactive({
+    input$charSeparator
+  })
+  
+  data2 <- reactive({
+    req(input$charSeparator)
+    paste(data(), collapse = input$charSeparator)
+  })
+  
+  output$rawDat1 <- renderText({    
     paste0("You have ",
            nRowData(),
            " rows of data as follows.\n",
            "   As a space separated vector:\n",
-           paste(data(), collapse = " "),
-           "\n\n   As a comma separated vector:\n",
-           paste(data(), collapse = ", "),
-           "\n\n\   As a semicolon separated vector:\n",
-           paste(data(), collapse = "; "),
-           "\n\n   And finally as a tab separated vector:\n",
-           paste(data(), collapse = "\t ")
-    )
+           paste(data(), collapse = ' '),
+           "\n\n")
   })
+  
+  
+  output$rawDat2 <- renderText({
+    req(input$charSeparator)
+    if(input$charSeparator != " ") {
+      data2()
+    }
+  })
+  
   
   output$dataTable <- DT::renderDataTable(
     DT::datatable({as_tibble(data())},
