@@ -2,10 +2,8 @@
 suppressMessages(library(shiny))
 suppressMessages(library(shinyWidgets))
 suppressMessages(library(shiny.telemetry))
-suppressMessages(library(shinyDownload))
 suppressMessages(library(tidyverse))
 suppressMessages(library(DT))
-suppressMessages(library(flextable))
 suppressMessages(library(CECPfuns))
 
 ### set ggplot defaults
@@ -26,7 +24,10 @@ telemetry <- Telemetry$new(app_name = "CORE-OM_scoring",
 
 itemStem <- "COREOM"
 
-### need to make scores
+### to read data efficiently
+itemsCOREOM <- paste(itemStem, sprintf("%02.0f", 1:34), sep = "")
+
+### needed to make scores
 itemsCOREwbN <- c(4,  14, 17, 31)
 itemsCOREwb <- paste(itemStem, sprintf("%02.0f", itemsCOREwbN), sep = "")
 # itemsCOREwb
@@ -71,23 +72,38 @@ ui <- fluidPage(
       # Input: Select a file ----
       fileInput("file1", "Choose file to upload"),
       
+      numericInput("dp",
+                   "Number of decimal places for the scores",
+                   value = 2,
+                   min = 0,
+                   max = 5,
+                   width = "100%"),
+      helpText("You can change this before or after data has been selected.")
+      
     ),
     
     # Main panel for displaying outputs ----
     mainPanel(
       # Output: Tabset w/ plot, summary, and table ----
       tabsetPanel(type = "tabs",
-
+                  
                   tabPanel("Data", 
                            p(" "),
-                           p("This shows all the unchanged data (well, Date and ID converted to character data) and computed scores.  Buttons at the bottom allow you to export the data."),
+                           p("The data will take a few seconds to appear, be patient!!"),
+                           p("What appears then is the data for any rows that had any non-missing data",
+                             br(),
+                             "Date and ID are converted to character data, scores are prorated by CORE rules.",
+                             br(),
+                             "The buttons allow you to export the data to the clipboard or to save in either CSV or Excel .xlsx format.",
+                             br(),
+                             "You can use all three buttons in any order!"),
                            p(" "),
-                          DT::dataTableOutput("contents")),
-                  
+                           DTOutput("summary")),    
+
                   tabPanel("Background", 
-                           p("App created 16.iv.24 by Chris Evans specifically for Oiatillo Temirov for checking at this point.",
+                           p("App created 16.iv.24 by Chris Evans at this point specifically for Oiatillo Temirov for checking his data.",
                              a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/")),
-                           p("Last updated 16.iv.24."),
+                           p("Last updated 19.iv.24."),
                            p("Licenced under a ",
                              a("Creative Commons, Attribution Licence-ShareAlike",
                                href="http://creativecommons.org/licenses/by-sa/1.0/"),
@@ -107,148 +123,73 @@ server <- function(input, output, session) {
   })
   
   telemetry$start_session(track_inputs = TRUE, track_values = FALSE) # 3. Track basics and inputs and input values
-
+  
   fileSelected <- reactive({
     req(input$file1)
     input$file1$datapath
   })
   
   fullData <- reactive({
-    # input$file1 will be NULL initially. After the user selects
-    # and uploads a file, head of that data file by default,
-    # or all rows if selected, will be shown.
-    
-    vecItems <- paste(itemStem, sprintf("%02.0f", 1:34), sep = "")
-    
+
     suppressMessages(readxl::read_xlsx(path = fileSelected(),
-                                       sheet = 2) %>%
-                       select(1:36) %>%
-                       rename(ID = `Email address`) %>%
-                       mutate(Date = as.character(Date),
-                              ID = as.character(ID))) -> dataInput
-    ### rename the CORE-OM item variables to get shorter names
-    colnames(dataInput)[3:36] <- vecItems
+                                       ### I think this is the most efficient way to get the data
+                                       range = "Data!A2:AJ2500",
+                                       col_names = c("Date", "ID", itemsCOREOM), # adds names and then formats
+                                       col_types = c("text", "text", rep("numeric", 34)))) -> dataInput
+
     
     ### do the scoring
     dataInput %>%
       rowwise() %>%
-      mutate(COREOMtot = getScoreFromItems(c_across(all_of(vecItems)),
-                                           propProrateMin = .1),
-             COREOMnonRisk = getScoreFromItems(c_across(all_of(itemsCOREnr)),
-                                           propProrateMin = .1),
-             COREOMwellB = getScoreFromItems(c_across(all_of(itemsCOREwb)),
-                                               propProrateMin = .1),
-             COREOMprob = getScoreFromItems(c_across(all_of(itemsCOREprob)),
-                                               propProrateMin = .1),
-             COREOMfunc = getScoreFromItems(c_across(all_of(itemsCOREfunc)),
-                                               propProrateMin = .1),
-             COREOMrisk = getScoreFromItems(c_across(all_of(itemsCORErisk)),
-                                               propProrateMin = .1)) %>%
-      ungroup() -> dataInput
-
+      mutate(nMissing = getNNA(c_across(COREOM01:COREOM34))) %>%
+      filter(!(nMissing == 34 & is.na(Date) & is.na(ID))) %>%
+      mutate(COREOMtot = round(getScoreFromItems(c_across(all_of(itemsCOREOM)),
+                                           propProrateMin = .1), input$dp),
+             COREOMnonRisk = round(getScoreFromItems(c_across(all_of(itemsCOREnr)),
+                                               propProrateMin = .1), input$dp),
+             COREOMwellB = round(getScoreFromItems(c_across(all_of(itemsCOREwb)),
+                                             propProrateMin = .1), input$dp),
+             COREOMprob = round(getScoreFromItems(c_across(all_of(itemsCOREprob)),
+                                            propProrateMin = .1), input$dp),
+             COREOMfunc = round(getScoreFromItems(c_across(all_of(itemsCOREfunc)),
+                                            propProrateMin = .1), input$dp),
+             COREOMrisk = round(getScoreFromItems(c_across(all_of(itemsCORErisk)),
+                                            propProrateMin = .1), input$dp)) %>%
+      ungroup() %>%
+      select(ID, Date, COREOMtot:COREOMrisk, COREOM01:COREOM34) -> dataInput
+    
     return(dataInput)
   })
   
-  varNames <- reactive({
-    colnames(fullData())
+  fileStubName <- reactive({
+    req(input$file1)
+    fileExt <- tools::file_ext(input$file1$name) # get the full filename
+    fileStubName <- str_replace(input$file1$name, fixed(fileExt), "") # strip the extension
+    fileStubName <- str_replace(fileStubName, "(\\.)+$", "") # remove any terminal "."!
+    fileStubName
   })
-  
-  selectedData <- reactive({
-    req(input$var)
-    fullData() %>%
-      select(input$var)
-  })
-  
-  output$summary <- DT::renderDataTable(
+
+  output$summary <- DT::renderDataTable(server = FALSE,
     DT::datatable({fullData()},
                   extensions = "Buttons",
-                  options = list(                                                     
-                    fixedColumns = TRUE,
+                  selection = "none",
+                  options = list(
+                    buttons = list(
+                      list(extend = 'csv',   filename =  paste0("scored-", fileStubName())),
+                      list(extend = 'excel', filename =  paste0("scored-", fileStubName()))
+                    ),
+                    ### the important thing is that there is the l to allow for the lengthMenu 
+                    ### https://stackoverflow.com/questions/52645959/r-datatables-do-not-display-buttons-and-length-menu-simultaneously
+                    dom = 'Blrtip',
+                    fixedColumns = list(leftColumns = 2, rightColumns = 6),
                     pageLength = 20,
                     autoWidth = TRUE,
-                    ordering = TRUE,
-                    dom = 'frtipB',
+                    ordering = FALSE,
                     editable = FALSE,
-                    searching = FALSE,
-                    buttons = c('copy', 'csv', 'excel', "pdf")
-                  ),
+                    searching = FALSE),
     )
   )
   
-  output$top20 <- renderTable({ 
-    fullData() %>%
-      filter(row_number() < 21)
-  })
-  
-  output$contents <- DT::renderDataTable(
-    DT::datatable({fullData()},
-                  extensions = "Buttons",
-                  options = list(                                                     
-                    fixedColumns = TRUE,
-                    autoWidth = TRUE,
-                    ordering = TRUE,
-                    dom = 'frtipB',
-                    editable = FALSE,
-                    searching = FALSE,
-                    buttons = c('copy', 'csv', 'excel', "pdf")
-                  ),
-    )
-  )
-  
-  # output$nBins <- renderUI({
-  #   numericInput("bins", "Number of bins to use in the histogram (between 3 and 60)",
-  #                value = 20,
-  #                min = 3,
-  #                max = 60,
-  #                step = 1,
-  #                width = "100%")
-  # })
-  # output$title <- renderUI({
-  #   textInput("title", "Put something here if you want a title to the plot",
-  #             value = "",
-  #             width ="100%")
-  # })
-  # output$xLab <- renderUI({
-  #   textInput("xLab", "Put something here if you want to override the default x axis label",
-  #             value = "",
-  #             width ="100%")
-  # })
-  # output$yLab <- renderUI({
-  #   textInput("yLab", "Put something here if you want to override the default y axis label",
-  #             value = "",
-  #             width ="100%")
-  # })
-  # output$titleText <- renderText({input$title})
-  # 
-  # histPlot <- reactive({
-  #   req(input$bins)
-  #   ggplot(data = fullData(),
-  #          aes(x = !!input$var)) +
-  #     geom_histogram(bins = input$bins) -> p
-  #   if (input$title != "") {
-  #     p +
-  #       ggtitle(input$title) -> p
-  #   }
-  #   if (input$xLab != "") {
-  #     p +
-  #       xlab(input$xLab) -> p
-  #   }
-  #   if (input$yLab != "") {
-  #     p +
-  #       ylab(input$yLab) -> p
-  #   }
-  #   p
-  # })
-  # 
-  # output$plot <- renderPlot({
-  #   histPlot()
-  # })
-  # 
-  # downloadGGPlotButtonServer(
-  #   id = "plotDownload", # <= this should match the ID used in the UI module
-  #   ggplotObject = histPlot # No parentheses here to pass *expression*
-  # )
-
 }
 
 # Create Shiny app ----
