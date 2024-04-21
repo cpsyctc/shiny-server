@@ -183,7 +183,6 @@ getCORE6Dutil <- function(tibDat) {
                               c(1, 2) ~ 1,
                               c(3, 4) ~ 2,
                               .default = NA)) %>%
-    # select(all_of(itemsCORE6D), starts_with("C6")) %>%
     mutate(
       # COMPUTE CORE6Dsc=(co6D01+co6D15+co6D16+co6D21+co6D33).
       C6Dsc = C6I01 + C6I15 + C6I16 + C6I21 + C6I33,
@@ -417,7 +416,8 @@ server <- function(input, output, session) {
              CORESFAtot,	CORESFAprob,	CORESFAfunc,	CORESFArisk,
              CORESFBtot,	CORESFBprob,	CORESFBfunc,	CORESFBrisk,
              COREOMGP,
-             COREOM6Draw,	C6Dut) -> dataInput2
+             COREOM6Draw,	C6Dut,
+             everything()) -> dataInput2
     
     return(dataInput2)
   })
