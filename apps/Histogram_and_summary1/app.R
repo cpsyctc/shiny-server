@@ -5,7 +5,6 @@ suppressMessages(library(shiny.telemetry))
 suppressMessages(library(shinyDownload))
 suppressMessages(library(tidyverse))
 suppressMessages(library(DT))
-suppressMessages(library(flextable))
 
 ### set ggplot defaults
 theme_set(theme_bw())
@@ -226,9 +225,6 @@ server <- function(input, output, session) {
   
   output$dropdownID <- renderUI({
     req(input$file1)
-    # selectInput("var", 
-    #             "Select the variable to analyse", 
-    #             names(fullData()))
     varSelectInput("var",
                    "Select the variable to analyse",
                    fullData())
