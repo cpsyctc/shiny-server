@@ -193,8 +193,7 @@ ui <- fluidPage(
                                             p("Here is the start of the uploaded data:"),
                                             p(" "),
                                             tableOutput("top20"),
-                                            textOutput("variableName"),
-                                            
+
                                             uiOutput('dropdownID'),
                            ),
                            
@@ -319,10 +318,6 @@ server <- function(input, output, session) {
     }
     
     return(dataInput)
-  })
-  
-  varNames <- reactive({
-    colnames(fullData())
   })
   
   output$dropdownID <- renderUI({
