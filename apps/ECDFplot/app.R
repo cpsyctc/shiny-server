@@ -190,7 +190,7 @@ ui <- fluidPage(
   use_telemetry(), # 2. Add necessary Javascript to Shiny
   
   setBackgroundColor("#ffff99"),
-  h1(HTML("Test of concept: upload or paste")),
+  h1(HTML("ECDF plot with quantiles and CIs for quantiles")),
   
   p("This app is really a test of concept and should be followed by other apps using both paste or uploaded data."),
   p("You input data using the sidebar on the left to select whether you are pasting or uploading."),
