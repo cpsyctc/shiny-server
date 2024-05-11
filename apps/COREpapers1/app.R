@@ -8,14 +8,16 @@ suppressMessages(library(tidyverse))
 suppressMessages(library(DT))
 # suppressMessages(library(CECPfuns))
 
-if(interactive()) {
-  # setwd("/media/chris/Clevo_SSD2/Data/MyR/shiny.psyctc.org/apps/COREpapers1") 
-  suppressMessages(read_csv("tibDat.csv",
+valGetwd <- getwd()
+
+# if(interactive()) {
+#   # setwd("/media/chris/Clevo_SSD2/Data/MyR/shiny.psyctc.org/apps/COREpapers1") 
+  suppressMessages(read_csv(paste0(valGetwd, "//", "tibDat.csv"),
                             progress = FALSE)) -> tibDat
-} else {
-  suppressMessages(read_csv("./apps/COREpapers1/tibDat.csv",
-                            progress = FALSE)) -> tibDat
-}
+# } else {
+#   suppressMessages(read_csv("./apps/COREpapers1/tibDat.csv",
+#                             progress = FALSE)) -> tibDat
+# }
 
 ### values
 vecCOREmeasures <-  c("CORE-OM" = "CORE-OM",
@@ -271,6 +273,9 @@ server <- function(input, output, session) {
   })
   
   telemetry$start_session(track_inputs = TRUE, track_values = FALSE) # 3. Track basics and inputs and input values
+  
+  
+  cat(file=stderr(), "getwd() is:", getwd(), "\n")
   
   output$whichCOREused <- renderText({
     input$whichCOREused
