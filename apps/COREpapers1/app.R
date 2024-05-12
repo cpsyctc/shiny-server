@@ -8,16 +8,11 @@ suppressMessages(library(tidyverse))
 suppressMessages(library(DT))
 # suppressMessages(library(CECPfuns))
 
-valGetwd <- getwd()
-
-# if(interactive()) {
-#   # setwd("/media/chris/Clevo_SSD2/Data/MyR/shiny.psyctc.org/apps/COREpapers1") 
-  suppressMessages(read_csv(paste0(valGetwd, "//", "tibDat.csv"),
-                            progress = FALSE)) -> tibDat
-# } else {
-#   suppressMessages(read_csv("./apps/COREpapers1/tibDat.csv",
-#                             progress = FALSE)) -> tibDat
-# }
+appPath <- getwd()
+# cat(file=stderr(), "serverPath is:", serverPath, "\n")
+# appPath <- paste0(serverPath, "/apps/COREpapers1")
+suppressMessages(read_csv(paste0(appPath, "/", "tibDat.csv"),
+                          progress = FALSE)) -> tibDat
 
 ### values
 vecCOREmeasures <-  c("CORE-OM" = "CORE-OM",
@@ -76,11 +71,72 @@ vecCORElanguages <- c("Brazilian",
                       "Vietnamese", 
                       "Xhosa")
 
+vecCountries <- c("Australia",
+                  "Belorussia",
+                  "Brazil",
+                  "Canada",
+                  "China",
+                  "Colombia",
+                  "Croatia",
+                  "Czech Republic",
+                  "Denmark",
+                  "Ecuador",
+                  "Finland",
+                  "France",
+                  "Germany",
+                  "Iceland",
+                  "India",
+                  "Ireland",
+                  "Israel",
+                  "Italy",
+                  "Japan",
+                  "Kenya",
+                  "Korea",
+                  "Lithuania",
+                  "Malta",
+                  "Mexico",
+                  "Myanmar",
+                  "New Zealand",
+                  "Norway",
+                  "Peru",
+                  "Philippines",
+                  "Poland",
+                  "Portugal",
+                  "Romania",
+                  "Russia",
+                  "Serbia",
+                  "Slovakia",
+                  "South Africa",
+                  "Spain",
+                  "Sweden",
+                  "UK",
+                  "USA",
+                  "Uganda",
+                  "Vietnam")
+
+vecGenderCats <- c("Women",
+                   "Men",
+                   "Unspecified",
+                   "Transgender", 
+                   "Other",
+                   "Non-binary",
+                   "Not applicable",
+                   "Unknown")
+
+vecFormats <- c("Unknown",
+                "Not applicable",
+                "Paper and pencil",
+                "Electronic/automated instruments",
+                "As an interview/Interview-assisted")
+
+tibDat %>%
+  select(AssessmentStructure) %>%
+  distinct() %>%
+  pull() -> vecAssStructure
+
 findMatches <- function(tibDat, searchVarName, idVarName, vecMatches, or = TRUE) {
   ### function to find matches to members of vecMatches in tibDat$varname
   ### can do it as Boolean OR or AND
-  # tibDat %>%
-  #   select({{idVarName}}, {{searchVarName}} ) -> tmpDat
   
   vecSelected <- NA # initialise vector
   
@@ -125,14 +181,22 @@ ui <- fluidPage(
   
   setBackgroundColor("#ffff99"),
   h1(HTML("Search interface to CORE related papers (to end of 2021)")),
+  p(paste0("This app uses the database of 721 papers, in English or Spanish, ",
+           "and indexed before the end of 2021 that referenced or used elements ",
+           "of the CORE system.")),
+  
   
   # Sidebar layout with input and output definitions ----
   sidebarLayout(
     
     # Sidebar panel for inputs ----
     sidebarPanel(
+      p(paste0("Search using entries in this sidebar, the impact on the numbers ",
+               "can be seen in the graph on the right and the table below it.  To get ",
+               "to more detail on the papers go to the tab titled 'DOIs and URLs' ",
+               "where you have access to the DOI and/or URL to find the papers selected.")),
       sliderInput("date1",
-                  "Earliest date (inclusive)",
+                  "Date range: earliest date (inclusive)",
                   min = 1998,
                   max = 2021,
                   value = 1998,
@@ -140,13 +204,18 @@ ui <- fluidPage(
                   round = TRUE,
                   sep = ""),
       sliderInput("date2",
-                  "Latest date (inclusive)",
+                  "Date range: last date (inclusive)",
                   min = 1998,
                   max = 2021,
                   value = 2021,
                   step = 1,
                   round = TRUE,
                   sep = ""),
+      
+      radioButtons("therOrGen",
+                   "Restrict papers by focus (or not)",
+                   choices = c("Treatment", "General population", "Either"),
+                   selected = "Either"),
       
       radioButtons("reqEmpCOREdata",
                    "Restrict papers with CORE instrument data",
@@ -175,10 +244,10 @@ ui <- fluidPage(
                    choices = c("Not important to me", "Yes please!"),
                    selected = "Not important to me"),
       helpText(paste0("This refers to use of a CORE measure in 'ECM',",
-                    "Embedded Change Management, or 'FIT': Feedback Informed Therapy")),
+                      "Embedded Change Management, or 'FIT': Feedback Informed Therapy")),
       
       radioButtons("filterCOREmeasures", 
-                   "Do you want to filter by CORE instruments used?",
+                   "Do you want to filter by CORE instruments used? ('Y' brings up dialogue for this.)",
                    choices = c("Y" = "Y",
                                "N" = "N"),
                    selected = "N"),
@@ -188,15 +257,17 @@ ui <- fluidPage(
                                     "Use Boolean OR or AND across instruments",
                                     choices = c("OR", "AND"),
                                     selected = "OR"),
-                       
-                       checkboxGroupInput("vecWhichCOREused",
-                                          "Paper must have used this/these CORE instruments (unselect to choose)",
-                                          vecCOREmeasures2,
-                                          vecCOREmeasures2),
+                       selectInput("vecWhichCOREused",
+                                   "CORE instruments (shift click to select more than one)",
+                                   vecCOREmeasures2,
+                                   width = "100%",
+                                   selectize = FALSE,
+                                   size = 5,
+                                   multiple = TRUE),
       ),
       
       radioButtons("filterCORElanguages", 
-                   "Do you want to filter by languages of CORE instruments used?",
+                   "Do you want to filter by languages of CORE instruments used? ('Y' brings up dialogue for this.)",
                    choices = c("Y" = "Y",
                                "N" = "N"),
                    selected = "N"),
@@ -206,15 +277,83 @@ ui <- fluidPage(
                                     "Use Boolean OR or AND across instruments",
                                     choices = c("OR", "AND"),
                                     selected = "OR"),
-                       
-                       checkboxGroupInput("vecCORElanguages",
-                                          "Paper must have used this/these CORE instruments (unselect to choose)",
-                                          vecCORElanguages,
-                                          vecCORElanguages),
+                       selectInput("vecCORElanguages",
+                                   "Languages of CORE instruments (shift click to select more than one)",
+                                   vecCORElanguages,
+                                   width = "100%",
+                                   selectize = FALSE,
+                                   size = 5,
+                                   multiple = TRUE),
+      ),
+      
+      radioButtons("filterAssStructure", 
+                   "Do you want to filter by how CORE instrument used? ('Y' brings up dialogue for this.)",
+                   choices = c("Y" = "Y",
+                               "N" = "N"),
+                   selected = "N"),
+      
+      conditionalPanel(condition = "input.filterAssStructure == 'Y'",
+                       radioButtons("or3",
+                                    "Use Boolean OR or AND across instruments",
+                                    choices = c("OR", "AND"),
+                                    selected = "OR"),
+                       selectInput("vecAssStructure",
+                                   "How CORE instrument(s) used (shift click to select more than one)",
+                                   vecAssStructure,
+                                   width = "100%",
+                                   selectize = FALSE,
+                                   size = 5,
+                                   multiple = TRUE),
+      ),
+      
+      radioButtons("filterGenderCats", 
+                   "Do you want to filter by gender categories used? ('Y' brings up dialogue for this.)",
+                   choices = c("Y" = "Y",
+                               "N" = "N"),
+                   selected = "N"),
+      
+      conditionalPanel(condition = "input.filterGenderCats == 'Y'",
+                       radioButtons("or4",
+                                    "Use Boolean OR or AND across instruments",
+                                    choices = c("OR", "AND"),
+                                    selected = "OR"),
+                       selectInput("vecGenderCats",
+                                   "Gender categories used (shift click to select more than one)",
+                                   vecGenderCats,
+                                   width = "100%",
+                                   selectize = FALSE,
+                                   size = 5,
+                                   multiple = TRUE),
+      ),
+      
+      radioButtons("filterFormats", 
+                   "Do you want to filter by measure formats? ('Y' brings up dialogue for this.)",
+                   choices = c("Y" = "Y",
+                               "N" = "N"),
+                   selected = "N"),
+      
+      conditionalPanel(condition = "input.filterFormats == 'Y'",
+                       radioButtons("or5",
+                                    "Use Boolean OR or AND across instruments",
+                                    choices = c("OR", "AND"),
+                                    selected = "OR"),
+                       selectInput("vecFormats",
+                                   "Formats used for measures (shift click to select more than one)",
+                                   vecFormats,
+                                   width = "100%",
+                                   selectize = FALSE,
+                                   size = 5,
+                                   multiple = TRUE),
       ),
       
       textInput("authName",
                 "Text to search for in names of authors",
+                value = ""),
+      helpText("Matching is case insensitive, no wildcards"),
+      
+      
+      textInput("otherMeasure",
+                "Text to search for in names of any non-CORE instruments used",
                 value = ""),
       helpText("Matching is case insensitive, no wildcards")
     ),
@@ -236,19 +375,27 @@ ui <- fluidPage(
                   
                   
                   
-                  tabPanel("Details",
-                           value = 6,
+                  tabPanel("DOIs and URLs",
+                           value = 2,
                            
-                           p("I am increasingly convinced that percentiles, quantiles, are neglected in our field and more informative than means and SDs."),
+                           DT::dataTableOutput("papers2"),
+                  ),
+                  
+                  tabPanel("Non-CORE measures",
+                           value = 3,
                            
+                           p("This shows the non-CORE measures used for papers selected where a non-CORE paper was used"),
+                           p("You can search within the table with the search box"),
+                           p(" "),
+                           DT::dataTableOutput("otherMeasures"),
                   ),
                   
                   tabPanel("General background", 
-                           value = 7,
+                           value = 4,
                            
                            p("App started 10.v.24 by Chris Evans.",
                              a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/")),
-                           p("Last updated 10.v.24."),
+                           p("Last updated 12.v.24."),
                            p("Licenced under a ",
                              a("Creative Commons, Attribution Licence-ShareAlike",
                                href="http://creativecommons.org/licenses/by-sa/1.0/"),
@@ -267,15 +414,14 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
   
+  # cat(file=stderr(), "colnames:", colnames(tibDat), "\n")
+  
   ### from https://community.rstudio.com/t/r-crashes-when-closing-shiny-app-window-instead-of-clicking-red-stop-button-in-rstudio/131951
   session$onSessionEnded(function() {
     stopApp()
   })
   
   telemetry$start_session(track_inputs = TRUE, track_values = FALSE) # 3. Track basics and inputs and input values
-  
-  
-  cat(file=stderr(), "getwd() is:", getwd(), "\n")
   
   output$whichCOREused <- renderText({
     input$whichCOREused
@@ -323,6 +469,33 @@ server <- function(input, output, session) {
     }
   })
   
+  orVal3 <- reactive({
+    req(input$or3)
+    if(input$or3 == "OR") {
+      TRUE
+    } else {
+      FALSE
+    }
+  })
+  
+  orVal4 <- reactive({
+    req(input$or4)
+    if(input$or4 == "OR") {
+      TRUE
+    } else {
+      FALSE
+    }
+  })
+  
+  orVal5 <- reactive({
+    req(input$or5)
+    if(input$or5 == "OR") {
+      TRUE
+    } else {
+      FALSE
+    }
+  })
+  
   data <- reactive({
     validate(
       need(input$date2 >= input$date1, "Second date must be greater or same as first")
@@ -330,9 +503,6 @@ server <- function(input, output, session) {
     
     ### now filter by what CORE instruments used
     if (input$filterCOREmeasures == "Y" & length(input$vecWhichCOREused) > 0) {
-      # cat(file=stderr(), "input$or is:", input$or, "\n")
-      # # cat(file=stderr(), "orVal() is:", orVal, "\n")
-      # cat(file=stderr(), "input$vecWhichCOREused is:", input$vecWhichCOREused, "\n")
       findMatches(tibDat, 
                   WhichCOREInstruments, 
                   shinyID, 
@@ -341,9 +511,6 @@ server <- function(input, output, session) {
     } 
     
     if (input$filterCORElanguages == "Y" & length(input$vecCORElanguages) > 0) {
-      # cat(file=stderr(), "input$or is:", input$or, "\n")
-      # # cat(file=stderr(), "orVal() is:", orVal, "\n")
-      # cat(file=stderr(), "input$vecWhichCOREused is:", input$vecWhichCOREused, "\n")
       findMatches(tibDat, 
                   LanguageOfCORE, 
                   shinyID, 
@@ -351,9 +518,40 @@ server <- function(input, output, session) {
                   or = orVal2()) -> tibDat
     } 
     
+    if (input$filterAssStructure == "Y" & length(input$vecAssStructure) > 0) {
+      findMatches(tibDat, 
+                  AssessmentStructure, 
+                  shinyID, 
+                  input$vecAssStructure, 
+                  or = orVal3()) -> tibDat
+    } 
+    
+    if (input$filterGenderCats == "Y" & length(input$vecGenderCats) > 0) {
+      findMatches(tibDat, 
+                  GenderCategories, 
+                  shinyID, 
+                  input$vecGenderCats, 
+                  or = orVal4()) -> tibDat
+    } 
+    
+    if (input$filterFormats == "Y" & length(input$vecFormats) > 0) {
+      findMatches(tibDat, 
+                  FormatOfMeasure, 
+                  shinyID, 
+                  input$vecFormats, 
+                  or = orVal5()) -> tibDat
+    } 
+    
+    
     ### now filter by year
     tibDat %>%
       filter(Year2021Num >= input$date1 & Year2021Num <= input$date2) -> tibDat
+    
+    ### therapy or general population or either
+    if(input$therOrGen != "Either") {
+      tibDat %>%
+        filter(TherOrGeneral == input$therOrGen) -> tibDat
+    }
     
     ### now filter by OA or not
     if(reqOA() == "Y") {
@@ -390,13 +588,20 @@ server <- function(input, output, session) {
         filter(str_detect(Author, fixed(tmp))) -> tibDat
     }
     
+    ### filter for author name
+    if (input$otherMeasure != "") {
+      tmp <- str_to_lower(input$otherMeasure)
+      tibDat %>%
+        filter(str_detect(OtherMeasureNamesLwr, fixed(tmp))) -> tibDat
+    }
+    
     return(tibDat)
   })
   
   tibPaperDat <- reactive({
     if(nrow(data()) > 0) {
       data() %>%
-        select(ref, DOI, URL)
+        select(cite, DOI, URL)
     } else {
       tibble(ref = "No papers fit these requirements")
     }
@@ -411,6 +616,16 @@ server <- function(input, output, session) {
     }
   })
   
+  tibOtherMeasures <- reactive({
+    if(nrow(data()) > 0) {
+      data() %>%
+        select(ref, OtherMeasureNames) %>%
+        filter(OtherMeasureNames != "")
+    } else {
+      tibble(ref = "No papers fit these requirements")
+    }
+  })
+  
   output$papers <- DT::renderDataTable(
     DT::datatable({tibPaperRefs()},
                   extensions = "Buttons",
@@ -419,13 +634,58 @@ server <- function(input, output, session) {
                     pageLength = 10,
                     autoWidth = TRUE,
                     ordering = TRUE,
+                    dom = 'frtip',
+                    editable = FALSE,
+                    searching = TRUE
+                  )
+    )
+  )
+  
+  output$papers2 <- DT::renderDataTable(
+    DT::datatable({tibPaperDat()},
+                  extensions = "Buttons",
+                  escape = FALSE,
+                  options = list(                                                     
+                    fixedColumns = FALSE,
+                    pageLength = 50,
+                    ### apparently you have to set autoWidth TRUE to control widths
+                    autoWidth = TRUE,
+                    ### this is two nested lists, the targets include the row numbers
+                    ### and are indexed from zero
+                    columnDefs = list(list(width = '300px', targets = c(1, 3))),
+                    ### this next seemed to be necessary to get any control over widths
+                    scrollX = TRUE,
+                    ordering = TRUE,
                     dom = 'frtipB',
                     editable = FALSE,
                     searching = TRUE,
                     buttons = c('copy', 'csv', 'excel', "pdf")
                   )
     )
-  )
+  )  
+  
+  output$otherMeasures <- DT::renderDataTable(
+    DT::datatable({tibOtherMeasures()},
+                  extensions = "Buttons",
+                  escape = FALSE,
+                  options = list(                                                     
+                    fixedColumns = FALSE,
+                    pageLength = 50,
+                    ### apparently you have to set autoWidth TRUE to control widths
+                    autoWidth = TRUE,
+                    ### this is two nested lists, the targets include the row numbers
+                    ### and are indexed from zero
+                    columnDefs = list(list(width = '350px', targets = c(1, 2))),
+                    ### this next seemed to be necessary to get any control over widths
+                    scrollX = TRUE,
+                    ordering = TRUE,
+                    dom = 'frtipB',
+                    editable = FALSE,
+                    searching = TRUE,
+                    buttons = c('copy', 'csv', 'excel', "pdf")
+                  )
+    )
+  )  
   
   ### the basic plot against years
   makePlot <- function(data, date1, date2) {
@@ -469,6 +729,12 @@ server <- function(input, output, session) {
 shinyApp(ui, server)
 
 ### todo
-# sort out shinyID
-# different listings in different tabs
-# additional filtering
+
+### perhaps
+# ? ServiceType
+# ? Ages
+# ? foci
+
+### cosmetics/UE
+# ?? popup abstract?
+# ?? clickable tiles in plot?
