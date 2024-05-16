@@ -219,18 +219,18 @@ ui <- fluidPage(
       
       radioButtons("reqEmpCOREdata",
                    "Restrict papers with CORE instrument data",
-                   choices = c("N", "Y"),
-                   selected = "N"),
+                   choices = c("No", "Yes"),
+                   selected = "No"),
       
       radioButtons("reqOA",
                    "Restrict to Open Access papers",
-                   choices = c("N", "Y"),
-                   selected = "N"),
+                   choices = c("No", "Yes"),
+                   selected = "No"),
       
       radioButtons("reqOpenData",
                    "Restrict to papers with data available",
-                   choices = c("N", "Y"),
-                   selected = "N"),
+                   choices = c("No", "Yes"),
+                   selected = "No"),
       
       radioButtons("paperLang",
                    "Restrict by language of paper",
@@ -247,12 +247,12 @@ ui <- fluidPage(
                       "Embedded Change Management, or 'FIT': Feedback Informed Therapy")),
       
       radioButtons("filterCOREmeasures", 
-                   "Do you want to filter by CORE instruments used? ('Y' brings up dialogue for this.)",
-                   choices = c("Y" = "Y",
-                               "N" = "N"),
-                   selected = "N"),
+                   "Do you want to filter by CORE instruments used? ('Yes' brings up dialogue for this.)",
+                   choices = c("Yes" = "Yes",
+                               "No" = "No"),
+                   selected = "No"),
       
-      conditionalPanel(condition = "input.filterCOREmeasures == 'Y'",
+      conditionalPanel(condition = "input.filterCOREmeasures == 'Yes'",
                        radioButtons("or",
                                     "Use Boolean OR or AND across instruments",
                                     choices = c("OR", "AND"),
@@ -267,12 +267,12 @@ ui <- fluidPage(
       ),
       
       radioButtons("filterCORElanguages", 
-                   "Do you want to filter by languages of CORE instruments used? ('Y' brings up dialogue for this.)",
-                   choices = c("Y" = "Y",
-                               "N" = "N"),
-                   selected = "N"),
+                   "Do you want to filter by languages of CORE instruments used? ('Yes' brings up dialogue for this.)",
+                   choices = c("Yes" = "Yes",
+                               "No" = "No"),
+                   selected = "No"),
       
-      conditionalPanel(condition = "input.filterCORElanguages == 'Y'",
+      conditionalPanel(condition = "input.filterCORElanguages == 'Yes'",
                        radioButtons("or2",
                                     "Use Boolean OR or AND across instruments",
                                     choices = c("OR", "AND"),
@@ -287,12 +287,12 @@ ui <- fluidPage(
       ),
       
       radioButtons("filterAssStructure", 
-                   "Do you want to filter by how CORE instrument used? ('Y' brings up dialogue for this.)",
-                   choices = c("Y" = "Y",
-                               "N" = "N"),
-                   selected = "N"),
+                   "Do you want to filter by how CORE instrument used? ('Yes' brings up dialogue for this.)",
+                   choices = c("Yes" = "Yes",
+                               "No" = "No"),
+                   selected = "No"),
       
-      conditionalPanel(condition = "input.filterAssStructure == 'Y'",
+      conditionalPanel(condition = "input.filterAssStructure == 'Yes'",
                        radioButtons("or3",
                                     "Use Boolean OR or AND across instruments",
                                     choices = c("OR", "AND"),
@@ -307,12 +307,12 @@ ui <- fluidPage(
       ),
       
       radioButtons("filterGenderCats", 
-                   "Do you want to filter by gender categories used? ('Y' brings up dialogue for this.)",
-                   choices = c("Y" = "Y",
-                               "N" = "N"),
-                   selected = "N"),
+                   "Do you want to filter by gender categories used? ('Yes' brings up dialogue for this.)",
+                   choices = c("Yes" = "Yes",
+                               "No" = "No"),
+                   selected = "No"),
       
-      conditionalPanel(condition = "input.filterGenderCats == 'Y'",
+      conditionalPanel(condition = "input.filterGenderCats == 'Yes'",
                        radioButtons("or4",
                                     "Use Boolean OR or AND across instruments",
                                     choices = c("OR", "AND"),
@@ -327,12 +327,12 @@ ui <- fluidPage(
       ),
       
       radioButtons("filterFormats", 
-                   "Do you want to filter by measure formats? ('Y' brings up dialogue for this.)",
-                   choices = c("Y" = "Y",
-                               "N" = "N"),
-                   selected = "N"),
+                   "Do you want to filter by measure formats? ('Yes' brings up dialogue for this.)",
+                   choices = c("Yes" = "Yes",
+                               "No" = "No"),
+                   selected = "No"),
       
-      conditionalPanel(condition = "input.filterFormats == 'Y'",
+      conditionalPanel(condition = "input.filterFormats == 'Yes'",
                        radioButtons("or5",
                                     "Use Boolean OR or AND across instruments",
                                     choices = c("OR", "AND"),
@@ -428,26 +428,26 @@ server <- function(input, output, session) {
   })
   
   reqOA <- reactive({
-    if (input$reqOA == "Y") {
-      return("Y")
+    if (input$reqOA == "Yes") {
+      return("Yes")
     } else {
-      return("N")
+      return("No")
     }
   })
   
   reqOpenData <- reactive({
-    if (input$reqOpenData == "Y") {
-      return("Y")
+    if (input$reqOpenData == "Yes") {
+      return("Yes")
     } else {
-      return("N")
+      return("No")
     }
   })
   
   reqEmbedded <- reactive({
     if (input$embedded == "Yes please!") {
-      return("Y")
+      return("Yes")
     } else {
-      return("N")
+      return("No")
     }
   })
   
@@ -502,7 +502,7 @@ server <- function(input, output, session) {
     )
     
     ### now filter by what CORE instruments used
-    if (input$filterCOREmeasures == "Y" & length(input$vecWhichCOREused) > 0) {
+    if (input$filterCOREmeasures == "Yes" & length(input$vecWhichCOREused) > 0) {
       findMatches(tibDat, 
                   WhichCOREInstruments, 
                   shinyID, 
@@ -510,7 +510,7 @@ server <- function(input, output, session) {
                   or = orVal()) -> tibDat
     } 
     
-    if (input$filterCORElanguages == "Y" & length(input$vecCORElanguages) > 0) {
+    if (input$filterCORElanguages == "Yes" & length(input$vecCORElanguages) > 0) {
       findMatches(tibDat, 
                   LanguageOfCORE, 
                   shinyID, 
@@ -518,7 +518,7 @@ server <- function(input, output, session) {
                   or = orVal2()) -> tibDat
     } 
     
-    if (input$filterAssStructure == "Y" & length(input$vecAssStructure) > 0) {
+    if (input$filterAssStructure == "Yes" & length(input$vecAssStructure) > 0) {
       findMatches(tibDat, 
                   AssessmentStructure, 
                   shinyID, 
@@ -526,7 +526,7 @@ server <- function(input, output, session) {
                   or = orVal3()) -> tibDat
     } 
     
-    if (input$filterGenderCats == "Y" & length(input$vecGenderCats) > 0) {
+    if (input$filterGenderCats == "Yes" & length(input$vecGenderCats) > 0) {
       findMatches(tibDat, 
                   GenderCategories, 
                   shinyID, 
@@ -534,7 +534,7 @@ server <- function(input, output, session) {
                   or = orVal4()) -> tibDat
     } 
     
-    if (input$filterFormats == "Y" & length(input$vecFormats) > 0) {
+    if (input$filterFormats == "Yes" & length(input$vecFormats) > 0) {
       findMatches(tibDat, 
                   FormatOfMeasure, 
                   shinyID, 
@@ -554,13 +554,13 @@ server <- function(input, output, session) {
     }
     
     ### now filter by OA or not
-    if(reqOA() == "Y") {
+    if(reqOA() == "Yes") {
       tibDat %>%
         filter(OpenAccess == "Y") -> tibDat
     }
     
     ### now filter by OD or not
-    if(reqOpenData() == "Y") {
+    if(reqOpenData() == "Yes") {
       tibDat %>%
         filter(DataAvailable == "Y") -> tibDat
     }
@@ -570,7 +570,7 @@ server <- function(input, output, session) {
         filter(Empirical == "Empirical") -> tibDat
     }
     
-    if(reqEmbedded() == "Y") {
+    if(reqEmbedded() == "Yes") {
       tibDat %>%
         filter(EmbeddedInTherapy == "Y") -> tibDat
     }
@@ -699,7 +699,7 @@ server <- function(input, output, session) {
       scale_x_continuous("Years",
                          breaks = 1998:2021,
                          limits = c(1998, 2021)) +
-      scale_y_continuous("n",
+      scale_y_continuous("No",
                          breaks = seq(0, 100, 10),
                          limits = c(0, 100)) +
       ggtitle("Your selection so far",
