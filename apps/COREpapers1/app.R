@@ -194,7 +194,9 @@ ui <- fluidPage(
       p(paste0("Search using entries in this sidebar, the impact on the numbers ",
                "can be seen in the graph on the right and the table below it.  To get ",
                "to more detail on the papers go to the tab titled 'DOIs and URLs' ",
-               "where you have access to the DOI and/or URL to find the papers selected.")),
+               "where you have access to the DOI and/or URL to find the papers selected.  ",
+               "There is a reset button at the bottom of this sidebar if you want to ",
+               "start again with no selections set.")),
       sliderInput("date1",
                   "Date range: earliest date (inclusive)",
                   min = 1998,
@@ -363,6 +365,8 @@ ui <- fluidPage(
       helpText("Matching is case insensitive, no wildcards"),
       
       tags$hr(),
+      helpText(paste0("This button will, as it says, reset all your selections above ",
+                      "so you can start over again easily.")),
       actionButton("reset_input", "Reset inputs")
     ),
     
