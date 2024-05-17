@@ -6,6 +6,7 @@ suppressMessages(library(shiny.telemetry))
 suppressMessages(library(shinyDownload))
 suppressMessages(library(tidyverse))
 suppressMessages(library(DT))
+suppressMessages(library(shinyjs)) # for reset button
 # suppressMessages(library(CECPfuns))
 
 appPath <- getwd()
@@ -174,9 +175,7 @@ telemetry <- Telemetry$new(app_name = "COREpapers1",
                            data_storage = DataStorageSQLite$new(db_path = file.path("../../telemetry.sqlite")))
 
 ui <- fluidPage(
-  
-  # useShinyFeedback(), # include shinyFeedback
-  
+
   use_telemetry(), # 2. Add necessary Javascript to Shiny
   
   setBackgroundColor("#ffff99"),
@@ -188,9 +187,10 @@ ui <- fluidPage(
   
   # Sidebar layout with input and output definitions ----
   sidebarLayout(
-    
     # Sidebar panel for inputs ----
     sidebarPanel(
+      shinyjs::useShinyjs(), # initialises shinyjs package of functions so can use reset button
+      id = "side-panel",
       p(paste0("Search using entries in this sidebar, the impact on the numbers ",
                "can be seen in the graph on the right and the table below it.  To get ",
                "to more detail on the papers go to the tab titled 'DOIs and URLs' ",
@@ -258,12 +258,13 @@ ui <- fluidPage(
                                     choices = c("OR", "AND"),
                                     selected = "OR"),
                        selectInput("vecWhichCOREused",
-                                   "CORE instruments (shift click to select more than one)",
+                                   "CORE instruments (select one or more)",
                                    vecCOREmeasures2,
                                    width = "100%",
                                    selectize = FALSE,
                                    size = 5,
                                    multiple = TRUE),
+                       helpText("Shift click for more than one adjacent instrument, command click for non-adjacent ones on Apples, control click on other machines"),
       ),
       
       radioButtons("filterCORElanguages", 
@@ -274,16 +275,17 @@ ui <- fluidPage(
       
       conditionalPanel(condition = "input.filterCORElanguages == 'Yes'",
                        radioButtons("or2",
-                                    "Use Boolean OR or AND across instruments",
+                                    "Use Boolean OR or AND across languages",
                                     choices = c("OR", "AND"),
                                     selected = "OR"),
                        selectInput("vecCORElanguages",
-                                   "Languages of CORE instruments (shift click to select more than one)",
+                                   "Languages of CORE instruments (select one or more)",
                                    vecCORElanguages,
                                    width = "100%",
                                    selectize = FALSE,
                                    size = 5,
                                    multiple = TRUE),
+                       helpText("Shift click for more than one adjacent language, command click for non-adjacent ones on Apples, control click on other machines"),
       ),
       
       radioButtons("filterAssStructure", 
@@ -294,16 +296,17 @@ ui <- fluidPage(
       
       conditionalPanel(condition = "input.filterAssStructure == 'Yes'",
                        radioButtons("or3",
-                                    "Use Boolean OR or AND across instruments",
+                                    "Use Boolean OR or AND across options",
                                     choices = c("OR", "AND"),
                                     selected = "OR"),
                        selectInput("vecAssStructure",
-                                   "How CORE instrument(s) used (shift click to select more than one)",
+                                   "How CORE instrument(s) used (select one or more options)",
                                    vecAssStructure,
                                    width = "100%",
                                    selectize = FALSE,
                                    size = 5,
                                    multiple = TRUE),
+                       helpText("Shift click for more than one adjacent option, command click for non-adjacent ones on Apples, control click on other machines"),
       ),
       
       radioButtons("filterGenderCats", 
@@ -314,16 +317,17 @@ ui <- fluidPage(
       
       conditionalPanel(condition = "input.filterGenderCats == 'Yes'",
                        radioButtons("or4",
-                                    "Use Boolean OR or AND across instruments",
+                                    "Use Boolean OR or AND across categories",
                                     choices = c("OR", "AND"),
                                     selected = "OR"),
                        selectInput("vecGenderCats",
-                                   "Gender categories used (shift click to select more than one)",
+                                   "Gender categories used (select one or more)",
                                    vecGenderCats,
                                    width = "100%",
                                    selectize = FALSE,
                                    size = 5,
                                    multiple = TRUE),
+                       helpText("Shift click for more than one adjacent category, command click for non-adjacent ones on Apples, control click on other machines"),
       ),
       
       radioButtons("filterFormats", 
@@ -334,16 +338,17 @@ ui <- fluidPage(
       
       conditionalPanel(condition = "input.filterFormats == 'Yes'",
                        radioButtons("or5",
-                                    "Use Boolean OR or AND across instruments",
+                                    "Use Boolean OR or AND across formats",
                                     choices = c("OR", "AND"),
                                     selected = "OR"),
                        selectInput("vecFormats",
-                                   "Formats used for measures (shift click to select more than one)",
+                                   "Formats used (select one or more)",
                                    vecFormats,
                                    width = "100%",
                                    selectize = FALSE,
                                    size = 5,
                                    multiple = TRUE),
+                       helpText("Shift click for more than one adjacent format, command click for non-adjacent ones on Apples, control click on other machines"),
       ),
       
       textInput("authName",
@@ -355,7 +360,10 @@ ui <- fluidPage(
       textInput("otherMeasure",
                 "Text to search for in names of any non-CORE instruments used",
                 value = ""),
-      helpText("Matching is case insensitive, no wildcards")
+      helpText("Matching is case insensitive, no wildcards"),
+      
+      tags$hr(),
+      actionButton("reset_input", "Reset inputs")
     ),
     
     # Main panel for displaying outputs ----
@@ -422,6 +430,11 @@ server <- function(input, output, session) {
   })
   
   telemetry$start_session(track_inputs = TRUE, track_values = FALSE) # 3. Track basics and inputs and input values
+  
+  ### reset button (requires shinyjs package)
+  observeEvent(input$reset_input, {
+    shinyjs::reset("side-panel")
+  })
   
   output$whichCOREused <- renderText({
     input$whichCOREused
