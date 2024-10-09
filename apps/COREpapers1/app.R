@@ -407,7 +407,7 @@ ui <- fluidPage(
                            
                            p("App started 10.v.24 by Chris Evans.",
                              a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/")),
-                           p("Last updated 17.v.24."),
+                           p(HTML("Last updated 3.viii.24, correcting <i>TherOrGeneral</i> to 'Treatment' for Sun <i>et al</i>. (2021)")),
                            p("Licenced under a ",
                              a("Creative Commons, Attribution Licence-ShareAlike",
                                href="http://creativecommons.org/licenses/by-sa/1.0/"),
