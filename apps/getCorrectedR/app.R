@@ -1,12 +1,10 @@
-### Attentuation of correlation by unreliability (2)
+### getCorrectionR: correction of correlation for unreliability
 
 suppressMessages(library(shiny))
 suppressMessages(library(shinyWidgets))
 suppressMessages(library(tidyverse))
 suppressMessages(library(CECPfuns))
 suppressMessages(library(shiny.telemetry))
-suppressMessages(library(shinyDownload)) # from remotes::install_github("keithnewman/shinyDownload")
-suppressMessages(library(DT))
 
 ### set ggplot defaults
 theme_set(theme_bw())
@@ -15,15 +13,15 @@ theme_update(plot.title = element_text(hjust = .5),
              text = element_text(size = 24))
 
 ### 1. Initialize telemetry with default options (store to a local logfile)
-telemetry <- Telemetry$new(app_name = "Attenuation2",
+telemetry <- Telemetry$new(app_name = "getCorrectionR",
                            data_storage = DataStorageSQLite$new(db_path = file.path("../../telemetry.sqlite"))) 
 
 ### function that gets the attenuated R
-getAttenuatedR <- function(unattR, rel1, rel2) {
+getCorrectedR <- function(obsR, rel1, rel2) {
   ### function that takes an unattenuated correlation 
   ### and the reliabilities of the two variables
   ### and returns the attenuated correlation
-  unattR * sqrt(rel1 * rel2)
+  obsR / sqrt(rel1 * rel2)
 }
 
 # Define UI for application that does the work
@@ -32,16 +30,14 @@ ui <- fluidPage(
   use_telemetry(), # 2. Add necessary Javascript to Shiny
   
   setBackgroundColor("#ffff99"),
-  h1(HTML("Attentuation of correlation by unreliability (2)\n\n")),
+  h1(HTML("'Correction' of an observed correlation for unreliability\n\n")),
   
-  p("This app simply uses the standard formula to show how correlation is attenuated by unreliability given an unattenuated correlation",
-    "and two reliabilities of the two variables."),
-  p("I have created another more complicated app that allows you to put in a range of reliabilities and to get a plot of the attenuated correlations",
-    " for a range of unattenuated correlations with a plot and a downloadable table of the correlations: "),
+  p("This app simply uses the standard formula for attenuation of correlation by unreliability given an 'corrected' correlation",
+    "from an observed correlation and reliabilities for the two variables."),
   HTML("<center"),
   p(" "),
-  a("https://shiny.psyctc.org/apps/Attenuation2/", 
-    href = "https://shiny.psyctc.org/apps/Attenuation2/"),
+  a("https://shiny.psyctc.org/apps/getCorrectionR/", 
+    href = "https://shiny.psyctc.org/apps/getCorrectionR/"),
   HTML("</center>"),
   p(" "),
   p(" "),
@@ -54,13 +50,12 @@ ui <- fluidPage(
     sidebarPanel(
       h3("Put your values in here, replacing the existing ones",
          align = "center"),
-      numericInput("unattR",
-                   "Unattenuated correlation you are considering: -1 < R < 1",
+      numericInput("obsR",
+                   "Observed correlation you are considering: -1 < R < 1",
                    value = .65,
                    min = -.1,
                    max = .999999,
                    width = "100%"),
-      helpText("Remember this is unknowable correlation in the model, not an observed correlation."),
       numericInput("rel1",
                    "Reliability of the first variable",
                    value = .7,
@@ -86,9 +81,10 @@ ui <- fluidPage(
     mainPanel(
       tabsetPanel(type = "tabs",
                   
-                  tabPanel("Transformed_correlation",
-                           p("The attenuated correlation for the inputs you gave is:"),
+                  tabPanel("Corrected_correlation",
+                           p("The 'corrected' correlation for the inputs you gave is:"),
                            verbatimTextOutput("res"),
+                           p("Please see the 'Explanation' tab for my health warning about this 'correction'.")
                   ),
                   
                   tabPanel("Explanation",
@@ -102,12 +98,16 @@ ui <- fluidPage(
                            p(paste0("The short summary is that unreliability in the measurement of both variables involved in a correlation ",
                                     "always reduces the observed correlation between the variables from what it would have been had the ",
                                     "variables been measured with no unreliability (which is essentially impossible for any self-report measures ",
-                                    "and pretty much any measures used in our fields.)"))),
+                                    "and pretty much any measures used in our fields.)")),
+                           p(paste0("I am putting 'scare quotes' round 'corrected' throughout this app because I think it's important to be very",
+                                    " cautious about this 'correction' as it can return a correlation above 1.0 where you have a reasonable observed",
+                                    " correlation and low reliabilities and as for any observed correlation, the lower your reliabilities the higher",
+                                    " the 'corrected' correlation which feels uncomfortable to me for all I see the logic!"))),
                   
                   tabPanel("Background", 
-                           p("App created 10.x.24 by Chris Evans",
+                           p("App created 13.x.24 by Chris Evans",
                              a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/")),
-                           p("Last updated 12.x.24."),
+                           p("Last updated 13.x.24."),
                            p("Licenced under a ",
                              a("Creative Commons, Attribution Licence-ShareAlike",
                                href="http://creativecommons.org/licenses/by-sa/1.0/"),
@@ -141,15 +141,15 @@ server <- function(input, output, session) {
   }
   
   transR <- reactive({
-    req(input$unattR)
+    req(input$obsR)
     req(input$rel1)
     req(input$rel2)
     
     validate(
-      need(checkAltB(input$unattR, 1), 
-           "unattR must be smaller than 1"),
-      need(checkAltB(-1, input$unattR), 
-           "unattR must be greater than -1"),
+      need(checkAltB(input$obsR, 1), 
+           "obsR must be smaller than 1"),
+      need(checkAltB(-1, input$obsR), 
+           "obsR must be greater than -1"),
       need(checkAltB(.2, input$rel1), 
            "rel1 must be greater than .2"),
       need(checkAltB(input$rel1, .99999), 
@@ -161,13 +161,20 @@ server <- function(input, output, session) {
       
     )
     
-    getAttenuatedR(input$unattR, input$rel1, input$rel2)
+    getCorrectedR(input$obsR, input$rel1, input$rel2)
   })
   
   # output$titleText <- renderText({input$title})
   
   output$res <- renderText({
-    round(transR(), input$dp)
+    if (transR() < 1) {
+      round(transR(), input$dp)
+    } else {
+      paste0("The 'corrected' correlation is ",
+             round(transR(), input$dp),
+             " which, as you can see, is over 1.0\n which is impossible.\n",
+             " This illustrates that the 'correction' can sometimes be misleading.")
+    }
   })
   
 }
