@@ -135,7 +135,7 @@ ui <- fluidPage(
                            p(" "),
                            p("The formula is simple:"),
                            p(" "),
-                           withMathJax("$$correctedCorr = unattenuatedCorr * \\sqrt{rel_{x} * rel_{y}}$$"),
+                           withMathJax("$$attenuatedR = unattenuatedR * \\sqrt{rel_{x} * rel_{y}}$$"),
                            p(paste0("The short summary is that unreliability in the measurement of both variables involved in a correlation ",
                                     "always reduces the observed correlation between the variables from what it would have been had the ",
                                     "variables been measured with no unreliability (which is essentially impossible for any self-report measures ",
