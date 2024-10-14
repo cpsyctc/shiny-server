@@ -1,4 +1,4 @@
-### getCorrectionR: correction of correlation for unreliability
+### getCorrectedR: correction of correlation for unreliability
 
 suppressMessages(library(shiny))
 suppressMessages(library(shinyWidgets))
@@ -13,7 +13,7 @@ theme_update(plot.title = element_text(hjust = .5),
              text = element_text(size = 24))
 
 ### 1. Initialize telemetry with default options (store to a local logfile)
-telemetry <- Telemetry$new(app_name = "getCorrectionR",
+telemetry <- Telemetry$new(app_name = "getCorrectedR",
                            data_storage = DataStorageSQLite$new(db_path = file.path("../../telemetry.sqlite"))) 
 
 ### function that gets the attenuated R
@@ -36,8 +36,8 @@ ui <- fluidPage(
     "from an observed correlation and reliabilities for the two variables."),
   HTML("<center"),
   p(" "),
-  a("https://shiny.psyctc.org/apps/getCorrectionR/", 
-    href = "https://shiny.psyctc.org/apps/getCorrectionR/"),
+  a("https://shiny.psyctc.org/apps/getCorrectedR/", 
+    href = "https://shiny.psyctc.org/apps/getCorrectedR/"),
   HTML("</center>"),
   p(" "),
   p(" "),
