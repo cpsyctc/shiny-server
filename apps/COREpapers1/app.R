@@ -358,13 +358,14 @@ ui <- fluidPage(
       textInput("authName",
                 "Text to search for in names of authors",
                 value = ""),
-      helpText("Matching is case insensitive, no wildcards"),
+      helpText(paste("Matching is case insensitive, no wildcards.",
+                     "It's also inclusive so if you search for 'carr' you will get papers by Carr, Carrington and any author list with 'carr' in it anywhere.")),
       
       
       textInput("otherMeasure",
                 "Text to search for in names of any non-CORE instruments used",
                 value = ""),
-      helpText("Matching is case insensitive, no wildcards"),
+      helpText("Matching is case insensitive, no wildcards and as for the author search, this is inclusive."),
       
       tags$hr(),
       helpText(paste0("This button will, as it says, reset all your selections above ",
@@ -528,17 +529,28 @@ server <- function(input, output, session) {
     }
   })
   
+  authToFind <- reactive({
+    validate(
+      need(input$authName == "" ||
+             tibDat %>% summarise(gotAmatch = sum(str_detect(Author, str_to_lower(input$authName)))) %>% pull() > 0,
+           "Sorry, that text is not found in any of the author lists")
+    )
+    str_to_lower(input$authName)
+  })
+
+  measureToFind <- reactive({
+    validate(
+      need(input$otherMeasure == "" ||
+             tibDat %>% summarise(gotAmatch = sum(str_detect(OtherMeasureNamesLwr, str_to_lower(input$otherMeasure)), na.rm = TRUE)) %>% pull() > 0,
+           "Sorry, that text is not found in any of the other measures' names")
+    )
+    str_to_lower(input$otherMeasure)
+  })
+  
   data <- reactive({
     validate(
       need(input$date2 >= input$date1, "Second date must be greater or same as first"),
       
-      need(input$authName == "" ||
-             tibDat %>% summarise(gotAmatch = sum(str_detect(Author, input$authName))) %>% pull() > 0,
-           "Sorry, that text is not found in any of the author lists"),
-      
-      need(input$otherMeasure == "" ||
-             tibDat %>% summarise(gotAmatch = sum(str_detect(OtherMeasureNamesLwr, input$otherMeasure), na.rm = TRUE)) %>% pull() > 0,
-           "Sorry, that text is not found in any of the other measures' names")
     )
     
     ### now filter by what CORE instruments used
@@ -622,15 +634,15 @@ server <- function(input, output, session) {
     }
     
     ### filter for author name
-    if (input$authName != "") {
+    if (authToFind() != "") {
       tibDat %>%
-        filter(str_detect(Author, fixed(str_to_lower(input$authName)))) -> tibDat
+        filter(str_detect(Author, fixed(authToFind()))) -> tibDat
     }
     
     ### filter for other measures
-    if (input$otherMeasure != "") {
+    if (measureToFind() != "") {
       tibDat %>%
-        filter(str_detect(OtherMeasureNamesLwr, fixed(str_to_lower(input$otherMeasure)))) -> tibDat
+        filter(str_detect(OtherMeasureNamesLwr, fixed(measureToFind()))) -> tibDat
     }
     
     return(tibDat)
