@@ -530,7 +530,15 @@ server <- function(input, output, session) {
   
   data <- reactive({
     validate(
-      need(input$date2 >= input$date1, "Second date must be greater or same as first")
+      need(input$date2 >= input$date1, "Second date must be greater or same as first"),
+      
+      need(input$authName == "" ||
+             tibDat %>% summarise(gotAmatch = sum(str_detect(Author, input$authName))) %>% pull() > 0,
+           "Sorry, that text is not found in any of the author lists"),
+      
+      need(input$otherMeasure == "" ||
+             tibDat %>% summarise(gotAmatch = sum(str_detect(OtherMeasureNamesLwr, input$otherMeasure), na.rm = TRUE)) %>% pull() > 0,
+           "Sorry, that text is not found in any of the other measures' names")
     )
     
     ### now filter by what CORE instruments used
@@ -615,16 +623,14 @@ server <- function(input, output, session) {
     
     ### filter for author name
     if (input$authName != "") {
-      tmp <- str_to_lower(input$authName)
       tibDat %>%
-        filter(str_detect(Author, fixed(tmp))) -> tibDat
+        filter(str_detect(Author, fixed(str_to_lower(input$authName)))) -> tibDat
     }
     
-    ### filter for author name
+    ### filter for other measures
     if (input$otherMeasure != "") {
-      tmp <- str_to_lower(input$otherMeasure)
       tibDat %>%
-        filter(str_detect(OtherMeasureNamesLwr, fixed(tmp))) -> tibDat
+        filter(str_detect(OtherMeasureNamesLwr, fixed(str_to_lower(input$otherMeasure)))) -> tibDat
     }
     
     return(tibDat)
@@ -721,31 +727,20 @@ server <- function(input, output, session) {
   
   ### the basic plot against years
   makePlot <- function(data, date1, date2) {
-    # ggplot(data = data,
-    #        aes(x = Year2021Num)) +
-    #   geom_bar() +
-    #   geom_vline(xintercept = date1,
-    #              colour = "red") +
-    #   geom_vline(xintercept = date2,
-    #              colour = "red") +
-    #   scale_x_continuous("Years",
-    #                      breaks = 1998:2021,
-    #                      limits = c(1998, 2021)) +
-    #   scale_y_continuous("No",
-    #                      breaks = seq(0, 100, 10),
-    #                      limits = c(0, 100)) +
-    #   ggtitle("Your selection so far",
-    #           subtitle = paste0(nrow(data),
-    #                             " papers of the 721 selected so far")) +
-    #   theme(axis.text.x = element_text(angle = 80,
-    #                                    hjust = 1)) -> p
-    ggplot(data = data,
-           aes(x = as.character(Year2021Num))) +
+    ### some massaging of the data to character
+    data %>%
+      mutate(Year2021char = as.character(Year2021Num)) -> tmpDat
+    date1char <- as.character(date1)
+    date2char <- as.character(date2)
+    ### now make the plot
+    ggplot(data = tmpDat,
+           aes(x = Year2021char)) +
       geom_bar() +
-      geom_vline(xintercept = as.character(date1),
+      geom_vline(xintercept = date1char,
                  colour = "red") +
-      geom_vline(xintercept = as.character(date2),
+      geom_vline(xintercept = date2char,
                  colour = "red") +
+      xlab("Year of publication") +
       ggtitle("Your selection so far",
               subtitle = paste0(nrow(data),
                                 " papers of the 721 selected so far")) +
