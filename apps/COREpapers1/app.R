@@ -7,13 +7,15 @@ suppressMessages(library(shinyDownload))
 suppressMessages(library(tidyverse))
 suppressMessages(library(DT))
 suppressMessages(library(shinyjs)) # for reset button
-# suppressMessages(library(CECPfuns))
 
+### this gets the application path so ...
 appPath <- getwd()
-# cat(file=stderr(), "serverPath is:", serverPath, "\n")
-# appPath <- paste0(serverPath, "/apps/COREpapers1")
-suppressMessages(read_csv(paste0(appPath, "/", "tibDat.csv"),
-                          progress = FALSE)) -> tibDat
+### ... that I can use it to get the data
+# suppressMessages(read_csv(paste0(appPath, "/", "tibDat.csv"),
+#                           progress = FALSE)) -> tibDat
+### that's reading from a CSV, might be faster to use load() and a saved tibble
+# load(paste0(appPath, "/apps/COREpapers1/", "tibDat.rda")) # just for local debugging
+load(paste0(appPath, "/tibDat.rda"))
 
 ### values
 vecCOREmeasures <-  c("CORE-OM" = "CORE-OM",
@@ -396,10 +398,23 @@ ui <- fluidPage(
                   tabPanel("Non-CORE measures",
                            value = 3,
                            
-                           p("This shows the non-CORE measures used for papers selected where a non-CORE paper was used"),
-                           p("You can search within the table with the search box"),
+                           p("This lists the non-CORE measures where one was used"),
+                           p("If you want to find the papers using any of these you can search within the table with the search box"),
                            p(" "),
                            DT::dataTableOutput("otherMeasures"),
+                  ),
+                  
+                  tabPanel("Searching beyond 2021",
+                           value = 3,
+                           
+                           p("Resource constraints meant that we have only done our thorough searching to 2021."),
+                           p("However, if you want to find papers that have emerged since you can use the search we used in Scopus."),
+                           p("I hope to have the searches for PubMed and Web of Science here shortly but for now I've only got SCOPUS working."),
+                           p("Searching is not my expert area!"),
+                           p("You can search within the table with the search box"),
+                           p(" "),
+                           h2("Scopus"),
+                           includeHTML("scopus.html")
                   ),
                   
                   tabPanel("General background", 
@@ -407,7 +422,7 @@ ui <- fluidPage(
                            
                            p("App started 10.v.24 by Chris Evans.",
                              a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/")),
-                           p(HTML("Last updated 3.viii.24, correcting <i>TherOrGeneral</i> to 'Treatment' for Sun <i>et al</i>. (2021)")),
+                           p(HTML("Last updated 21.x.24, improving main barchart and sorting messed up citations")),
                            p("Licenced under a ",
                              a("Creative Commons, Attribution Licence-ShareAlike",
                                href="http://creativecommons.org/licenses/by-sa/1.0/"),
@@ -706,19 +721,31 @@ server <- function(input, output, session) {
   
   ### the basic plot against years
   makePlot <- function(data, date1, date2) {
+    # ggplot(data = data,
+    #        aes(x = Year2021Num)) +
+    #   geom_bar() +
+    #   geom_vline(xintercept = date1,
+    #              colour = "red") +
+    #   geom_vline(xintercept = date2,
+    #              colour = "red") +
+    #   scale_x_continuous("Years",
+    #                      breaks = 1998:2021,
+    #                      limits = c(1998, 2021)) +
+    #   scale_y_continuous("No",
+    #                      breaks = seq(0, 100, 10),
+    #                      limits = c(0, 100)) +
+    #   ggtitle("Your selection so far",
+    #           subtitle = paste0(nrow(data),
+    #                             " papers of the 721 selected so far")) +
+    #   theme(axis.text.x = element_text(angle = 80,
+    #                                    hjust = 1)) -> p
     ggplot(data = data,
-           aes(x = Year2021Num)) +
+           aes(x = as.character(Year2021Num))) +
       geom_bar() +
-      geom_vline(xintercept = date1,
+      geom_vline(xintercept = as.character(date1),
                  colour = "red") +
-      geom_vline(xintercept = date2,
+      geom_vline(xintercept = as.character(date2),
                  colour = "red") +
-      scale_x_continuous("Years",
-                         breaks = 1998:2021,
-                         limits = c(1998, 2021)) +
-      scale_y_continuous("No",
-                         breaks = seq(0, 100, 10),
-                         limits = c(0, 100)) +
       ggtitle("Your selection so far",
               subtitle = paste0(nrow(data),
                                 " papers of the 721 selected so far")) +
