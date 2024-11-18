@@ -25,50 +25,51 @@ ui <- fluidPage(
   sidebarLayout(
     sidebarPanel(
       h3("Put your values in here, replacing the existing ones", align="center"),
-    numericInput("n",
-                 "Total n, (zero or positive integer)",
-                 value = 100,
-                 min = 0,
-                 max = 10^9,
-                 width="100%"),
-    numericInput("R",
-                 "Observed correlation",
-                 value = .7,
-                 min = -1,
-                 max = 1,
-                 width="100%"),
-    numericInput("ci",
-                 "Width of CI (usually .95, i.e. 95% CI, <=.99)",
-                 value = .95,
-                 min = .699999,
-                 max = .999,
-                 width="100%"),
-    numericInput("dp",
-                 "Number of decimal places",
-                 value = 2,
-                 min = 0,
-                 max = 5,
-                 width="100%")
-  ),
-  
-  mainPanel(
-    h3("Your input and results",align="center"),
-    verbatimTextOutput("res"),
-    p("This uses parametric assumptions, i.e. that distributions of the variables in the population are Gaussian.\n
+      numericInput("n",
+                   "Total n, (zero or positive integer)",
+                   value = 100,
+                   min = 0,
+                   max = 10^9,
+                   width="100%"),
+      numericInput("R",
+                   "Observed correlation",
+                   value = .7,
+                   min = -1,
+                   max = 1,
+                   width="100%"),
+      numericInput("ci",
+                   "Width of CI (usually .95, i.e. 95% CI, <=.99)",
+                   value = .95,
+                   min = .699999,
+                   max = .999,
+                   width="100%"),
+      numericInput("dp",
+                   "Number of decimal places",
+                   value = 2,
+                   min = 0,
+                   max = 5,
+                   width="100%")
+    ),
+    
+    mainPanel(
+      h3("Your input and results",align="center"),
+      verbatimTextOutput("res"),
+      p("This uses parametric assumptions, i.e. that distributions of the variables in the population are Gaussian.\n
         That's always dodgy!  If distributions are not Gaussian the CI can have coverage considerably off from what you want\n
         but if all you have is the observed correlations and the n it's as good as you can get.\n
         If you have the raw data I recommend you use the bootstrap CI of the Pearson correlation.\n
       I'll put up an app to do that when I can.\n\n"),
-    p("App created by Chris Evans",
-      a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/"),
-      "licenced under a ",
-      a("Creative Commons, Attribution Licence-ShareAlike",
-        href="http://creativecommons.org/licenses/by-sa/1.0/"),
-      " Please respect that and put an acknowledgement and link back to here if re-using anything from here."),
-    hr(),
-    includeHTML("https://shiny.psyctc.org/boilerplate.html")
+      p("App created by Chris Evans ",
+        a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/"),
+        " 27.xi.23 and last updated (adding SE calculations) 18.xi.24.",
+        "\nIt is licenced under a ",
+        a("Creative Commons, Attribution Licence-ShareAlike",
+          href="http://creativecommons.org/licenses/by-sa/1.0/"),
+        " Please respect that and put an acknowledgement and link back to here if re-using anything from here."),
+      hr(),
+      includeHTML("https://shiny.psyctc.org/boilerplate.html")
+    )
   )
-)
 )
 
 
@@ -84,8 +85,29 @@ server <- function(input, output, session) {
   telemetry$start_session(track_inputs = TRUE, track_values = TRUE) # 3. Minimal setup to track events, not even inputs
   ### 
   ### start with validation functions
-  ### I don't think I actually use any these as I've now used numericInput() to set the ranges
-
+  checkIsInteger <- function(x) {
+    isTRUE(all.equal(x, round(x), tolerance = sqrt(.Machine$double.eps)))
+  }
+  checkIsGtrThan <- function(x, y) {
+    x > y
+  }
+  checkIsLessThan <- function(x, y) {
+    x < y
+  }
+  checkIsGtrOrEq <- function(x, y) {
+    x >= y
+  }
+  checkIsLessThanOrEq <- function(x, y) {
+    x >= y
+  }
+  checkIsInRange <- function(x, lwr, upr, inclusive = TRUE) {
+    if (inclusive) {
+      (x >= lwr) & (x <= upr)
+    } else {
+      (x > lwr) & (x < upr)
+    }
+  }
+  
   ### 
   ### now the functions adapted from CECPfuns plotCIcorrelation
   ###
@@ -98,27 +120,46 @@ server <- function(input, output, session) {
     rl <- tanh(zl)
     ru <- tanh(zu)
     ci.perc <- round(100 * ci)
+    SE1 <- sqrt((1 - R^2) / (n - 2))
+    z <- atanh(.975)
+    SEz <- tanh(1 / sqrt(n - 3))
     retText <- paste0("Given:\n",
                       "   R = ", R,"\n",
                       "   n = ", n,"\n",
                       "   observed correlation = ", round(R, dp),
                       "\n",
                       "   ", ci.perc, "% confidence interval from ", round(rl, dp),
-                      " to ", round(ru, dp),"\n\n")
+                      " to ", round(ru, dp),
+                      "\n\n",
+                      "A nice little sideline here is that there are two ways to compute the SE",
+                      "\n (Standard Error) of a Pearson correlation.",
+                      "\nOne is based on raw correlations, the other, like the calculation ",
+                      "\nof the CI, is based on the z transform.  The first only works well ",
+                      "\nwhen correlations are near zero, the other is more stable across all ",
+                      "\ncorrelation values.  For your values of R and n the first method gives ",
+                      "\n an SE of: ",
+                      round(SE1, dp),
+                      " and the other gives an SE of ",
+                      round(SEz, dp),
+                      ". \n\nIt seems clear that if you really want the SE, use the second!")
     return(retText)
   }
   
   output$res <- renderText({
-    # validate(
-    #   need(checkForPosInt(input$n, minInt = 0), 
-    #        "n must be a positive integer > 10 and < 10^9"),
-    #   need(checkNumRange(input$R, minx = -1, maxx = 1, incEq = TRUE),
-    #        "R must be a value >= -1.0 and <= 1.0"),
-    #   need(checkNumRange(input$ci, minx = .69999, maxx = 1, incEq = FALSE),
-    #        "ci must be a value > .7 and < .99"),
-    #   need(checkForPosInt(input$dp, minInt = 1, maxInt = 5),
-    #        "dp must be a value between 1 and 5")
-    # )
+    validate(
+      need(checkIsInteger(input$n),
+           "n must be a positive integer > 10 and < 10^9"),
+      need(checkIsInRange(input$n, 10, 10^9),
+           "n must be a positive integer > 10 and < 10^9"),
+      need(checkIsInteger(input$dp),
+           "n must be a positive integer > 1 and < 8"),
+      need(checkIsInRange(input$dp, 1, 8),
+           "n must be a positive integer > 1 and < 8"),
+      need(checkIsInRange(input$R, -1, 1),
+           "R must be between -1 and +1"),
+      need(checkIsInRange(input$ci, .7, .999),
+           "ci must be between .7 and .999"),
+    )
     getCI(input$R,
           input$n,
           input$ci,
