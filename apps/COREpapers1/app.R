@@ -584,6 +584,12 @@ server <- function(input, output, session) {
       
     )
     
+    ### filter by paper using CORE data
+    if (input$reqEmpCOREdata == "Yes") {
+      tibDat %>%
+        filter(Empirical == "Empirical") -> tibDat
+    } 
+    
     ### now filter by what CORE instruments used
     if (input$filterCOREmeasures == "Yes" & length(input$vecWhichCOREused) > 0) {
       findMatches(tibDat, 
