@@ -101,20 +101,21 @@
     </div>
   </div>
   <div id = "main">
-  The current list of apps follows, click on one you want, allow a second or so for it to open.</body>
+  The current list of apps follows, click on one you want, allow a second or so for it to open.  
+  <a href="https://www.psyctc.org/psyctc/contact-me/">Do contact me</a> if you hit problems or have questions.</body>
 <h2>Apps</h1>
 <ul>
   <li><b>Apps giving useful values from a few inputs</b>
   <ul>
   <li><b><i>Apps saving you from looking up formulae or using a calculator</i></b></li>
-    <li><a href="./apps/RCI1/">App that gives you the RCI (Reliable Change Index) for given baseline score SD, reliability and the inclusion interval you want (usually .95, i.e. 95%)</a>.  Uses the <i></i>getRCIfromSDandAlpha()</i> function from the <a href="https://cecpfuns.psyctc.org/">CECPfuns R library</a> but the maths is trivial.</li>
-    <li><a href="./apps/RCI2/">App which extends that to give you a plausible interval around that RCI</a> using the confidence interval for the SD given your n.</li>
+    <li><a href="./apps/RCI1/">App that gives you the RCI (Reliable Change Index) for given baseline score SD, reliability and the inclusion interval you want (usually .95, i.e. 95%)</a>.  Uses the <i></i>getRCIfromSDandAlpha()</i> function from the <a href="https://cecpfuns.psyctc.org/">CECPfuns R library</a> but the maths is trivial.  See also this next ...</li>
+    <li><a href="./apps/RCI2/">App which extends that to give you a plausible interval around that RCI</a> using the confidence interval for the SD given your n.  And that links with this next ...</li>
     <li><a href="./apps/CSC1/">App that gives you the CSC (Clinically Significant Change)</a> method c cut off value for given referential help-seeking and non-help-seeking means and SDs.  The maths is trivial for the CSC but this does show the plot of the probabilities underpinning the CSC and that it balances the misclassification rates (given truly Gaussian distributions!).</li>
     <li><a href="./apps/g_from_d_and_n/">App that gives you Hedges's g effect size measure</a> given reported Cohen's d and the n.  See also my <a href="https://www.psyctc.org/Rblog/">Rblog</a> post: <a href="https://www.psyctc.org/Rblog/posts/2024-01-19-hedgess-g/">Hedges's g</a>.</li>
     <li><a href="./apps/CSClookup2a/">App that gives you the appropriate CSC (and hence CSC classification)</a> given a YP-CORE score, age and gender.  It allows use of lookup tables for the CSC for the UK and Ireland and for Italy.  See also my <a href="https://www.psyctc.org/Rblog/">Rblog</a> post: <a href="https://www.psyctc.org/Rblog/posts/2024-01-21-lookupcsc2/">CSC by gender and age</a> for more on this.</li>
-    <li><a href="./apps/Spearman-Brown/">App that gives you the predicted internal reliabilities for different lengths of measures</a> given a reliability and length or a measure.  See also my <a href="https://www.psyctc.org/Rblog/">Rblog</a> post about <a href="https://www.psyctc.org/Rblog/posts/2021-04-09-spearman-brown-formula/">the Spearman-Brown (or Brown-Spearman!) formula</a> that is behind this.</li>
+    <li><a href="./apps/Spearman-Brown/">App that gives you the predicted internal reliabilities for different lengths of measures</a> given a reliability and length or a measure.  See also my <a href="https://www.psyctc.org/Rblog/">Rblog</a> post about <a href="https://www.psyctc.org/Rblog/posts/2021-04-09-spearman-brown-formula/">the Spearman-Brown (or Brown-Spearman!) formula</a> that is behind this.   Links with this next ...</li>
     <li><a href="./apps/Attenuation2/">App that gives you the attenuated correlation for any reliabilities of the two correlated variables and any unattenuated correlation</a>.  See also my OMbook glossary entry: <a href="https://www.psyctc.org/psyctc/glossary2/attenuation-by-unreliability-of-measurement/">Attenuation (by unreliability of measurement)</a>.</li>
-    <li><a href="./apps/Attenuation/">More complicated app for attenuated correlations giving plot and table of values for a range of unattenuated correlations and of reliabilities of one of the variables</a>.</li>
+    <li><a href="./apps/Attenuation/">More complicated app for attenuated correlations giving plot and table of values for a range of unattenuated correlations and of reliabilities of one of the variables</a>.  And both link to this ...</li>
     <li><a href="./apps/getCorrectedR/">App that gives you the 'corrected' correlation from an observed correlation and the reliabilities of the two  variables </a>.  This is the inverse of the last two apps above. Again, see also my OMbook glossary entry: <a href="https://www.psyctc.org/psyctc/glossary2/attenuation-by-unreliability-of-measurement/">Attenuation (by unreliability of measurement)</a>.</li>
     
 
@@ -125,7 +126,7 @@
       <li><a href="./apps/CISD/">App that gives you a confidence interval (CI) around an observed SD or variance</a> given that value, either the observed SD or SE, the width of CI you want (usually .95, i.e. 95%) and the <i>n</i> of the dataset from which the alpha was obtained.  Again, the maths is parametric and can be sensitive to non-Gaussian distributions, bootstrap CI definitely preferred if you have the raw data.</li>
       <li><a href="./apps/CIcorrelation/">App that gives you a confidence interval around an observed Pearson correlation</a> given the total <i>n</i>, R the correlation and the width of CI you want (usually .95, i.e. 95%). Uses basic parametric theory so treat the CI as indicative rather than definitive.  However, if all you have is the <i>n</i> and correlation, it's the best you can do!</li>
       <li><a href="./apps/CISpearman/">App that gives you a confidence interval around an observed Spearman correlation</a> given the total <i>n</i>, Rs the correlation and the width of CI you want (usually .95, i.e. 95%). I used to say the Pearson CI could be used but that is a very poor approximation, this is better.</li>
-      <li><a href="./apps/Cronbach1Feldt/">App that gives you a confidence interval (CI) around an observed Cronbach alpha value</a> given that value, the width of CI you want (usually .95, i.e. 95%) and the <i>n</i> of the dataset from which the alpha was obtained.  The maths is parametric but fairly robust to non-Gaussian distributions.</li>
+      <li><a href="./apps/Cronbach1Feldt/">App that gives you a confidence interval (CI) around an observed Cronbach alpha value</a> given that value, the width of CI you want (usually .95, i.e. 95%) and the <i>n</i> of the dataset from which the alpha was obtained.  The maths is parametric but fairly robust to non-Gaussian distributions.  See also the next one ...</li>
 
     <li><i><b>Apps giving p values</b></i><br>I'm generally not keen on p values as they are so overused and misunderstood but this one can be useful ....</li>
       <li><a href="./apps/Feldt2/">App giving a p value for the difference between two Cronbach alpha values from independent samples</a>.</li>
@@ -151,12 +152,13 @@
       
   </ul>
   <h2>Usage statistics</h2>
-I have created a simple breakdown of the log data at <a href="https://www.psyctc.org/Analysing_shiny_usage.html">https://www.psyctc.org/Analysing_shiny_usage.html</a>
+For those with incurable geeky curiosity (OK, mostly for my insatiable geeky curiosity!) I have created a breakdown of the log data <a href="https://www.psyctc.org/Analysing_shiny_usage.html">here</a>.<br> 
+As above: do please <a href="https://www.psyctc.org/psyctc/contact-me/">contact me</a> if you hit problems or have questions.
   <h2>Email update list</h2>
   <p>There is now an Email announcement list, never updating more than monthly, where I will put up developments of new apps here but also a summary of updates to the 
   <a href="https://www.psyctc.org/psyctc/book/glossary/">online glossary</a> and new posts in 
   <a href="https://www.psyctc.org/Rblog/index.html">the Rblog</a>. You can sign up for the update list 
   <a href="https://ombook.psyctc.org/signup">here</a> to be alerted to new things.</p>
-  <p><i>Last updated 12.x.24</i></p>
+  <p><i>Last updated 2.xii.24</i></p>
   </div>
 </html>
