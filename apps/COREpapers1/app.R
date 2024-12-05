@@ -7,6 +7,9 @@ suppressMessages(library(shinyDownload))
 suppressMessages(library(tidyverse))
 suppressMessages(library(DT))
 suppressMessages(library(shinyjs)) # for reset button
+suppressMessages(library(rclipboard)) # for copy clipboard button
+suppressMessages(library(bslib)) # embellishes that buton
+
 
 ### this gets the application path so ...
 appPath <- getwd()
@@ -137,6 +140,11 @@ tibDat %>%
   distinct() %>%
   pull() -> vecAssStructure
 
+txtScopus <- "ALL ( \"clinical outcomes in routine evaluation\"  OR  \"Clinical Outcomes in Routine Evaluation-Outcome Measure\"  OR  coreom  OR  \"CORE-OM\"  OR  \"CORE OM\"  OR  \"CORE-10\"  OR  \"YP-CORE\"  OR  \"CORE-SF\"  OR  \"CORE-A\"  OR  \"CORE-TAF\"  OR  \"CORE-EoT \"  OR  \"CORE-5\"  OR  \"GP-CORE\"  OR  \"LD-CORE\"  OR  \"Young Person's Clinical Outcomes in Routine Evaluation\"  OR  \"Young Person's CORE\"  OR  \"Clinical Outcomes in Routine Evaluation-10\" )  AND  PUBYEAR  >  1997  AND  ( LIMIT-TO ( SUBJAREA ,  \"PSYC\" )  OR  LIMIT-TO ( SUBJAREA ,  \"NEUR\" )  OR  LIMIT-TO ( SUBJAREA ,  \"HEAL\" ) )  AND  ( EXCLUDE ( SUBJAREA ,  \"BIOC\" )  OR  EXCLUDE ( SUBJAREA ,  \"AGRI\" )  OR  EXCLUDE ( SUBJAREA ,  \"COMP\" )  OR  EXCLUDE ( SUBJAREA ,  \"IMMU\" )  OR  EXCLUDE ( SUBJAREA ,  \"BUSI\" )  OR  EXCLUDE ( SUBJAREA ,  \"ENGI\" )  OR  EXCLUDE ( SUBJAREA ,  \"PHAR\" )  OR  EXCLUDE ( SUBJAREA ,  \"MATH\" )  OR  EXCLUDE ( SUBJAREA ,  \"PHYS\" )  OR  EXCLUDE ( SUBJAREA ,  \"CENG\" )  OR  EXCLUDE ( SUBJAREA ,  \"CHEM\" )  OR  EXCLUDE ( SUBJAREA ,  \"ECON\" ) )  AND  ( LIMIT-TO ( DOCTYPE ,  \"ar\" ) )  AND  (LIMIT-TO (LANGUAGE ,  \"English\" )  OR  LIMIT-TO (LANGUAGE ,  \"Spanish\" ))"
+
+txtPubmed <- "((((((((((((((((\"clinical outcomes in routine evaluation\") OR (\"Clinical Outcomes in Routine Evaluation-Outcome Measure\")) OR (coreom)) OR (\"CORE-OM\")) OR (\"CORE OM\")) OR (\"CORE-10\")) OR (\"YP-CORE\")) OR (\"CORE-SF\")) OR (\"CORE-A\")) OR (\"CORE-TAF\")) OR (\"CORE-EoT\")) OR (\"CORE-5\")) OR (\"GP-CORE\")) OR (\"LD-CORE\")) OR (\"Young Person's Clinical Outcomes in Routine Evaluation\")) OR (\"Young Person's CORE\")) OR (\"Clinical Outcomes in Routine Evaluation-10\")"
+
+
 findMatches <- function(tibDat, searchVarName, idVarName, vecMatches, or = TRUE) {
   ### function to find matches to members of vecMatches in tibDat$varname
   ### can do it as Boolean OR or AND
@@ -179,6 +187,8 @@ telemetry <- Telemetry$new(app_name = "COREpapers1",
 ui <- fluidPage(
   
   use_telemetry(), # 2. Add necessary Javascript to Shiny
+  
+  rclipboardSetup(), # does what it says!
   
   setBackgroundColor("#ffff99"),
   h1(HTML("Search interface to CORE related papers (to end of 2021)")),
@@ -408,19 +418,29 @@ ui <- fluidPage(
                   tabPanel("Searching beyond 2021",
                            value = 3,
                            
-                           p("Resource constraints meant that we could only do our thorough searching to 2021."),
-                           p("However, if you want to find papers that have emerged since you can use the searches based on those we used."),
+                           p(paste0("Resource constraints meant that we could only do our thorough searching to 2021. ",
+                                    "However, if you want to find papers that have emerged since you can use the searches based on those we used.")),
                            p("I am assuming that you have some familiarity with these search resources, if not, find a colleague who has or do some searching for help!"),
                            p(" "),
-                           p("With any of these searches I am afraid you will find a fair number of falsely identified papers so filter carefully."),
+                           p(paste0("With any of these searches I am afraid you will find a fair number of falsely identified papers so filter carefully and bear in mind ",
+                                    "that our database came from combining findings across these three resources and then removing papers that weren't about CORE ",
+                                    "and removing duplicates that had come from more than one resource.")),
                            
                            h2("Scopus"),
                            
-                           p("If you have access to Clarivate's resources you can get into SCOPUS then if you put your cursor at the start of the very long line below, then click-pull down to select the entire box you should be able to copy the search text out of the box."),
-                           pre("ALL ( \"clinical outcomes in routine evaluation\"  OR  \"Clinical Outcomes in Routine Evaluation-Outcome Measure\"  OR  coreom  OR  \"CORE-OM\"  OR  \"CORE OM\"  OR  \"CORE-10\"  OR  \"YP-CORE\"  OR  \"CORE-SF\"  OR  \"CORE-A\"  OR  \"CORE-TAF\"  OR  \"CORE-EoT \"  OR  \"CORE-5\"  OR  \"GP-CORE\"  OR  \"LD-CORE\"  OR  \"Young Person's Clinical Outcomes in Routine Evaluation\"  OR  \"Young Person's CORE\"  OR  \"Clinical Outcomes in Routine Evaluation-10\" )  AND  PUBYEAR  >  1997  AND  ( LIMIT-TO ( SUBJAREA ,  \"PSYC\" )  OR  LIMIT-TO ( SUBJAREA ,  \"NEUR\" )  OR  LIMIT-TO ( SUBJAREA ,  \"HEAL\" ) )  AND  ( EXCLUDE ( SUBJAREA ,  \"BIOC\" )  OR  EXCLUDE ( SUBJAREA ,  \"AGRI\" )  OR  EXCLUDE ( SUBJAREA ,  \"COMP\" )  OR  EXCLUDE ( SUBJAREA ,  \"IMMU\" )  OR  EXCLUDE ( SUBJAREA ,  \"BUSI\" )  OR  EXCLUDE ( SUBJAREA ,  \"ENGI\" )  OR  EXCLUDE ( SUBJAREA ,  \"PHAR\" )  OR  EXCLUDE ( SUBJAREA ,  \"MATH\" )  OR  EXCLUDE ( SUBJAREA ,  \"PHYS\" )  OR  EXCLUDE ( SUBJAREA ,  \"CENG\" )  OR  EXCLUDE ( SUBJAREA ,  \"CHEM\" )  OR  EXCLUDE ( SUBJAREA ,  \"ECON\" ) )  AND  ( LIMIT-TO ( DOCTYPE ,  \"ar\" ) )  AND  (LIMIT-TO (LANGUAGE ,  \"English\" )  OR  LIMIT-TO (LANGUAGE ,  \"Spanish\" ))"),
+                           p(paste0("If you have access to Clarivate's resources you can get into SCOPUS then this is the search that we used.  Alternatively, I ",
+                                    "believe that the button should copy that text to your clipboard on most modern browsers and platforms.")),
+                           
+                           p(txtScopus),
+                           
+                           # UI for the copy-to-clipboard button
+                           uiOutput("scopusClip"),
+                           
                            p(" "),
-                           p("Alternatively, if you hit the button below you will be given a dialogue to save that search text to your local computer."),
+                           p("Alternatively, this next button will give you a dialogue to save that search text to your local computer as a file."),
                            downloadButton("SCOPUSsearchText", label = "Download SCOPUS search text"),
+                           p(" "),
+                           p("We have found that some days Scopus grumbles about the search for reasons we don't understand!  Good luck!"),
                            
                            h2("Web of Science"),
                            
@@ -428,16 +448,25 @@ ui <- fluidPage(
                            a("https://www.webofscience.com/wos/alldb/summary/0d15db99-47df-4ce0-bdba-aa3a025468e8-3c711e33/relevance/1",
                              href = "https://www.webofscience.com/wos/alldb/summary/0d15db99-47df-4ce0-bdba-aa3a025468e8-3c711e33/relevance/1"),
                            p(),
-                           p("Then if you click inside the search at the top you can change the 'Publication Date' upper date from 31/12/2021 to whatever you want"),
+                           p(paste0("That defaults to give you the search we used up to but if you click on the search you can change the upper date ",
+                                    "from 31/12/2021 to whatever you want")),
                            
                            h2("PubMed"),
                            
-                           p("I think this works."),
-                           p("1. Add this query:"),
-                           pre("((((((((((((((((\"clinical outcomes in routine evaluation\") OR (\"Clinical Outcomes in Routine Evaluation-Outcome Measure\")) OR (coreom)) OR (\"CORE-OM\")) OR (\"CORE OM\")) OR (\"CORE-10\")) OR (\"YP-CORE\")) OR (\"CORE-SF\")) OR (\"CORE-A\")) OR (\"CORE-TAF\")) OR (\"CORE-EoT\")) OR (\"CORE-5\")) OR (\"GP-CORE\")) OR (\"LD-CORE\")) OR (\"Young Person's Clinical Outcomes in Routine Evaluation\")) OR (\"Young Person's CORE\")) OR (\"Clinical Outcomes in Routine Evaluation-10\")"),
+                           p("Go to:"),
+                           a("https://pubmed.ncbi.nlm.nih.gov/",
+                             href = "https://pubmed.ncbi.nlm.nih.gov/"),
+                           p("then paste in this query:"),
+                           p(txtPubmed),
+                           
+                           # UI for the copy-to-clipboard button
+                           uiOutput("pubmedClip"),
+                           
+                           p(" "),
                            p("Again, if you hit the button below you will be given a dialogue to save that search text to your local computer."),
                            downloadButton("PubMedSearchText", label = "Download PubMed search text"),
-                           p("2. Once the search is conducted you can click on these 'Article Type' filters to match our search:"),
+                           p(" "),
+                           p("Once the search is conducted you can click on these 'Article Type' filters to match our search:"),
                            tags$ul(
                              tags$li("Clinical Trial"),
                              tags$li("Meta-Analysis"), 
@@ -454,7 +483,7 @@ ui <- fluidPage(
                            
                            p("App started 10.v.24 by Chris Evans.",
                              a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/")),
-                           p(HTML("Last updated 23.x.24: improved 'Searching beyond 2021'")),
+                           p(HTML("Last updated 5.xii.24: more improvements to 'Searching beyond 2021'")),
                            p("Licenced under a ",
                              a("Creative Commons, Attribution Licence-ShareAlike",
                                href="http://creativecommons.org/licenses/by-sa/1.0/"),
@@ -829,6 +858,30 @@ server <- function(input, output, session) {
     }
   )
   
+  # Add clipboard buttons
+  output$scopusClip <- renderUI({
+    rclipButton(
+      inputId = "clipbtn",
+      label = "Copy Scopus search text to clipboard",
+      clipText = txtScopus, 
+      icon = icon("clipboard"),
+      tooltip = "Click to copy that Scopus search",
+      placement = "top",
+      options = list(delay = list(show = 800, hide = 100), trigger = "hover")
+    )
+  })
+  
+  output$pubmedClip <- renderUI({
+    rclipButton(
+      inputId = "clipbtn",
+      label = "Copy PubMed search text to clipboard",
+      clipText = txtPubmed, 
+      icon = icon("clipboard"),
+      tooltip = "Click to copy that PubMed search",
+      placement = "top",
+      options = list(delay = list(show = 800, hide = 100), trigger = "hover")
+    )
+  })
 }
 
 shinyApp(ui, server)
