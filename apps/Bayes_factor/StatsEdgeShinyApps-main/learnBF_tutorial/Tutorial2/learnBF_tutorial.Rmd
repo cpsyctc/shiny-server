@@ -1,0 +1,650 @@
+---
+title: "The Bayes factor"
+output: 
+    learnr::tutorial:
+        # progressive: true
+        # allow_skip: false
+        css: "mystyle.css"
+runtime: shiny_prerendered
+description: "Learn about the Bayes factor!"
+---
+
+
+
+```{r setup, include=FALSE}
+library(learnr)
+library(shiny)
+library(shinyWidgets)
+library(markdown)
+knitr::opts_chunk$set(echo = FALSE)
+set.seed(NULL)
+
+# Load the functions allowing to compute the Bayes factors:
+######source("BayesFactors.R")
+```
+
+
+
+```{css, echo=FALSE}
+/* Button colors:  */
+.btn-primary, .btn-success, .btn-info {
+background-color: #005E3CCC;
+background-image: none;
+border: none; 
+}
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary:focus:active, .btn-success:hover, .btn-success:focus, .btn-success:active, .btn-success:focus:active, .btn-info:hover, .btn-info:focus, .btn-info:active, .btn-info:focus:active {
+background-color: #005E3C33; 
+color: black;
+}
+.btn-primary:focus:hover, .btn-primary:active:hover, .btn-primary:focus:active:hover, .btn-success:focus:hover, .btn-success:active:hover, .btn-success:focus:active:hover, .btn-info:focus:hover, .btn-info:active:hover, .btn-info:focus:active:hover {
+background-color: #005E3C; 
+color: black;
+}
+.btn-primary.disabled, .btn-primary:disabled, .btn-primary.disabled:hover, .btn-primary:disabled:hover, .btn-success.disabled, .btn-success:disabled, .btn-success.disabled:hover, .btn-success:disabled:hover, .btn-info.disabled, .btn-info:disabled, .btn-info.disabled:hover, .btn-info:disabled:hover {
+background-color: #005E3CCC; 
+}
+```
+
+
+
+Let's test your knowledge of the Bayes factor!
+
+```{r questions1}
+questions.1 <- quiz(
+  caption = "", 
+  
+  # Posterior odds I:
+  question(
+    paste0(
+      HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"), em("\"From $BF_{10} = 2$ we can conclude that $\\mathcal{H}_1$ is twice as probable as $\\mathcal{H}_0$, given the observed data.\'\'"), 
+      br(), br(), 
+      "Is this correct?"),
+    answer("False.", correct = TRUE),
+    answer("True."), 
+    post_message = paste0(
+      "In effect, the interpretation in the quote concerns the posterior odds, $\\frac{p(\\mathcal{H}_1|D)}{p(\\mathcal{H}_0|D)}$.", 
+      br(), br(), 
+      "Since nothing is said about the prior odds being equal to 1 (i.e., that both hypotheses are deemed equally likely a priori), interpreting the Bayes factor as if it were the posterior odds is incorrect."), 
+    ###
+    try_again           = "Please try again.", 
+    correct             = "Yes!", 
+    allow_retry         = TRUE, 
+    random_answer_order	= FALSE
+  ), 
+  
+  # Posterior odds II:
+  question(
+    paste0(
+      HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"), em("\"Assume that, a priori, both $\\mathcal{H}_0$ and $\\mathcal{H}_1$ are equally likely. Then, from $BF_{10} = 2$ we can conclude that $\\mathcal{H}_1$ is twice as probable as $\\mathcal{H}_0$, given the observed data.\'\'"), 
+      br(), br(), 
+      "Is this correct?"),
+    answer("False."), 
+    answer("True.", correct = TRUE),
+    post_message = paste0(
+      "In effect, the interpretation in the quote concerns the posterior odds, $\\frac{p(\\mathcal{H}_1|D)}{p(\\mathcal{H}_0|D)}$.", 
+      br(), br(), 
+      "But since the prior odds are equal to 1 (i.e., both hypotheses are deemed equally likely a priori), the Bayes factor and the posterior odds coincide. It is therefore correct to interpret the Bayes factor in the 'posterior odds' sense.", 
+      br(), br(), 
+      "Do notice that explicitly reporting the fact that both hypotheses are a priori equally likely is crucial here."), 
+    ###
+    try_again           = "Please try again.", 
+    correct             = "Yes!", 
+    allow_retry         = TRUE, 
+    random_answer_order	= FALSE
+  ), 
+  
+  # Posterior odds III:
+  question(
+    paste0(
+      "Knowing that $p(\\mathcal{H}_0|D)=.2$ and $p(\\mathcal{H}_1|D)=.8$ we can conclude that $BF_{10} = \\frac{.8}{.2} = 4$."),
+    answer("False.", correct = TRUE),
+    answer("True."),
+    post_message = paste0(
+      "From $p(\\mathcal{H}_0|D)=.2$ and $p(\\mathcal{H}_1|D)=.8$, we know that the posterior odds are equal to $\\frac{p(\\mathcal{H}_1|D)}{p(\\mathcal{H}_0|D)} = \\frac{.8}{.2} = 4$.", 
+      br(), 
+      "In other words, $\\mathcal{H}_1$ is four times more likely than $\\mathcal{H}_0$, given the observed data.", 
+      br(), br(), 
+      "However, nothing is said about the prior odds.",
+      br(),
+      "Since we have that $$\\text{(prior odds)} \\times \\text{Bayes factor} = \\text{(posterior odds),}$$we do not know what the value of the Bayes factor actually is."),
+    ###
+    try_again           = "Please try again.",
+    correct             = "Yes!",
+    allow_retry         = TRUE,
+    random_answer_order	= FALSE
+  ), 
+  
+  # Posterior odds IV: evidence vs belief
+  question(
+    paste0(
+      "What should we focus on when interpreting the results: The Bayes factor or the posterior odds?"),
+    answer("It depends on what the researcher wants to focus on.", correct = TRUE),
+    answer("The Bayes factor."), 
+    answer("The posterior odds."), 
+    post_message = paste0(
+      "The research question should dictate what we focus on for the interpretation.", 
+      br(), br(), 
+      "If the interest lies in the ", em("updated relative belief"), " between both hypotheses, then the posterior odds are of more interest.", 
+      br(),
+      "This is why the posterior odds are related to the ", em("belief on either hypothesis"), ".", 
+      br(), br(), 
+      "If the interest lies in ", em("how the initial relative belief is updated"), " by means of the observed data, then the Bayes factor is of more interest.", 
+      br(), 
+      "This is why the Bayes factor is related to the ", em("evidence in the data"), " that allows us to update our relative belief.", 
+      br(), br(), 
+      "In short, there is no general answer to the question being asked."), 
+    ###
+    try_again           = "Please try again.",
+    correct             = "Yes!",
+    allow_retry         = TRUE,
+    random_answer_order	= TRUE
+  ), 
+  
+  # Posterior odds V: omitting priors odds is ok?
+  question(
+    paste0(
+      "Is ", em("not"), " reporting the prior odds a serious error?"),
+    answer("Not necessarily.", correct = TRUE),
+    answer("Yes."), 
+    answer("No."), 
+    post_message = paste0(
+      "To answer the question above we must first answer this question:", 
+      br(), 
+      HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"), em("\\'Are we interested in how we can update our relative belief between both hypotheses, or are we interested in the final, updated, relative belief between both hypotheses?\\'"), 
+      br(), br(), 
+      "If we answer affirmatively to the former, then clearly we are interested in the Bayes factor.", 
+      br(), 
+      "In this case, the prior odds pay no role and can be disregarded.", 
+      br(), br(), 
+      "If we answer affirmatively to the latter, then we are clearly interested in the posterior odds. ", 
+      br(), 
+      "In this case, the prior odds are crucial and should be reported."), 
+    ###
+    try_again           = "Please try again.",
+    correct             = "Yes!",
+    allow_retry         = TRUE,
+    random_answer_order	= TRUE
+  )
+)
+
+n.questions1     <- c(sample(1:2, 1), 3, sample(4:5, 1)) |> sample()
+questions.1[[2]] <- questions.1[[2]][n.questions1]
+```
+
+
+
+```{r questions2}
+questions.2 <- quiz(
+  caption = "", 
+  
+  # Prior under H0:
+  question(
+    paste0("A prior distribution for parameter $\\mu_D$ under $\\mathcal{H}_0:\\mu_D=0$ must be chosen, as there are many possible priors available."),
+    answer("False.", correct = TRUE),
+    answer("True."), 
+    post_message = paste0(
+      "As specified, $\\mathcal{H}_0$ is a so-called ", em("point null"), " hypothesis: The only hypothesized value for parameter $\\mu_D$ is 0.", br(), 
+      "Therefore, there is only one possible prior distribution under $\\mathcal{H}_0$: $p(\\mu_D) = 1$ when $\\mu_D = 0$, and $p(\\mu_D)=0$ when $\\mu_D\\not=0$.", 
+      br(), br(), 
+      "This is the reason why we do not typically choose a prior distribution for this type of point null $\\mathcal{H}_0$."), 
+    ###
+    try_again           = "Please try again.", 
+    correct             = "Yes!", 
+    allow_retry         = TRUE, 
+    random_answer_order	= FALSE
+  ), 
+  
+  # Prior under H1:
+  question(
+    paste0("A prior distribution for parameter $\\mu_D$ under $\\mathcal{H}_1:\\mu_D\\not=0$ must be chosen, as there are many possible priors available."),
+    answer("False."),
+    answer("True.", correct = TRUE), 
+    post_message = paste0(
+      "Bayesian hypothesis testing requires that, under any hypothesis, each parameter value has an associated a priori probability.", 
+      br(), 
+      "In the case of hypothesis $\\mathcal{H}_1:\\mu_D\\not=0$, there are many values to consider (namely, all $\\mu_D$ values different from 0).", 
+      br(), br(), 
+      "On the left menu, we offer three families of distributions (Cauchy, Normal, $t$-Student).", 
+      br(), 
+      "But in theory we could consider many other distributions."), 
+    ###
+    try_again           = "Please try again.", 
+    correct             = "Yes!", 
+    allow_retry         = TRUE, 
+    random_answer_order	= FALSE
+  ), 
+  
+  # Need to report priors used:
+  question(
+    type = "multiple", 
+    paste0("It is important to report all prior distributions used because...", br(), "(select all options that apply)"),
+    answer("the Bayes factor is sensitive to the prior distributions. ", correct = TRUE), 
+    answer("the prior odds are sensitive to the prior distributions. "), 
+    answer("the posterior odds are sensitive to the prior distributions. ", correct = TRUE), 
+    answer("it is more important to interpret the prior distributions than the Bayes factor."), 
+    post_message = paste0(
+      "Prior distributions are required to compute the Bayes factor. As such, the value of the Bayes factor and the value of the posterior odds ( $=$ prior odds $\\times$ Bayes factor) vary as the prior distributions change.", 
+      br(), br(), 
+      "The effect of the prior distributions on the Bayes factor must be acknowledged by fully reporting what prior distributions were used.", br(), "Furthermore, and as much as possible, providing an explanation as to ", em("why"), " such priors were chosen would be ideal."), 
+    ###
+    try_again           = "Please try again.", 
+    correct             = "Yes!", 
+    allow_retry         = TRUE, 
+    random_answer_order	= TRUE
+  ), 
+  
+  # What should prior reflect?
+  question(
+    paste0("When choosing prior distributions, we may want to take into account... "),
+    answer("that some priors are more convenient than others (e.g., because they are already prepackaged in available software)."), 
+    answer("what is currently known about the parameter being tested."), 
+    answer("that some values are logically impossible and should therefore be ignored."), 
+    answer("that different persons may not like some choices of prior distributions."), 
+    answer("all of the above options.", correct = TRUE), 
+    post_message = paste0(
+      "There is no unique strategy, or motivation, to commit to certain prior distributions over others. The first four answer options above reflect various thought processes that may 'justify' why some priors are (not) chosen.", 
+      br(), br(), 
+      "Since there is quite some freedom in this regard, we advice that users explain their choices as much as possible. "), 
+    ###
+    try_again           = "Please try again.", 
+    correct             = "Yes!", 
+    allow_retry         = TRUE, 
+    random_answer_order	= FALSE
+  ), 
+  
+  # Default priors plusses:
+  question(
+    type = "multiple", 
+    paste0("What is a clear advantage of using default priors to compute Bayes factors?", br(), "(select all options that apply)"),
+    answer("Default priors make the computation of the Bayes factor more precise."), 
+    answer("Default priors reflect better the current state of the art than custom-chosen priors."), 
+    answer("Default priors facilitate comparisons between analyses.", correct = TRUE), 
+    answer("Default priors are more easily accepted by others than custom-chosen priors.", correct = TRUE), 
+    post_message = paste0(
+      "Default priors were developed with some ideal statistical (and often mathematical) desiderata in mind.", 
+      br(), 
+      "In this sense, default priors do not necessarily adequately reflect prior knowledge nor the person's intentions.", br(), "Put it this way, we find it surprising how many people resort to default priors without giving it any second thought.", 
+      br(), br(), 
+      "But we must also realize that there are several advantages to using default priors. Besides being readily available in available software, relying on default priors does facilitate comparison of results (", em("comparing apples to apples"), ").", br(), "Furthermore, default priors typically raise less questions than other priors (in this sense, one could say that they are more 'objective')."),
+    ###
+    try_again           = "Please try again.", 
+    correct             = "Yes!", 
+    allow_retry         = TRUE, 
+    random_answer_order	= TRUE
+  )
+)
+
+n.questions2     <- c(sample(1:2, 1), 4, sample(c(3, 5), 1)) |> sample()
+questions.2[[2]] <- questions.2[[2]][n.questions2]
+```
+
+
+
+```{r questions3}
+questions.3 <- quiz(
+  caption = "", 
+  
+  # Relative assessment:
+  question(
+    paste0(
+      HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"), em("\"From $BF_{01} = 7$ we can conclude that the evidence supports $\\mathcal{H}_0$.\'\'"), 
+      br(), br(), 
+      "Is this correct?"),
+    answer("False.", correct = TRUE),
+    answer("True."), 
+    post_message = paste0(
+      em("It takes two to tango!"), " A hypotheses test requires two hypotheses, and it is a requirement that both hypotheses being tested are mentioned. In fact, the merit of any hypothesis is dependent on whatever alternative hypothesis we use for the test.", 
+      br(), br(), 
+      "To fix the quote given we must therefore also mention $\\mathcal{H}_1$:", 
+      br(), 
+      HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"), em("\\'From $BF_{01} = 7$ we can conclude that the evidence supports $\\mathcal{H}_0$ over this particular $\\mathcal{H}_1$ [including the chosen prior distributions].\\'"), 
+      br(), br(), 
+      "The main idea here is that, if we change $\\mathcal{H}_1$, then the Bayes factor will also change.", 
+      br(), 
+      "Evidence is relative.")
+    , 
+    ###
+    try_again           = "Please try again.", 
+    correct             = "Yes!", 
+    allow_retry         = TRUE, 
+    random_answer_order	= FALSE
+  ), 
+  
+  # Relative assessment II:
+  question(
+    paste0(
+      HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"), em("\"From $BF_{01} = 7$ we can conclude that the evidence supports $\\mathcal{H}_0$ over $\\mathcal{H}_1$.\'\'"), 
+      br(), br(), 
+      "Is this correct?"),
+    answer("False."), 
+    answer("True.", correct = TRUE),
+    post_message = paste0(
+      "The quote correctly associates the Bayes factor to the evidence in the data.", 
+      br(), 
+      "Furthermore, the result is provided as a relative assessment between both hypotheses under comparison.", 
+      br(), 
+      "This is correct.")
+    , 
+    ###
+    try_again           = "Please try again.", 
+    correct             = "Yes!", 
+    allow_retry         = TRUE, 
+    random_answer_order	= FALSE
+  )
+)
+
+n.questions3     <- sample(1:2, 1)
+questions.3[[2]] <- questions.3[[2]][n.questions3]
+```
+
+
+
+```{r questions4}
+questions.4 <- quiz(
+  caption = "", 
+  
+  # Relative assessment:
+  question(
+    paste0(
+      HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"), em("\"From $BF_{01} = 170$ we can conclude that there is no mean group difference.\'\'"), 
+      br(), br(), 
+      "Is this correct?"),
+    answer("False.", correct = TRUE),
+    answer("True."), 
+    post_message = paste0(
+      "The Bayes factor pertains to the relative probability of the observed data under either hypothesis.", 
+      br(), 
+      "In this case, we may say that the observed data are 170 times more likely under $\\mathcal{H}_0$ than under $\\mathcal{H}_1$.", 
+      br(), 
+      "This is a statement about the ", em("probability of the observed data"), ".", 
+      br(), br(), 
+      "In case both hypotheses are equally likely a priori (i.e., prior odds are equal to 1), then the Bayes factor can also be thought of as a posterior odds.", 
+      br(), 
+      "We may then also say that $\\mathcal{H}_0$ is 170 times more probable than $\\mathcal{H}_1$, given the data.", 
+      br(), 
+      "This is a statement about the ", em("probability of the hypotheses"), ".", 
+      br(), br(), 
+      "In either case, we are talking about ", em("probabilities"), " (of data or of hypotheses),", 
+      br(), 
+      "We have no grounds to logically derive that $\\mathcal{H}_0$ is true (from the quote, that \"there is no mean group difference\'\').", 
+      br(), br(), 
+      "Bayes factors, on their own, can not be used to establish the absence or presence of an effect.", 
+      br(), 
+      "The quote is therefore incorrect.")
+    , 
+    ###
+    try_again           = "Please try again.", 
+    correct             = "Yes!", 
+    allow_retry         = TRUE, 
+    random_answer_order	= FALSE
+  ), 
+  
+  # Relative assessment:
+  question(
+    paste0(
+      HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"), em("\"From $BF_{10} = 322$ we can not conclude that there is a mean group difference.\'\'"), 
+      br(), br(), 
+      "Is this correct?"),
+    answer("False."), 
+    answer("True.", correct = TRUE),
+    post_message = paste0(
+      "The Bayes factor pertains to the relative probability of the observed data under either hypothesis.", 
+      br(), 
+      "In this case, we may say that the observed data are 322 times more likely under $\\mathcal{H}_1$ than under $\\mathcal{H}_0$.", 
+      br(), 
+      "This is a statement about the ", em("probability of the observed data"), ".", 
+      br(), br(), 
+      "In case both hypotheses are equally likely a priori (i.e., prior odds are equal to 1), then the Bayes factor can also be thought of as a posterior odds.", 
+      br(), 
+      "We may then also say that $\\mathcal{H}_1$ is 322 times more probable than $\\mathcal{H}_0$, given the data.", 
+      br(), 
+      "This is a statement about the ", em("probability of the hypotheses"), ".", 
+      br(), br(), 
+      "In either case, we are talking about ", em("probabilities"), " (of data or of hypotheses),", 
+      br(), 
+      "We have no grounds to logically derive that $\\mathcal{H}_1$ is true (from the quote, that \"there is a mean group difference\'\').", 
+      br(), br(), 
+      "Bayes factors, on their own, can not be used to establish the absence or presence of an effect.", 
+      br(), 
+      "The quote is therefore correct.")
+    , 
+    ###
+    try_again           = "Please try again.", 
+    correct             = "Yes!", 
+    allow_retry         = TRUE, 
+    random_answer_order	= FALSE
+  )
+)
+
+n.questions4     <- sample(1:2, 1)
+questions.4[[2]] <- questions.4[[2]][n.questions4]
+```
+
+
+
+```{r questions5}
+questions.5 <- quiz(
+  caption = "", 
+  
+  # BF not ES 1:
+  question(
+    paste0(
+      "Assume that the sample mean and the sample standard deviation of both groups are fixed, such that the two means are different from each other.", 
+      br(), 
+      "Further assume that both groups have the same sample size, which we can manipulate.", 
+      br(), 
+      "What do you expect to happen to $BF_{10}$ and to Cohen's $d$ as the sample size increases?"),
+    answer("$BF_{10}$ increases, Cohen's $d$ stays constant.", correct = TRUE),
+    answer("$BF_{10}$ stays constant, Cohen's $d$ increases."), 
+    answer("$BF_{10}$ increases, Cohen's $d$ increases."), 
+    answer("$BF_{10}$ stays constant, Cohen's $d$ stays constant."), 
+    post_message = paste0(
+      "The effect size is independent from the sample size.", 
+      br(), 
+      "Therefore, Cohen's $d$ is constant as a function of the sample size.", 
+      br(), br(), 
+      " $BF_{10}$, on the other hand, increases as a function of the sample size.",
+      br(), 
+      "The reason is that, as the sample size increases, the evidence in the data in favor of $\\mathcal{H}_1$ over $\\mathcal{H}_0$ keeps increasing.", 
+      br(), 
+      "Simply put: More data make $\\mathcal{H}_1$ look like a better explanation for the observed data than $\\mathcal{H}_0$.")
+    , 
+    ###
+    try_again           = "Please try again.", 
+    correct             = "Yes!", 
+    allow_retry         = TRUE, 
+    random_answer_order	= TRUE
+  ), 
+  
+  # BF not ES 2:
+  question(
+    paste0(
+      "Assume that the sample mean and the sample standard deviation of both groups are fixed, such that the two means are equal.", 
+      br(), 
+      "Further assume that both groups have the same sample size, which we can manipulate.", 
+      br(), 
+      "What do you expect to happen to $BF_{01}$ and to Cohen's $d$ as the sample size increases?"),
+    answer("$BF_{01}$ increases, Cohen's $d$ stays constant.", correct = TRUE),
+    answer("$BF_{01}$ stays constant, Cohen's $d$ increases."), 
+    answer("$BF_{01}$ increases, Cohen's $d$ increases."), 
+    answer("$BF_{01}$ stays constant, Cohen's $d$ stays constant."), 
+    post_message = paste0(
+      "The effect size is independent from the sample size.", 
+      br(), 
+      "Therefore, Cohen's $d$ is constant as a function of the sample size.", 
+      br(), br(), 
+      " $BF_{01}$, on the other hand, increases as a function of the sample size.", 
+      br(), 
+      "The reason is that, as the sample size increases, the evidence in the data in favor of $\\mathcal{H}_0$ over $\\mathcal{H}_1$ keeps increasing.", 
+      br(), 
+      "Simply put: More data make $\\mathcal{H}_0$ look like a better explanation for the observed data than $\\mathcal{H}_1$. ")
+    , 
+    ###
+    try_again           = "Please try again.", 
+    correct             = "Yes!", 
+    allow_retry         = TRUE, 
+    random_answer_order	= TRUE
+  )
+)
+
+n.questions5     <- sample(1:2, 1)
+questions.5[[2]] <- questions.5[[2]][n.questions5]
+```
+
+
+
+```{r questions6}
+questions.6 <- quiz(
+  caption = "", 
+  
+  # absence of evidence != evidence of absence 1:
+  question(
+    paste0(
+      HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"), em("\"The Bayes factor is $BF_{01} = 1.3$, a value very close to the reference value of 1. We therefore infer that the two group means are likely to be equal to each other in the population.\'\'"), 
+      br(), br(), 
+      "Is this correct?"),
+    answer("False.", correct = TRUE),
+    answer("True."), 
+    post_message = paste0(
+      "The test result is rather ", em("inconclusive"), " since the Bayes factor is about 1.", br(), "This means that the data are about equally likely under either hypothesis.", 
+      br(), 
+      "There is therefore ", em("absence of evidence"), " allowing us to favor any one hypothesis over the other.", 
+      br(), br(), 
+      "As such, it is incorrect to draw relative support in favor of $\\mathcal{H}_0$ as done in the quote (\"", em("the two group means are likely to be equal to each other in the population"), "\'\').", 
+      br(), 
+      "In other words, we have no grounds to claim that there is ", em("evidence of absence"), " of an effect.", 
+      br(), 
+      "To have evidence of absence of an effect, $BF_{01}$ should have been rather large (strong relative support for $\\mathcal{H}_0$ over $\\mathcal{H}_1$).")
+    , 
+    ###
+    try_again           = "Please try again.", 
+    correct             = "Yes!", 
+    allow_retry         = TRUE, 
+    random_answer_order	= FALSE
+  ), 
+  
+  # absence of evidence != evidence of absence 2:
+  question(
+    paste0(
+      HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"), em("\"The Bayes factor is $BF_{01} = 1.3$, a value very close to the reference value of 1. We therefore infer that the observed data are about equally likely under either $\\mathcal{H}_0$ or $\\mathcal{H}_1$.\'\'"), 
+      br(), br(), 
+      "Is this correct?"),
+    answer("False."), 
+    answer("True.", correct = TRUE),
+    post_message = paste0(
+      "The test result is rather ", em("inconclusive"), " since the Bayes factor is about 1.", br(), "This means that the data are about equally likely under either hypothesis, so indeed the quote is correct.", 
+      br(), 
+      "In other words, there is ", em("absence of evidence"), " allowing us to favor any one hypothesis over the other.", 
+      br(), br(), 
+      "It would be incorrect to draw relative support in favor of $\\mathcal{H}_0$.", 
+      br(), 
+      "In other words, we have no grounds to claim that there is ", em("evidence of absence"), " of an effect.", 
+      br(), 
+      "To have evidence of absence of an effect, $BF_{01}$ should have been rather large (strong relative support for $\\mathcal{H}_0$ over $\\mathcal{H}_1$).")
+    , 
+    ###
+    try_again           = "Please try again.", 
+    correct             = "Yes!", 
+    allow_retry         = TRUE, 
+    random_answer_order	= FALSE
+  )
+)
+
+n.questions6     <- sample(1:2, 1)
+questions.6[[2]] <- questions.6[[2]][n.questions6]
+```
+
+
+
+```{r questions7}
+questions.7 <- quiz(
+  caption = "", 
+  
+  # Labels II:
+  question(
+    type = "multiple", 
+    paste0(
+      HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"), em("\"We computed the Bayes factor testing $\\mathcal{H}_0$ against $\\mathcal{H}_1$ (with a standard normal prior distribution on the standardized effect size). The strength of evidence in favor of $\\mathcal{H}_0$ is deemed ", em("\'positive\'"), " based on the categorization of Kass and Raftery.\'\'"), 
+      br(), br(), 
+      "There are at least three problems with this reporting of the results; please identify all three.", 
+      br(), 
+      "(select all options that apply)"),
+    answer("The exact value of the Bayes factor is missing.", correct = TRUE),
+    answer("It is not explained what \'positive\' evidence actually means.", correct = TRUE), 
+    answer("It must be stated that the evidence favors $\\mathcal{H}_0$ in comparison to the specific alternative hypothesis $\\mathcal{H}_1$ that was used in the test.", correct = TRUE), 
+    answer("The categorization by Jeffreys is more authoritative than the one by Kass and Raftery and should therefore be favored."), 
+    post_message = paste0(
+      "Various things are not reported as ideally as one could wish for.", 
+      br(), br(), 
+      "For instance, the exact value of the Bayes factor should always be reported.", 
+      br(), 
+      "This makes it easier for others to judge by themselves how strong the evidence is.", 
+      br(), 
+      "Furthermore, this makes it possible for anyone to compute posterior probabilities for either hypothesis, based on their own prior odds.", 
+      br(), br(), 
+      "Also, it is rather unclear what a \\'positive\\' amount of evidence stands for.", 
+      br(), 
+      "Instead, it would have been best if the researchers had explained how relevant their finding is, in the context of their research question, experiment, quality of the data, generalizability, etc.", 
+      br(), br(), 
+      "Specifying that the evidence favors $\\mathcal{H}_0$ is also an incomplete statement.", 
+      br(), 
+      "No hypothesis is tested on its own. It takes another hypothesis (or model) for us to be able to perform a comparison.", 
+      br(), 
+      "We therefore encourage researchers to be explicit about this. An improved text could include the following: \\'The strength of evidence in favor of $\\mathcal{H}_0$ over $\\mathcal{H}_1$...\\'.")
+    , 
+    ###
+    try_again           = "Please try again.", 
+    correct             = "Yes!", 
+    allow_retry         = TRUE, 
+    random_answer_order	= TRUE
+  )
+)
+
+n.questions7     <- 1
+questions.7[[2]] <- questions.7[[2]][n.questions7]
+```
+
+
+
+```{r deployquestions}
+deployQs      <- questions.1
+deployQs[[2]] <- c(questions.1[[2]], questions.2[[2]], questions.3[[2]], 
+                   questions.4[[2]], questions.5[[2]], questions.6[[2]], questions.7[[2]]) |> sample()
+deployQs
+```
+
+<!-- ## {data-progressive=TRUE} -->
+
+<!-- ```{r deploy1} -->
+<!-- tmp <- c(questions.1[[2]], questions.2[[2]], questions.3[[2]], -->
+<!--                   questions.4[[2]], questions.5[[2]], questions.6[[2]], questions.7[[2]]) |> sample() -->
+<!-- deployQs1      <- deployQs -->
+<!-- deployQs1[[2]] <- tmp[1] -->
+<!-- deployQs1 -->
+<!-- ``` -->
+
+<!-- ## {data-progressive=TRUE} -->
+
+<!-- ```{r deploy2} -->
+<!-- deployQs1[[2]] <- tmp[2:4] -->
+<!-- deployQs1 -->
+<!-- ``` -->
+
+<!-- ## {data-progressive=TRUE} -->
+
+<!-- ```{r deploy3} -->
+<!-- deployQs1[[2]] <- tmp[5] -->
+<!-- deployQs1 -->
+<!-- ``` -->
+
+<!-- ## {data-progressive=TRUE} -->
+
+<!-- ```{r deploy4} -->
+<!-- deployQs1[[2]] <- tmp[6] -->
+<!-- deployQs1 -->
+<!-- ``` -->
+
+
+
+
+

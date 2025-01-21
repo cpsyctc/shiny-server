@@ -1,0 +1,77 @@
+.checkbox-primary input[type='checkbox']:checked + label::before {
+  background-color: #005E3C;
+  border-color:     #005E3C;
+}
+
+.well {
+  background-color:#005E3C1A;
+}
+
+.inline label{ 
+  display: table-cell; 
+  text-align: right; 
+  vertical-align: middle; 
+} 
+.inline .form-group{
+  display: table-row;
+}
+
+/* Left-align xtables: */
+div.MathJax_Display{
+   text-align: left !important;
+}
+
+/* Changing the color of prettyRadioButtons:  */
+.pretty input:checked~.state.p-success label:after, .pretty.p-toggle .state.p-success label:after {
+    background-color: #DCA559!important;
+}
+
+/* slide inputs: */
+.irs--shiny .irs-single {
+    color: #fff;
+    text-shadow: none;
+    padding: 1px 3px;
+    background-color: #DCA559;
+    color: #595855;
+    border-radius: 3px;
+    font-size: 11px;
+    line-height: 1.333;
+}
+.irs--shiny .irs-bar {
+    top: 25px;
+    height: 8px;
+    border-top: 1px solid #DCA559;
+    border-bottom: 1px solid #DCA559;
+    background: #DCA559;
+}
+.irs--shiny .irs-shadow {
+    background: rgba(255, 0, 0, 0);
+}
+
+/* Animation play button */
+a {
+    color: #DCA559;
+    text-decoration: none
+}
+a:hover, a:focus {
+    color: #DCA559CC;
+    text-decoration: underline;
+}
+
+/*  Navbar color selected button */
+.navbar-default .navbar-nav>.active>a, .navbar-default .navbar-nav>.active>a:focus, .navbar-default .navbar-nav>.active>a:hover {
+    background-color: #DCA55966;
+}
+.navbar-brand{width: 120%; padding: 5px 0px 0px 10px} body {padding-top: 30px;}
+/* .navbar-default {background-color: #005E3C1A;} */
+
+/* Glowing action buttons */
+@keyframes glowing {
+    0% { background-color: #fcfcfc; box-shadow: 0 0 10px #DCA559; }
+    50% { background-color: #e8f0fc; box-shadow: 0 0 30px #DCA55980; }
+    100% { background-color: #fcfcfc; box-shadow: 0 0 10px #DCA559; }
+}
+                                             
+
+
+
