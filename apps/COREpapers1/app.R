@@ -365,6 +365,12 @@ ui <- fluidPage(
                        helpText("Shift click for more than one adjacent format, command click for non-adjacent ones on Apples, control click on other machines"),
       ),
       
+      textInput("titleWord",
+                "Text to search for in paper titles",
+                value = ""),
+      helpText(paste("Matching is case insensitive, no wildcards.",
+                     "It's also inclusive so if you search for 'obsess' you will get papers with titles including 'obsessions', 'obsessionality' etc.")),
+      
       textInput("authName",
                 "Text to search for in names of authors",
                 value = ""),
@@ -402,6 +408,10 @@ ui <- fluidPage(
                   
                   tabPanel("DOIs and URLs",
                            value = 2,
+                           
+                           p("This lists all the DOIs and URLs"),
+                           p("If you want to find the papers using these you can search within the table with the search box"),
+                           p(" "),
                            
                            DT::dataTableOutput("papers2"),
                   ),
@@ -483,7 +493,7 @@ ui <- fluidPage(
                            
                            p("App started 10.v.24 by Chris Evans.",
                              a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/")),
-                           p(HTML("Last updated 5.xii.24: more improvements to 'Searching beyond 2021'")),
+                           p(HTML("Last updated 21.i.25: added searching in paper titles.")),
                            p("Licenced under a ",
                              a("Creative Commons, Attribution Licence-ShareAlike",
                                href="http://creativecommons.org/licenses/by-sa/1.0/"),
@@ -589,11 +599,20 @@ server <- function(input, output, session) {
     }
   })
   
+  titleWordToFind <- reactive({
+    validate(
+      need(input$titleWord == "" ||
+             tibDat %>% summarise(gotAmatch = sum(str_detect(TitleExcel, str_to_lower(input$titleWord)))) %>% pull() > 0,
+           "Sorry, that text is not found in any of the titles.")
+    )
+    str_to_lower(input$titleWord)
+  })
+  
   authToFind <- reactive({
     validate(
       need(input$authName == "" ||
              tibDat %>% summarise(gotAmatch = sum(str_detect(Author, str_to_lower(input$authName)))) %>% pull() > 0,
-           "Sorry, that text is not found in any of the author lists")
+           "Sorry, that text is not found in any of the author lists.")
     )
     str_to_lower(input$authName)
   })
@@ -602,7 +621,7 @@ server <- function(input, output, session) {
     validate(
       need(input$otherMeasure == "" ||
              tibDat %>% summarise(gotAmatch = sum(str_detect(OtherMeasureNamesLwr, str_to_lower(input$otherMeasure)), na.rm = TRUE)) %>% pull() > 0,
-           "Sorry, that text is not found in any of the other measures' names")
+           "Sorry, that text is not found in any of the other measures' names.")
     )
     str_to_lower(input$otherMeasure)
   })
@@ -699,6 +718,12 @@ server <- function(input, output, session) {
         filter(PaperLanguage %in% input$paperLang) -> tibDat
     }
     
+    ### filter for title word
+    if (titleWordToFind() != "") {
+      tibDat %>%
+        filter(str_detect(TitleExcel, fixed(titleWordToFind()))) -> tibDat
+    }
+    
     ### filter for author name
     if (authToFind() != "") {
       tibDat %>%
@@ -747,7 +772,7 @@ server <- function(input, output, session) {
                   extensions = "Buttons",
                   options = list(                                                     
                     fixedColumns = FALSE,
-                    pageLength = 10,
+                    pageLength = 50,
                     autoWidth = TRUE,
                     ordering = TRUE,
                     dom = 'frtip',
