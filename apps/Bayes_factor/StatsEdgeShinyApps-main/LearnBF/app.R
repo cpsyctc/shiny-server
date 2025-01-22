@@ -11,7 +11,7 @@ library(fontawesome)
 # install devtools in server
 # install the following specific kableExtra from Github (other version of this package will break
 #   tables with using the collapse_rows() function):
-#   devtools::install_github(repo="haozhu233/kableExtra", ref="a6af5c0")
+# devtools::install_github(repo="haozhu233/kableExtra", ref="a6af5c0")
 
 # Function computing the t-test from summaries ----
 t.test.summ <- function(m1, m2, sd1, sd2, n1, n2, alternative = "H1.diff0")
