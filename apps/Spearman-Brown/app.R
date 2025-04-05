@@ -134,7 +134,7 @@ ui <- fluidPage(
                   tabPanel("Background", 
                            p("App created 2.v.24 by Chris Evans",
                              a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/")),
-                           p("Last updated 2.v.24."),
+                           p("Last updated 5.iv.25 to fix download not downloading all rows of the reliabilities."),
                            p("Licenced under a ",
                              a("Creative Commons, Attribution Licence-ShareAlike",
                                href="http://creativecommons.org/licenses/by-sa/1.0/"),
@@ -245,7 +245,7 @@ server <- function(input, output, session) {
                   extensions = "Buttons",
                   options = list(                                                     
                     fixedColumns = TRUE,
-                    pageLength = 20,
+                    pageLength = -1,
                     autoWidth = TRUE,
                     ordering = TRUE,
                     dom = 'frtipB',

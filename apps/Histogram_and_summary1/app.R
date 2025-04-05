@@ -119,6 +119,7 @@ ui <- fluidPage(
                   tabPanel("Summary", 
                            p("The table below gives some simple descriptive statistics for your data"),
                            p(" "),
+                           uiOutput("nDP"),
                            DT::dataTableOutput("summary"),
                            p(" "),
                            br(),
@@ -128,7 +129,7 @@ ui <- fluidPage(
                            p("Geek point: The quantiles and median are computed by R's default method, type 7.  This may lead to small differences from values",
                              "returned from SAS, which uses type 3 and from Minitab and SPSS which use type 6.",
                              "see ",
-                             a("detailed wikipedia artile", href="https://en.wikipedia.org/wiki/Quantile"),
+                             a("detailed wikipedia article", href="https://en.wikipedia.org/wiki/Quantile"),
                              "for much more detail on that probably entirely academic issue for our sorts of data."),
                            p(" ")),
                   
@@ -142,7 +143,7 @@ ui <- fluidPage(
                   tabPanel("Background", 
                            p("App created 22.iii.24 by Chris Evans",
                              a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/")),
-                           p("Last updated 26.iii.24."),
+                           p("Last updated 5.iv.25 to add control of the decimal places in the summary output."),
                            p("Licenced under a ",
                              a("Creative Commons, Attribution Licence-ShareAlike",
                                href="http://creativecommons.org/licenses/by-sa/1.0/"),
@@ -231,13 +232,13 @@ server <- function(input, output, session) {
   })
   
   selectedData <- reactive({
-    req(input$var)
+    req(input$var, input$nDP)
     fullData() %>%
       select(input$var)
   })
   
   tibSummary <- reactive({
-    req(input$var)
+    req(input$var, input$nDP)
     selectedData() %>%
       summarise(nRows = n(),
                 nMiss = sum(is.na(!!input$var)),
@@ -260,10 +261,13 @@ server <- function(input, output, session) {
                 Mean = mean(!!input$var, na.rm = TRUE),
                 SD = sd(!!input$var, na.rm = TRUE),
                 Variance = var(!!input$var, na.rm = TRUE))  %>%
+      # mutate(across(Min : Variance, ~ round(.x, nDP()))) %>%
+      # mutate(across(Min : Variance, round, nDP())) %>%
       rename(`n(Rows)` = nRows,
              `n(Missing)` = nMiss,
              `n(Usable)` = nOK) %>%
-      pivot_longer(cols = everything()) 
+      pivot_longer(cols = everything()) %>%
+      mutate(value = round(value, nDP()))
   })
   
   output$summary <- DT::renderDataTable(
@@ -292,6 +296,7 @@ server <- function(input, output, session) {
                   extensions = "Buttons",
                   options = list(                                                     
                     fixedColumns = TRUE,
+                    pageLength = -1,
                     autoWidth = TRUE,
                     ordering = TRUE,
                     dom = 'frtipB',
@@ -355,6 +360,19 @@ server <- function(input, output, session) {
     id = "plotDownload", # <= this should match the ID used in the UI module
     ggplotObject = histPlot # No parentheses here to pass *expression*
   )
+  
+  output$nDP <- renderUI({
+    numericInput("nDP", "Number of decimal places (between 1 and 7)",
+                 value = 3,
+                 min = 1,
+                 max = 7,
+                 step = 1,
+                 width = "100%")
+  })
+  
+  nDP <- reactive({
+    round(as.numeric(input$nDP))
+  })
 
 }
 

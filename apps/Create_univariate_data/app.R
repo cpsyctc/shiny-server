@@ -156,7 +156,7 @@ ui <- fluidPage(
                   tabPanel("Background", 
                            p("App created 7.iv.24 by Chris Evans",
                              a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/"),
-                             p("Last updated 7.iv.24."),
+                             p("Last updated 5.iv.25: tweak to ensure that the full length of larger simulations show and download OK."),
                              "Licenced under a ",
                              a("Creative Commons, Attribution Licence-ShareAlike",
                                href="http://creativecommons.org/licenses/by-sa/1.0/"),
@@ -244,7 +244,8 @@ server <- function(input, output, session) {
   output$dataTable <- DT::renderDataTable(
     DT::datatable({as_tibble(data())},
                   extensions = "Buttons",
-                  options = list(                                                     
+                  options = list(
+                    pageLength = -1,
                     fixedColumns = TRUE,
                     autoWidth = TRUE,
                     ordering = TRUE,
