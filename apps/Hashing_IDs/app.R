@@ -45,10 +45,6 @@ ui <- fluidPage(
         "that you write the key phrase you input here down somewhere so you can use it again."),
       textInput("hashKey", "Hashing key value you want", value = "Whatever you want!"),
       
-      p("The next step is to upload, or input the data containing the variable you want to be ",
-        "hashed.  Next block is for uploading a file, then there is the option to just paste ",
-        "in a vector of values."),
-      
       # Input: file type ----
       radioButtons("dataType", 
                    "What type of file do you want to use?",
@@ -60,7 +56,7 @@ ui <- fluidPage(
                                "TSV (Tab Separated Variables)" = "tsv",
                                "SPSS sav file" = "sav"),
                    selected = "csv"),
-                   
+      
       # Input: Select a file ----
       fileInput("file1", "Choose file if using file upload"),
       
@@ -75,7 +71,7 @@ ui <- fluidPage(
                    max = 20,
                    step = 1,
                    width = "100%"),
-
+      
       tags$p("If you are inputting a csv file you have to define the separator"),
       
       # Input: Select separator ----
@@ -94,8 +90,6 @@ ui <- fluidPage(
                                "Double Quote" = '"',
                                "Single Quote" = "'"),
                    selected = '"'),
-      
-      p("Instead of uploading via a file,  you can paste the data in here"),
     ),
     
     # Main panel for displaying outputs ----
@@ -110,11 +104,19 @@ ui <- fluidPage(
                            # Output: Data file ----
                            tableOutput("top20")),
                   
-                  tabPanel("Data", 
+                  tabPanel("Data with hashed values", 
                            p(" "),
-                           p("This shows all the data for the selected variable.  Buttons at the bottom allow you to export the data."),
+                           p("This shows the first ten rows of the data with hashed values."),
                            p(" "),
-                          DT::dataTableOutput("contents")),
+                           tableOutput('viewHead'),
+                           p("You can download the entire dataset using the following button.  ",
+                             "I have chosen csv (comma separated variables) format as it's a ",
+                             "nice safe format for simple data like this and can be imported into ",
+                             "pretty much any software though you may have to check out how if you ",
+                             "haven't done this before."),
+                           downloadButton("download", "Download as csv")),
+                  
+                  # DT::dataTableOutput("contents")),
                   
                   tabPanel("Background", 
                            p("App created 05.iv.25 by Chris Evans",
@@ -139,7 +141,7 @@ server <- function(input, output, session) {
   })
   
   telemetry$start_session(track_inputs = TRUE, track_values = FALSE) # 3. Track basics and inputs and not input values
-
+  
   fileSelected <- reactive({
     req(input$dataType)
     input$file1$datapath
@@ -152,15 +154,15 @@ server <- function(input, output, session) {
     
     if (input$dataType == "csv") {
       dataInput <- read.csv(fileSelected(),
-                     header = input$header,
-                     sep = input$sep,
-                     quote = input$quote)
+                            header = input$header,
+                            sep = input$sep,
+                            quote = input$quote)
     }
     
     if (input$dataType == "tsv") {
       suppressMessages(dataInput <- read_tsv(fileSelected(),
-                            col_names = input$header))
-                            # quote = input$quote)
+                                             col_names = input$header))
+      # quote = input$quote)
     }
     
     if (input$dataType == "xls") {
@@ -226,23 +228,18 @@ server <- function(input, output, session) {
       filter(row_number() < 21)
   })
   
-  output$contents <- DT::renderDataTable(
-    DT::datatable({hashedData()},
-                  extensions = "Buttons",
-                  options = list(                                                     
-                    fixedColumns = TRUE,
-                    autoWidth = TRUE,
-                    ordering = TRUE,
-                    dom = 'frtipB',
-                    editable = FALSE,
-                    searching = FALSE,
-                    buttons = c('copy', 'csv', 'excel', "pdf")
-                  ),
-    )
+  output$viewHead <- renderTable({
+    head(hashedData())
+  })
+  
+  output$download <- downloadHandler(
+    filename = "hashedValues.csv",
+    contentType = "text/csv",
+    content = function(file) {
+      write_csv(hashedData(), file = file)
+    }
   )
   
-
-
 }
 
 # Create Shiny app ----
