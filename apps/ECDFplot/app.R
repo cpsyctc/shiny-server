@@ -82,8 +82,13 @@ plotQuantileCIsfromDat2 <- function (vecDat = NA,
   minVal <- min(vecDat)
   maxVal <- max(vecDat)
   rangeVal <- maxVal - minVal
-  tibCIs <- getCIforQuantiles(vecDat, vecQuantiles, method = method, 
-                              ci = ci, R = R, type = type)
+  tibCIs <- getCIforQuantiles(vecDat, 
+                              vecQuantiles, 
+                              method = method, 
+                              ci = ci, 
+                              R = R, 
+                              type = type)
+  
   vecDat %>% as_tibble() %>% 
     filter(!is.na(value)) -> tibDat
   
@@ -193,12 +198,17 @@ ui <- fluidPage(
   h1(HTML("ECDF plot with quantiles and CIs for quantiles")),
   
   p("This app is really a test of concept and should be followed by other apps using both paste or uploaded data."),
-  p("You input data using the sidebar on the left to select whether you are pasting or uploading."),
-  p("choose the file to upload (you should see a file upload dialogue for that).",
-    "You may need to use some of the other sidebar inputs depending on your file format.",
-    "The first tab to the right of the sidebar will show you the top rows of the data and allow you to choose your variable.",
-    "Once you have selected your variable the next tab show the histogram which you can customise a bit and can download in various formats.",
-    "Similarly, the summary tab gives you some summary statistics for your dataset which you can download and the data tab shows the actual variable data."),
+  p("You input data using the sidebar on the left starting by saying whether you are pasting or uploading."),
+  p("I recommend uploading from file as it's less prone to mangle your data than pasting.  ",
+    "It's hard to parse pasted data properly with different decimal separators and possible use of ",
+    "a thousands separator on top of the diversity of separators and quoting.  So please check the ",
+    "summary of the data to see if it matches what you expect."),
+  p("If uploading data the first tab to the right of the sidebar will show you the top rows of the data ",
+    "and allow you to choose your variable to analyse."),
+  p("Once you have got your data in the next tab show the histogram.  ",
+    "You can customise that a bit and can download it in various formats.",
+    "Similarly, the summary tab gives you some summary statistics for your dataset which you can ",
+    "download.  The final, data, tab shows the actual data you uploaded or input."),
   
   # Sidebar layout with input and output definitions ----
   sidebarLayout(
@@ -211,11 +221,7 @@ ui <- fluidPage(
                    choices = c("Upload your data from file" = "upload",
                                "Paste your data in" = "paste"),
                    selected = character(0)),
-      helpText(paste0("I recommend uploading from file as it's less prone to mangle your data than pasting.  ",
-                      "It's hard to parse pasted data properly with different decimal separators and possible use of ",
-                      "a thousands separator on top of the diversity of separators and quoting.  So please check the ",
-                      "summary of the data to see if it matches what you expect.")),
-      
+
       conditionalPanel(condition = "input.inputType == 'paste'",
                        
                        p("Paste or type your data in the box below."),
@@ -223,17 +229,23 @@ ui <- fluidPage(
                                      "Paste your data here (you need at least ten values):",
                                      width = "100%",
                                      resize = "both"),
-                       helpText("Pasted data can have various formats"),
+                       helpText("Pasted data must be numeric but can have various formats"),
                        
-                       # Input: Select quotes ----
-                       radioButtons("quoteChar", 
-                                    "Quote",
-                                    choices = c("None" = "",
-                                                "Double Quote" = '"',
-                                                "Single Quote" = "'"),
-                                    selected = ""),
+                       # # Input: Select quotes ----
+                       # radioButtons("quoteChar", 
+                       #              "Quote",
+                       #              choices = c("None" = "",
+                       #                          "Double Quote" = '"',
+                       #                          "Single Quote" = "'"),
+                       #              selected = ""),
                        
-                       tags$p("You may have to choose a separator character"),
+                       tags$p("Choose a separator character.  Be careful! ",
+                              "You will get very odd analyses if you have ",
+                              "the wrong separator, e.g. if you leave it as ",
+                              "the default of a space when your separator is ",
+                              "actually a comma. Look at the summary tab on the ",
+                              "right to see if those statistics look sensible.  ",
+                              "If your separator is not a space then spaces are ignored."),
                        
                        # Input: Select separator ----
                        radioButtons("sepChar", 
@@ -331,12 +343,15 @@ ui <- fluidPage(
                            ),
                            conditionalPanel(condition = "input.inputType == 'upload'",
                                             p(" "),
+                                            uiOutput('dropdownID'),
+                                            
                                             p(" "),
-                                            p("Here is the start of the uploaded data:"),
+                                            p("Here is the start of the uploaded data for that variable:"),
                                             p(" "),
+                                            
                                             tableOutput("top20"),
                                             
-                                            uiOutput('dropdownID'),
+                                            # uiOutput('dropdownID'),
                            ),
                   ),
                   
@@ -488,7 +503,7 @@ ui <- fluidPage(
                            
                            p("App started 16.iv.24 by Chris Evans.",
                              a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/")),
-                           p("Last updated 5.v.24."),
+                           p("Last updated 5.iv.25 to improve handling of pasted data."),
                            p("Licenced under a ",
                              a("Creative Commons, Attribution Licence-ShareAlike",
                                href="http://creativecommons.org/licenses/by-sa/1.0/"),
@@ -577,7 +592,6 @@ server <- function(input, output, session) {
     ### select numeric variables only
     dataInput %>%
       select(where(is.numeric))
-    # return(dataInput)
   })
   
   output$dropdownID <- renderUI({
@@ -603,15 +617,24 @@ server <- function(input, output, session) {
   ###
   output$text2 <- renderUI(pastedDataRaw())
   
-  output$data1 <- renderText(pastedDataNum()[1:5]) 
+  # output$data1 <- renderText(pastedDataNum()[1:5]) 
+  output$data1 <- renderText(tmpRawDataShort()) 
   
-  tmpRawData <- reactive({
+  tmpRawDataShort <- reactive({
+    validate(
+      need(nchar(input$pastedData) > 50, 
+           "You have fewer than 50 characters there, highly unlikely that that will be enough data"),
+    )
     str_sub(input$pastedData, 1, 24)
   })
   
   pastedDataRaw <- reactive({
     req(input$pastedData)
-    paste0("The first 24 characters of your raw data are: ", tmpRawData())
+    validate(
+      need(nchar(input$pastedData) > 50, 
+           ""),
+    )
+    paste0("The first 24 characters of your raw data are: ", tmpRawDataShort())
   })
   
   pastedDataNum <- reactive({
@@ -622,7 +645,8 @@ server <- function(input, output, session) {
     )
     parseData(input$pastedData,
               sepChar = input$sepChar,
-              quoteChar = input$quoteChar,
+              # quoteChar = input$quoteChar, ## doesn't apply as we're looking for numeric data, hence ...
+              quoteChar = "",
               decChar = input$decChar,
               bigChar = input$bigChar)
   })
@@ -857,20 +881,10 @@ server <- function(input, output, session) {
   ### now the ECDF/quantile plot
   
   makePlot <- function(data, vecQuantiles, ci) {
-    # cat(file=stderr(), "data inside makePlot() is:", unlist(data), "\n")
-    # cat(file=stderr(), "str(data) inside makePlot() is:", unlist(str(data)), "\n")
-    # cat(file=stderr(), "vecQuantiles inside makePlot() is:", unlist(vecQuantiles), "\n")
-    
-    # cat(file=stderr(), "got here #1", "\n")
     ### get data to vector form
     data %>%
       pull() -> vecData
-    
-    # cat(file=stderr(), "got here #2\n")
-    # cat(file=stderr(), "vecData inside makePlot() 2nd time is:", vecData, "\n")
-    # 
-    # cat(file=stderr(), "got here #3\n")
-    
+
     suppressWarnings(suppressMessages(plotQuantileCIsfromDat2(vecDat = vecData, 
                                                               vecQuantiles = vecQuantiles, 
                                                               method = "N", 
