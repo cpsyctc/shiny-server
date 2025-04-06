@@ -120,7 +120,10 @@
   <li><b>Apps giving useful values from a few inputs</b>
   <ul>
   <li><b><i>Apps saving you from looking up formulae or using a calculator</i></b></li>
-    <li><a href="./apps/RCI1/">App that gives you the RCI (Reliable Change Index) for given baseline score SD, reliability and the inclusion interval you want (usually .95, i.e. 95%)</a>.  Uses the <i></i>getRCIfromSDandAlpha()</i> function from the <a href="https://cecpfuns.psyctc.org/">CECPfuns R library</a> but the maths is trivial.  See also this next ...</li>
+    <li><a href="./apps/useConvFiveNum/">App that gives you estimated mean and SD given sufficient of the min, q1, median, q3 and max for a dataset</a>.  
+       Uses the <i></i>conv.fivenum()</i> function from the <a href="https://wviechtb.github.io/metafor/reference/conv.fivenum.html">metafor R package</a></li>
+    <li><a href="./apps/RCI1/">App that gives you the RCI (Reliable Change Index) for given baseline score SD, reliability and the inclusion interval you want (usually .95, i.e. 95%)</a>.  
+    Uses the <i></i>getRCIfromSDandAlpha()</i> function from the <a href="https://cecpfuns.psyctc.org/">CECPfuns R package</a> but the maths is trivial.  See also this next ...</li>
     <li><a href="./apps/RCI2/">App which extends that to give you a plausible interval around that RCI</a> using the confidence interval for the SD given your n.  And that links with this next ...</li>
     <li><a href="./apps/CSC1/">App that gives you the CSC (Clinically Significant Change)</a> method c cut off value for given referential help-seeking and non-help-seeking means and SDs.  The maths is trivial for the CSC but this does show the plot of the probabilities underpinning the CSC and that it balances the misclassification rates (given truly Gaussian distributions!).</li>
     <li><a href="./apps/g_from_d_and_n/">App that gives you Hedges's g effect size measure</a> given reported Cohen's d and the n.  See also my <a href="https://www.psyctc.org/Rblog/">Rblog</a> post: <a href="https://www.psyctc.org/Rblog/posts/2024-01-19-hedgess-g/">Hedges's g</a>.</li>
@@ -133,7 +136,7 @@
     
 
     <li><i><b>Apps giving confidence intervals from observed counts or statistics and dataset sizes</b></i><br>These can be useful if you have these statistics from a report that doesn't give the confidence intervals.</li>
-      <li><a href="./apps/CIproportion/">App that gives you a confidence interval around an observed proportion</a> given the total <i>n</i>, x the (smaller) number of interest within that <i>n</i> and the width of CI you want (usually .95, i.e. 95%).  Uses the binconf() function from the Hmisc R library which uses the Wilson method to get the CI.</li>
+      <li><a href="./apps/CIproportion/">App that gives you a confidence interval around an observed proportion</a> given the total <i>n</i>, x the (smaller) number of interest within that <i>n</i> and the width of CI you want (usually .95, i.e. 95%).  Uses the binconf() function from the Hmisc R package which uses the Wilson method to get the CI.</li>
       <li><a href="./apps/CIdiff2proportions/">App that gives you a confidence interval around the difference between two independent proportions</a> given the total <i>n</i>, x in each dataset/group, the numbers of interest within each group <i>n</i> and the width of CI you want (usually .95, i.e. 95%).  Gives what I call a "biplane plot" of the two CIs.</li>
       <li><a href="./apps/CImean/">App that gives you a confidence interval (CI) around an observed mean</a> given that value, either the observed SD or SE, the width of CI you want (usually .95, i.e. 95%) and the <i>n</i> of the dataset from which the alpha was obtained.  The maths is parametric and can be sensitive to non-Gaussian distributions, bootstrap CI definitely preferred if you have the raw data.</li>
       <li><a href="./apps/CISD/">App that gives you a confidence interval (CI) around an observed SD or variance</a> given that value, either the observed SD or SE, the width of CI you want (usually .95, i.e. 95%) and the <i>n</i> of the dataset from which the alpha was obtained.  Again, the maths is parametric and can be sensitive to non-Gaussian distributions, bootstrap CI definitely preferred if you have the raw data.</li>
@@ -184,6 +187,6 @@ As above: do please <a href="https://www.psyctc.org/psyctc/contact-me/">contact 
   <a href="https://www.psyctc.org/psyctc/book/glossary/">online glossary</a> and new posts in 
   <a href="https://www.psyctc.org/Rblog/index.html">the Rblog</a>. You can sign up for the update list 
   <a href="https://ombook.psyctc.org/signup">here</a> to be alerted to new things.</p>
-  <p><i>Last updated 10.ii.25</i></p>
+  <p><i>Last updated 6.iv.25</i></p>
   </div>
 </html>
