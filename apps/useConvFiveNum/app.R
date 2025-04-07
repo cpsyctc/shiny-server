@@ -4,7 +4,7 @@ suppressMessages(library(shinyWidgets))
 suppressMessages(library(tidyverse))
 suppressMessages(library(metafor))
 suppressMessages(library(shiny.telemetry))
-# suppressMessages(library(shinyDownload)) # from remotes::install_github("keithnewman/shinyDownload")
+suppressMessages(library(shinyDownload)) # from remotes::install_github("keithnewman/shinyDownload")
 
 ### set ggplot defaults
 theme_set(theme_bw())
