@@ -125,7 +125,7 @@ retInputs <- function(overallAlpha, effectSize, yourK, maxK, minN, maxN) {
 
 # Define server logic required
 server <- function(input, output, session) {
-  telemetry$start_session(track_inputs = TRUE, track_values = TRUE) # 3. Track basics and inputs and input values
+  telemetry$start_session(track_inputs = FALSE, track_values = FALSE) # 3. Track basics and inputs and input values
   
   ### from https://community.rstudio.com/t/r-crashes-when-closing-shiny-app-window-instead-of-clicking-red-stop-button-in-rstudio/131951
   session$onSessionEnded(function() {
