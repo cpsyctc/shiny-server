@@ -18,15 +18,6 @@ telemetry <- Telemetry$new(app_name = "Bonferroni1",
 ui <- fluidPage(
   use_telemetry(), # 2. Add necessary Javascript to Shiny
   setBackgroundColor("#ffff99"),
-  ### this is from
-  ### https://stackoverflow.com/questions/51298177/how-to-centre-the-titlepanel-in-shiny
-  ### and centers the first title across the whole page by tweaking the css
-  # tags$head(
-  #   tags$style(
-  #     ".title {margin: auto; align: center}"
-  #   )
-  # ),
-  # tags$div(class="title", titlePanel("Power loss with Bonferroni correction\n\n")),
   HTML(r"(
     <h1><center>Power loss with Bonferroni correction</center></h1>
     <p>This (cosmetically horrible!) app shows the effect of using the Bonferroni correction for a given number of tests, <i>k</i>.</p>
