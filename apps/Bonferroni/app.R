@@ -1,13 +1,12 @@
 ### Bonferroni1
 
-### shiny app to model the basic screening situation
+### shiny app to model the Bonferroni correction and its costs in power terms
 
 suppressMessages(library(tidyverse))
 suppressMessages(library(shiny))
 suppressMessages(library(shinyWidgets))
 suppressMessages(library(pwr)) # for power calculation
 suppressMessages(library(shiny.telemetry))
-# suppressMessages(library(shinyvalidate)) # input validation
 
 ### 1. Initialize telemetry with default options (store to a local logfile)
 telemetry <- Telemetry$new(app_name = "Bonferroni1",
@@ -20,21 +19,24 @@ ui <- fluidPage(
   setBackgroundColor("#ffff99"),
   HTML(r"(
     <h1><center>Power loss with Bonferroni correction</center></h1>
-    <p>This (cosmetically horrible!) app shows the effect of using the Bonferroni correction for a given number of tests, <i>k</i>.</p>
-    <p>It is using the model of t-tests so the effect size you put into the input panel on the left is the same as Cohen's d for the t-test but the principle generalises to any test.</p>
-    <p>The calculations are for independent t-tests of two groups of the same size so this is a very limited model but the principle of the power costs of the Bonferroni correction will hold across all sorts of null hypothesis tests.</p>
-    <p>The app gives the power for one test, the power for your chossen number of tests then a plot which maps power against sample size for a range of <i>k</i>, the number of tests highlighting the number of tests you chose in red and mapping for k from 1 to maxK.  Finally, it tabulates the mapping of power against <i>n</i> for your <i>k</i>.</p>
-    <p>The overall, experimentwise or reportwise alpha you want defaults to .05 but you can change that.</p>
-    <p><b>Shiny currently (24.xii.23) throws a warning if you empty any of the inputs so try to change them using the adjuster arrows without ever emptying them while I try to understand and fix that!</b></p>
+    <p>This app shows the effect of using the Bonferroni correction for a given number of tests, <i>k</i>.</p>
+    <p>It is using the model of t-tests so the effect size you put into the input panel on the left is the same as Cohen's d for the t-test.
+    The calculations are for independent t-tests of two groups of the same size so this is a very limited model, however the principle 
+    generalises to all sorts of null hypothesis tests.</p>
+    <p>The app gives on two text lines after showing you your input the power for one test and then the power for your chosen number of tests.<br>
+    It then gives a plot which maps power against sample size for a range of <i>k</i>, the number of tests highlighting the number of tests you chose in red
+    and mapping for k from 1 to maxK: the maximum number of tests you requested to be modelled.<br>
+    Finally, it tabulates the mapping of power against <i>n</i> for your <i>k</i>.</p>
+    <p>The overall, experimentwise or reportwise alpha you want defaults to the conventional .05 but you can change that.</p>
   )"),
   
   # Get input values
   sidebarLayout(
     sidebarPanel(
-      h3("Put your values in here, for reasons I don't understand, best to delete existing values to change them, rather than using the arrows",
+      h3("Put your values in here",
          align = "center"),
       numericInput("overallAlpha",
-                   "The overall, experimentwise, reportwise, alpha you want",
+                   "The overall alpha, experimentwise, reportwise, that you want",
                    value = .05,
                    min = .01,
                    max = .2,
@@ -46,37 +48,37 @@ ui <- fluidPage(
                    max = 5,
                    width="100%"),
       numericInput("yourK",
-                   "Your number of tests (your k))",
+                   "The number of tests in your report/experiment",
                    value = 3,
                    min = 10,
                    max = 10^5,
                    width="100%"),
       numericInput("maxK",
-                   "Maximum number of tests (maxK: for plot))",
+                   "Maximum number of tests to model and to plot",
                    value = 10,
                    min = 10,
                    max = 99,
                    width="100%"),
       numericInput("yourN",
-                   "Your n (at least 10))",
+                   "Your dataset size, n (at least 10))",
                    value = 10,
                    min = 10,
                    max = 10^5,
                    width="100%"),
       numericInput("minN",
-                   "Minimum n (at least 10: for plot))",
+                   "Minimum n to model (at least 10)",
                    value = 10,
                    min = 10,
                    max = 10^5,
                    width="100%"),
       numericInput("maxN",
-                   "Maximum n (up to 10,000: for plot)",
+                   "Maximum n to model (up to 10,000)",
                    value = 100,
                    min = 50,
                    max = 10^5,
                    width="100%"),
       numericInput("dp",
-                   "Decimal places you want in the PPV and NPV results (0 to 5)",
+                   "Decimal places you want in the results (0 to 5)",
                    value = 2,
                    min = 0,
                    max = 5)
@@ -132,28 +134,7 @@ server <- function(input, output, session) {
     stopApp()
   })
   
-  ### input validation #1. Create an InputValidator object (from shinyvalidate)
-  ### see https://rstudio.github.io/shinyvalidate/articles/shinyvalidate.html
-  # iv <- InputValidator$new()
-  
-  ### input validation #2. Add validation rules
-  # iv$add_rule("overallAlpha", sv_required())
-  # iv$add_rule("effectSize", sv_required())
-  # iv$add_rule("yourK", sv_required())
-  # iv$add_rule("maxK", sv_required())
-  # iv$add_rule("minN", sv_required())
-  # iv$add_rule("maxN", sv_required())
-  ### 
-  # iv$add_rule("overallAlpha", sv_numeric())
-  # iv$add_rule("effectSize", sv_numeric())
-  # iv$add_rule("yourK", sv_integer())
-  # iv$add_rule("maxK", sv_integer())
-  # iv$add_rule("minN", sv_integer())
-  # iv$add_rule("maxN", sv_integer())
-
-  
-  ### input validation #3. Start displaying errors in the UI
-  # iv$enable()
+  ### input validation 
   
   checkGT <- function(maxN, minN){
     if (maxN <= minN) {
@@ -168,9 +149,11 @@ server <- function(input, output, session) {
     return(TRUE)
   }
   
+  ### function to get power using pwr.t.test() from pwr package
   getPower <- function(n, d, alpha){
     pwr::pwr.t.test(n = n, d = d, sig.level = alpha)$power
   }
+  
   ### function to make the power table for the chosen k
   makeTibYourK <- function(overallAlpha,
                            effectSize,
@@ -188,10 +171,55 @@ server <- function(input, output, session) {
   ### 
   ### now the reactive values
   ###
-  reacOneTestPower <- reactive({getPower(input$yourN, input$effectSize, input$overallAlpha)})
-  reacYourPower <- reactive({getPower(input$yourN, input$effectSize, input$overallAlpha / input$yourK)})
+  reacOneTestPower <- reactive({
+    validate(
+      need(!is.na(input$overallAlpha), 
+           "You must give a value for the overall alpha"),
+      need(!is.na(input$effectSize), 
+           "You must give a value for the effect size"),
+      need(!is.na(input$yourK), 
+           "You must give a value for k, the number of tests you are doing"),
+      need(!is.na(input$minN), 
+           "You must give a value for the minimum n to model"),
+      need(!is.na(input$maxN), 
+           "You must give a value for the minimum n to model"),
+    )
+    getPower(input$yourN, input$effectSize, input$overallAlpha)
+    })
+  
+  reacYourPower <- reactive({
+    validate(
+      need(!is.na(input$overallAlpha), 
+           "You must give a value for the overall alpha"),
+      need(!is.na(input$effectSize), 
+           "You must give a value for the effect size"),
+      need(!is.na(input$yourK), 
+           "You must give a value for k, the number of tests you are doing"),
+      need(!is.na(input$minN), 
+           "You must give a value for the minimum n to model"),
+      need(!is.na(input$maxN), 
+           "You must give a value for the minimum n to model"),
+      need(!is.na(input$dp), 
+           "You must give a value for number of decimal places in the output!")
+    )
+    getPower(input$yourN, input$effectSize, input$overallAlpha / input$yourK)
+    })
 
   reacTibYourK <- reactive({
+    validate(
+      need(!is.na(input$overallAlpha), 
+           "You must give a value for the overall alpha"),
+      need(!is.na(input$effectSize), 
+           "You must give a value for the effect size"),
+      need(!is.na(input$yourK), 
+           "You must give a value for k, the number of tests you are doing"),
+      need(!is.na(input$minN), 
+           "You must give a value for the minimum n to model"),
+      need(!is.na(input$maxN), 
+           "You must give a value for the minimum n to model"),
+      need(!is.na(input$dp), 
+           "You must give a value for number of decimal places in the output!")
+    )
     makeTibYourK(input$overallAlpha,
                input$effectSize,
                input$yourK,
@@ -204,6 +232,7 @@ server <- function(input, output, session) {
                        yourK,
                        maxK,
                        minN,
+                       yourN,
                        maxN){
     tibble(n = minN : maxN) %>%
       mutate(overallAlpha = overallAlpha,
@@ -236,15 +265,13 @@ server <- function(input, output, session) {
                  colour = "red") +
       geom_line(data = tibYourK,
                 colour = "red") +
-      # geom_text(data = tibLabels,
-      #           aes(label = labelK),
-      #           nudge_x = nudgeX,
-      #           hjust = 0) +
-      # xlim(c(10, maxN + 15)) +
+      geom_vline(xintercept = yourN,
+                 linetype = 3) +
       ggtitle(paste0("Power for two-group t-test and effect size", effectSize, " against n",
               "\nSeparate lines for different numbers of tests (k) with Bonferroni correction",
               "\nThese show from k = 1 at the top to k = ", maxK,
-              " at the bottom, with your chosen k marked in red")) -> p
+              " at the bottom, with your chosen k marked in red",
+              "\nYour current dataset size is shown by the vertical dotted line.")) -> p
     return(p)
   }
   
@@ -253,9 +280,22 @@ server <- function(input, output, session) {
   ###
   
   output$powerPlot <- renderPlot({
-    ### input validation 4. Don't proceed if any input is invalid
-    # req(iv$is_valid())
-    
+    validate(
+      need(!is.na(input$overallAlpha), 
+           "You must give a value for the overall alpha"),
+      need(!is.na(input$effectSize), 
+           "You must give a value for the effect size"),
+      need(!is.na(input$yourK), 
+           "You must give a value for k, the number of tests you are doing"),
+      need(!is.na(input$maxK), 
+           "You must give a value for the maximum number of tests you want to model"),
+      need(!is.na(input$minN), 
+           "You must give a value for the minimum n to model"),
+      need(!is.na(input$maxN), 
+           "You must give a value for the minimum n to model"),
+      need(!is.na(input$dp), 
+           "You must give a value for number of decimal places in the output!")
+    )
     # validate(
     #   need(checkGT(input$maxN, input$minN),
     #        "maxN must be greater than minN"),
@@ -269,6 +309,7 @@ server <- function(input, output, session) {
              input$yourK,
              input$maxK,
              input$minN,
+             input$yourN,
              input$maxN)
   })
   
