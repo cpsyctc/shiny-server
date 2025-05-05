@@ -863,8 +863,10 @@ server <- function(input, output, session) {
   downloadGGPlotButtonServer(
     id = "mainPlotDownload", # <= this should match the ID used in the UI module
     ggplotObject = mainPlot, # No parentheses here to pass *expression*
-    width = input$fileWidth,
-    height = input$fileHeight
+    width = 1500,
+    height = 800
+    # width = input$fileWidth,
+    # height = input$fileHeight
   )
   
   output$SCOPUSsearchText <- downloadHandler(
