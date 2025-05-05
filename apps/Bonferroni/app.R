@@ -5,10 +5,9 @@
 suppressMessages(library(tidyverse))
 suppressMessages(library(shiny))
 suppressMessages(library(shinyWidgets))
+suppressMessages(library(shinyDownload))
 suppressMessages(library(pwr)) # for power calculation
 suppressMessages(library(shiny.telemetry))
-
-logger::log_threshold("DEBUG", namespace = "shiny.telemetry")
 
 ### 1. Initialize telemetry with default options (store to a local logfile)
 telemetry <- Telemetry$new(app_name = "Bonferroni1",
@@ -63,7 +62,7 @@ ui <- fluidPage(
                    width="100%"),
       numericInput("yourN",
                    "Your dataset size, n (at least 10))",
-                   value = 10,
+                   value = 25,
                    min = 10,
                    max = 10^5,
                    width="100%"),
@@ -98,18 +97,31 @@ ui <- fluidPage(
       h2("Plot of power"),
       plotOutput("powerPlot", height = 500),
       
+      downloadGGPlotButtonUI("mainPlotDownload", "powerPlot"),
+      
       h2("Power table"),
-      p("In case you need to plan a power analysis, this probably long, table gives you power for all n range for your k ..."),
+      p("In case you need to plan a power analysis this, probably long, table gives you power for all
+        n across the range you requested and for your k, i.e. the number of tests you plan to do.  
+        At the end of the table there is a button that allows you to download the table in CSV format 
+        if that is helpful for you."),
       tableOutput('table'),
       
+      p("You can download the entire dataset using the following button.  ",
+        "I have chosen csv (comma separated variables) format as it's a ",
+        "nice safe format for simple data like this and can be imported into ",
+        "pretty much any software though you may have to check out how if you ",
+        "haven't done this before."),
+      downloadButton("download", "Download as csv"),
       br(),
       br(),
       p("App created by Chris Evans",
         a("PSYCTC.org", href="https://www.psyctc.org/psyctc/about-me/"),
-        "licenced under a ",
+        "some time before 24.xii.24.  Licenced under a ",
         a("Creative Commons, Attribution Licence-ShareAlike",
           href="http://creativecommons.org/licenses/by-sa/1.0/"),
-        " Please respect that and put an acknowledgement and link back to here if re-using anything from here."),
+        " Please respect that and put an acknowledgement and link back to here if re-using 
+        anything from here."),
+      p("Updated 4.v.25 and 5.v.25 sorting out various infelicities in the original."),
       hr(),
       includeHTML("https://shiny.psyctc.org/boilerplate.html")
     )
@@ -267,13 +279,37 @@ server <- function(input, output, session) {
                  colour = "red") +
       geom_line(data = tibYourK,
                 colour = "red") +
+      ### intersect lines for current situation
       geom_vline(xintercept = yourN,
-                 linetype = 3) +
+                 linetype = 3,
+                 colour = "red") +
+      geom_hline(yintercept = reacYourPower(),
+                 linetype = 3,
+                 colour = "red") +
+      ### annotations
+      annotate("text",
+               x = maxN,
+               y = reacYourPower() - 0.02,
+               hjust = 1,
+               vjust = 1,
+               label = paste0("Your power with ",
+                              yourK,
+                              " tests and n = ",
+                              yourN,
+                              " is ",
+                              round(reacYourPower(), input$dp))) +
+      annotate("text",
+               x = yourN,
+               y = .95,
+               hjust = 0,
+               vjust = 1,
+               label = paste0("  Your n is ",
+                              yourN)) +
       ggtitle(paste0("Power for two-group t-test and effect size", effectSize, " against n",
               "\nSeparate lines for different numbers of tests (k) with Bonferroni correction",
               "\nThese show from k = 1 at the top to k = ", maxK,
               " at the bottom, with your chosen k marked in red",
-              "\nYour current dataset size is shown by the vertical dotted line.")) -> p
+              "\nYour current scenario is shown by the intersecting dotted (red) lines and annotation.")) -> p
     return(p)
   }
   
@@ -282,6 +318,34 @@ server <- function(input, output, session) {
   ###
   
   output$powerPlot <- renderPlot({
+    validate(
+      need(!is.na(input$overallAlpha), 
+           "You must give a value for the overall alpha"),
+      need(!is.na(input$effectSize), 
+           "You must give a value for the effect size"),
+      need(!is.na(input$yourK), 
+           "You must give a value for k, the number of tests you are doing"),
+      need(!is.na(input$maxK), 
+           "You must give a value for the maximum number of tests you want to model"),
+      need(!is.na(input$minN), 
+           "You must give a value for the minimum n to model"),
+      need(!is.na(input$maxN), 
+           "You must give a value for the minimum n to model"),
+      need(!is.na(input$dp), 
+           "You must give a value for number of decimal places in the output!")
+    )
+    # validate(
+    #   need(checkGT(input$maxN, input$minN),
+    #        "maxN must be greater than minN"),
+    #   need(checkGT(input$yourK, 1),
+    #        "yourK must be greater than 1"),
+    #   need(checkGE(input$maxK, input$yourK),
+    #        "maxK must be greater than or equal to yourK")
+    # )
+    mainPlot()
+  })
+  
+  mainPlot <- reactive({
     validate(
       need(!is.na(input$overallAlpha), 
            "You must give a value for the overall alpha"),
@@ -315,10 +379,12 @@ server <- function(input, output, session) {
              input$maxN)
   })
   
-  ### now the reactive text output of the PPV and NPV
+  ### now the reactive text output of the power values for this situation
   reacComputed <- reactive({
-    paste("The power for only one test is:                          ", round(reacOneTestPower(), input$dp),
-          "<br>The power after applying the Bonferroni correction is: ", round(reacYourPower(), input$dp))
+    paste("The power for only one test is:                          ", 
+          round(reacOneTestPower(), input$dp),
+          "<br>The power after applying the Bonferroni correction is: ", 
+          round(reacYourPower(), input$dp))
   })
   
   ### outputting the inputs
@@ -331,6 +397,13 @@ server <- function(input, output, session) {
               input$maxN)
   })
   
+  downloadGGPlotButtonServer(
+    id = "mainPlotDownload", # <= this should match the ID used in the UI module
+    ggplotObject = mainPlot, # No parentheses here to pass *expression*
+    width = 1500,
+    height = 800
+  )
+  
   ### the computed power
   output$retComputed <- renderText({
     reacComputed()
@@ -338,6 +411,14 @@ server <- function(input, output, session) {
   
   ### the power table
   output$table <- renderTable(reacTibYourK())
+  
+  output$download <- downloadHandler(
+    filename = "powerValues.csv",
+    contentType = "text/csv",
+    content = function(file) {
+      write_csv(reacTibYourK(), file = file)
+    }
+  )
 
 }
 
