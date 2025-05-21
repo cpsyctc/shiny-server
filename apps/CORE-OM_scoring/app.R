@@ -266,11 +266,15 @@ ui <- fluidPage(
   setBackgroundColor("#ffff99"),
   h1(HTML("App to score CORE-OM from my Excel (ugh) spreadsheet #1")),
   
-  p("This app uses data from the CORE-OM that has been put into the spreadsheet I created for people using Micro$oft forms",
+  p("This app uses data from the CORE-OM that has been put into the spreadsheet I created for people who were/are using Micro$oft forms",
     "to collect CORE-OM data."),
   p("You input data using the sidebar on the left to select the Excel file you want to analyse",
     "Then the data will appear in the Data tab to the right with the six scores: all items, non-risk and the four domains.",
     "If you have, say 2,500 rows of data it will definitely take a fair few seconds for the data."),
+  p("You can find an example of such a file with some artificial data in it",
+    a("Google_forms_CORE-OM_scoring-with-my-data.xlsx",
+      href="https://www.coresystemtrust.org.uk/wp-content/uploads/2025/05/Google_forms_CORE-OM_scoring-with-my-data.xlsx")),
+  p("If you download that file to your own machine to test this app I think you may need to reload this app to get it to work."),
   
   # Sidebar layout with input and output definitions ----
   sidebarLayout(
