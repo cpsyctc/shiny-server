@@ -335,7 +335,7 @@ ui <- fluidPage(
                            value = 3,
                            p("App created 16.iv.24 by Chris Evans at this point specifically for Oiatillo Temirov for checking his data.",
                              a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/")),
-                           p("Last updated 21.iv.24."),
+                           p("Last updated 21.v.24 (adding link to example file to upload to experiment with the app)."),
                            p("Licenced under a ",
                              a("Creative Commons, Attribution Licence-ShareAlike",
                                href="http://creativecommons.org/licenses/by-sa/1.0/"),
