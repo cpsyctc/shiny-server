@@ -101,7 +101,13 @@
     </div>
   </div>
   <div id = "main">
-  The current list of apps follows, click on one you want, allow a second or so for it to open.  
+    As of May 2025 I am creating some collections of apps which may make it easier to find the ones you want.
+    <ul>
+      <li><a href="./docs/CORE-OM/index.html">Apps pertinent to the CORE-OM,</a></li>
+      <li><a href="./docs/YP-CORE/index.html">Apps pertinent to the YP-CORE,</a></li>
+      <li><a href="./docs/CORE_general/index.html">Apps relating to any CORE measures</a></li>
+    </ul>
+    The full list of apps follows, click on one you want, allow a second or so for it to open.  
   <a href="https://www.psyctc.org/psyctc/contact-me/">Do contact me</a> if you hit problems or have questions.</body>
 <h2>Apps</h1>
 <ul>
@@ -122,30 +128,62 @@
   <li><b><i>Apps saving you from looking up formulae or using a calculator</i></b></li>
     <li><a href="./apps/useConvFiveNum/">App that gives you estimated mean and SD given sufficient of the min, q1, median, q3 and max for a dataset</a>.  
        Uses the <i></i>conv.fivenum()</i> function from the <a href="https://wviechtb.github.io/metafor/reference/conv.fivenum.html">metafor R package</a></li>
-    <li><a href="./apps/RCI1/">App that gives you the RCI (Reliable Change Index) for given baseline score SD, reliability and the inclusion interval you want (usually .95, i.e. 95%)</a>.  
-    Uses the <i></i>getRCIfromSDandAlpha()</i> function from the <a href="https://cecpfuns.psyctc.org/">CECPfuns R package</a> but the maths is trivial.  See also this next ...</li>
-    <li><a href="./apps/RCI2/">App which extends that to give you a plausible interval around that RCI</a> using the confidence interval for the SD given your n.  And that links with this next ...</li>
-    <li><a href="./apps/CSC1/">App that gives you the CSC (Clinically Significant Change)</a> method c cut off value for given referential help-seeking and non-help-seeking means and SDs.  The maths is trivial for the CSC but this does show the plot of the probabilities underpinning the CSC and that it balances the misclassification rates (given truly Gaussian distributions!).</li>
-    <li><a href="./apps/g_from_d_and_n/">App that gives you Hedges's g effect size measure</a> given reported Cohen's d and the n.  See also my <a href="https://www.psyctc.org/Rblog/">Rblog</a> post: <a href="https://www.psyctc.org/Rblog/posts/2024-01-19-hedgess-g/">Hedges's g</a>.</li>
-    <li><a href="./apps/CSClookup2a/">App that gives you the appropriate CSC (and hence CSC classification)</a> given a YP-CORE score, age and gender.  It allows use of lookup tables for the CSC for the UK and Ireland and for Italy.  See also my <a href="https://www.psyctc.org/Rblog/">Rblog</a> post: <a href="https://www.psyctc.org/Rblog/posts/2024-01-21-lookupcsc2/">CSC by gender and age</a> for more on this.</li>
-    <li><a href="./apps/Spearman-Brown/">App that gives you the predicted internal reliabilities for different lengths of measures</a> given a reliability and length or a measure.  See also my <a href="https://www.psyctc.org/Rblog/">Rblog</a> post about <a href="https://www.psyctc.org/Rblog/posts/2021-04-09-spearman-brown-formula/">the Spearman-Brown (or Brown-Spearman!) formula</a> that is behind this.   Links with this next ...</li>
-    <li><a href="./apps/Attenuation2/">App that gives you the attenuated correlation for any reliabilities of the two correlated variables and any unattenuated correlation</a>.  See also my OMbook glossary entry: <a href="https://www.psyctc.org/psyctc/glossary2/attenuation-by-unreliability-of-measurement/">Attenuation (by unreliability of measurement)</a>.</li>
-    <li><a href="./apps/Attenuation/">More complicated app for attenuated correlations giving plot and table of values for a range of unattenuated correlations and of reliabilities of one of the variables</a>.  And both link to this ...</li>
-    <li><a href="./apps/getCorrectedR/">App that gives you the 'corrected' correlation from an observed correlation and the reliabilities of the two  variables </a>.  This is the inverse of the last two apps above. Again, see also my OMbook glossary entry: <a href="https://www.psyctc.org/psyctc/glossary2/attenuation-by-unreliability-of-measurement/">Attenuation (by unreliability of measurement)</a>.</li>
+    <li><a href="./apps/RCI1/">App that gives you the RCI (Reliable Change Index) for given baseline score SD, reliability and the inclusion interval you want
+    (usually .95, i.e. 95%)</a>.  
+    Uses the <i></i>getRCIfromSDandAlpha()</i> function from the <a href="https://cecpfuns.psyctc.org/">CECPfuns R package</a> but the maths is trivial.
+    See also this next ...</li>
+    <li><a href="./apps/RCI2/">App which extends that to give you a plausible interval around that RCI</a> using the confidence interval for the SD given your n.
+    And that links with this next ...</li>
+    <li><a href="./apps/CSC1/">App that gives you the CSC (Clinically Significant Change)</a> method c cut off value for given referential help-seeking and
+    non-help-seeking means and SDs.  The maths is trivial for the CSC but this does show the plot of the probabilities underpinning the CSC and that it
+    balances the misclassification rates (given truly Gaussian distributions!).</li>
+   <li><a href="./apps/g_from_d_and_n/">App that gives you Hedges's g effect size measure</a> given reported Cohen's d and the n.  See also my
+    <a href="https://www.psyctc.org/Rblog/">Rblog</a> post: <a href="https://www.psyctc.org/Rblog/posts/2024-01-19-hedgess-g/">Hedges&apos;s g</a>.</li>
+   <li><a href="./apps/CSClookup2a/">App that gives you the appropriate CSC (and hence CSC classification)</a> given a YP-CORE score, age and gender.
+   It allows use of lookup tables for the CSC for the UK and Ireland and for Italy.  See also my <a href="https://www.psyctc.org/Rblog/">Rblog</a> post:
+   <a href="https://www.psyctc.org/Rblog/posts/2024-01-21-lookupcsc2/">CSC by gender and age</a> for more on this.</li>
+   <li><a href="./apps/Spearman-Brown/">App that gives you the predicted internal reliabilities for different lengths of measures</a> given a reliability
+     and length or a measure.  See also my <a href="https://www.psyctc.org/Rblog/">Rblog</a> post about
+     <a href="https://www.psyctc.org/Rblog/posts/2021-04-09-spearman-brown-formula/">the Spearman-Brown (or Brown-Spearman!) formula</a> that is behind this.
+     Links with this next ...</li>
+   <li><a href="./apps/Attenuation2/">App that gives you the attenuated correlation for any reliabilities of the two correlated variables and any
+       unattenuated correlation</a>.  See also my OMbook glossary entry:
+     <a href="https://www.psyctc.org/psyctc/glossary2/attenuation-by-unreliability-of-measurement/">Attenuation (by unreliability of measurement)</a>.</li>
+   <li><a href="./apps/Attenuation/">More complicated app for attenuated correlations giving plot and table of values for a range of unattenuated
+    correlations and of reliabilities of one of the variables</a>.  And both link to this ...</li>
+   <li><a href="./apps/getCorrectedR/">App that gives you the 'corrected' correlation from an observed correlation and the reliabilities
+       of the two  variables </a>.  This is the inverse of the last two apps above. Again, see also my OMbook glossary entry:
+     <a href="https://www.psyctc.org/psyctc/glossary2/attenuation-by-unreliability-of-measurement/">Attenuation (by unreliability of measurement)</a>.</li>
     <br>  <br>
     
 
-    <li><i><b>Apps giving confidence intervals from observed counts or statistics and dataset sizes</b></i><br>These can be useful if you have these statistics from a report that doesn't give the confidence intervals.</li>
-      <li><a href="./apps/CIproportion/">App that gives you a confidence interval around an observed proportion</a> given the total <i>n</i>, x the (smaller) number of interest within that <i>n</i> and the width of CI you want (usually .95, i.e. 95%).  Uses the binconf() function from the Hmisc R package which uses the Wilson method to get the CI.</li>
-      <li><a href="./apps/CIdiff2proportions/">App that gives you a confidence interval around the difference between two independent proportions</a> given the total <i>n</i>, x in each dataset/group, the numbers of interest within each group <i>n</i> and the width of CI you want (usually .95, i.e. 95%).  Gives what I call a "biplane plot" of the two CIs.</li>
-      <li><a href="./apps/CImean/">App that gives you a confidence interval (CI) around an observed mean</a> given that value, either the observed SD or SE, the width of CI you want (usually .95, i.e. 95%) and the <i>n</i> of the dataset from which the alpha was obtained.  The maths is parametric and can be sensitive to non-Gaussian distributions, bootstrap CI definitely preferred if you have the raw data.</li>
-      <li><a href="./apps/CISD/">App that gives you a confidence interval (CI) around an observed SD or variance</a> given that value, either the observed SD or SE, the width of CI you want (usually .95, i.e. 95%) and the <i>n</i> of the dataset from which the alpha was obtained.  Again, the maths is parametric and can be sensitive to non-Gaussian distributions, bootstrap CI definitely preferred if you have the raw data.</li>
-      <li><a href="./apps/CIcorrelation/">App that gives you a confidence interval around an observed Pearson correlation</a> given the total <i>n</i>, R the correlation and the width of CI you want (usually .95, i.e. 95%). Uses basic parametric theory so treat the CI as indicative rather than definitive.  However, if all you have is the <i>n</i> and correlation, it's the best you can do!</li>
-      <li><a href="./apps/CISpearman/">App that gives you a confidence interval around an observed Spearman correlation</a> given the total <i>n</i>, Rs the correlation and the width of CI you want (usually .95, i.e. 95%). I used to say the Pearson CI could be used but that is a very poor approximation, this is better.</li>
-      <li><a href="./apps/Cronbach1Feldt/">App that gives you a confidence interval (CI) around an observed Cronbach alpha value</a> given that value, the width of CI you want (usually .95, i.e. 95%) and the <i>n</i> of the dataset from which the alpha was obtained.  The maths is parametric but fairly robust to non-Gaussian distributions.  See also the next one ...</li>
+   <li><i><b>Apps giving confidence intervals from observed counts or statistics and dataset sizes</b></i><br>These can be useful if you have these statistics
+  from a report that doesn&apos;t give the confidence intervals.</li>
+   <li><a href="./apps/CIproportion/">App that gives you a confidence interval around an observed proportion</a> given the total <i>n</i>, x the
+   (smaller) number of interest within that <i>n</i> and the width of CI you want (usually .95, i.e. 95%).  Uses the binconf() function from
+     the Hmisc R package which uses the Wilson method to get the CI.</li>
+   <li><a href="./apps/CIdiff2proportions/">App that gives you a confidence interval around the difference between two independent proportions</a>
+     given the total <i>n</i>, x in each dataset/group, the numbers of interest within each group <i>n</i> and the width of CI you want (usually .95,
+     i.e. 95%).  Gives what I call a "biplane plot" of the two CIs.</li>
+   <li><a href="./apps/CImean/">App that gives you a confidence interval (CI) around an observed mean</a> given that value, either the observed
+     SD or SE, the width of CI you want (usually .95, i.e. 95%) and the <i>n</i> of the dataset from which the alpha was obtained.  The maths is
+     parametric and can be sensitive to non-Gaussian distributions, bootstrap CI definitely preferred if you have the raw data.</li>
+   <li><a href="./apps/CISD/">App that gives you a confidence interval (CI) around an observed SD or variance</a> given that value,
+     either the observed SD or SE, the width of CI you want (usually .95, i.e. 95%) and the <i>n</i> of the dataset from which the
+     alpha was obtained.  Again, the maths is parametric and can be sensitive to non-Gaussian distributions, bootstrap CI definitely
+     preferred if you have the raw data.</li>
+   <li><a href="./apps/CIcorrelation/">App that gives you a confidence interval around an observed Pearson correlation</a> given the total
+     <i>n</i>, R the correlation and the width of CI you want (usually .95, i.e. 95%). Uses basic parametric theory so treat the CI as indicative
+     rather than definitive.  However, if all you have is the <i>n</i> and correlation, it&apos;s the best you can do!</li>
+   <li><a href="./apps/CISpearman/">App that gives you a confidence interval around an observed Spearman correlation</a> given the total <i>n</i>,
+     Rs the correlation and the width of CI you want (usually .95, i.e. 95%). I used to say the Pearson CI could be used but that is a very poor
+     approximation, this is better.</li>
+   <li><a href="./apps/Cronbach1Feldt/">App that gives you a confidence interval (CI) around an observed Cronbach alpha value</a>
+     given that value, the width of CI you want (usually .95, i.e. 95%) and the <i>n</i> of the dataset from which the alpha was obtained.
+     The maths is parametric but fairly robust to non-Gaussian distributions.  See also the next one ...</li>
        <br>  <br>
 
-    <li><i><b>Apps giving p values</b></i><br>I'm generally not keen on p values as they are so overused and misunderstood but this one can be useful ....</li>
+    <li><i><b>Apps giving p values</b></i><br>I am generally not keen on p values as they are so overused and misunderstood but this one can be useful ....</li>
       <li><a href="./apps/Feldt2/">App giving a p value for the difference between two Cronbach alpha values from independent samples</a>.</li>
      <br>  <br>
     <li><i><b>Utility Apps</b></i><br>So far just the one ....</li>
@@ -153,35 +191,53 @@
          which is part of what I call <a href="https://www.psyctc.org/psyctc/root/rigorous-idiography/"</a> 'rigorous idiography'.</a>.</li>
      <br>  <br>
     <li><b><i>Apps to give plots from population parameters or sample statistics</b></i></li>
-      <li><a href="./apps/Gaussian1/">App that gives sample statistics, histogram, ecdf and qqplot for samples from a true Gaussian population.</a>  You input the sample size, mean, SD you want and the number of histogram bins (and the random number seed: to get replicable samples).  Mainly for teaching/illustration.</li>
-      <li><a href="./apps/plotCIPearson/">App that gives a plot of the CIs around an observed Pearson correlation</a> for a range of dataset sizes (n).  The CI can be anything from .7 to .999 but defaults to .95, i.e. 95%.  Parametric CI as it assumes you only have an R value of interest to you, not data. Probably mainly for teaching/illustration.</li>
+   <li><a href="./apps/Gaussian1/">App that gives sample statistics, histogram, ecdf and qqplot for samples from a true Gaussian population.</a>
+     You input the sample size, mean, SD you want and the number of histogram bins (and the random number seed: to get replicable samples).
+     Mainly for teaching/illustration.</li>
+   <li><a href="./apps/plotCIPearson/">App that gives a plot of the CIs around an observed Pearson correlation</a> for a range of dataset sizes (n).
+     The CI can be anything from .7 to .999 but defaults to .95, i.e. 95%.  This is a parametric CI as it assumes you only have an R value of interest
+     to you, not data. Probably mainly for teaching/illustration.</li>
      <br>  <br>
      <li><b><i>Illustrative and modelling apps</i></b></li>
-        <li><a href="./apps/Create_univariate_data/">App to create samples of data from various population distributions</a>  Currently it has just Gaussian and uniform distributions as these are the most common in pure modelling distributions in our field. You control the seed (to get replicable samples), the <i>n</i> and the population parameters and you can get the data as space, comma, semicolon and tab spaced vectors or as a table that you can download in spreadsheet formats.  You can use this to generate data to feed into other data crunching apps here as those expand.</i></li>
-        <li><a href="./apps/Screening/">Model of a simple screening design taking the n, prevalence and the sensitivity and specificity of the screening test.</a>  Gives full screening table and the PPV and NPV.  Changing the prevalence allows you to see how much this affects PPV and NPV. Created to complement <a href="https://ombook.psyctc.org/book/">OMbook</a> <a hef = "https://www.psyctc.org/psyctc/glossary2/screening/">glossary</a> entry about screening</a>.</li>
-        <li><a href="./apps/Bonferroni/">Model of how the statistical power to detect an effect is affected by using the Bonferroni correction for multiple tests.</a> Created to complement <a href="https://ombook.psyctc.org/book/">OMbook</a> <a hef = "https://www.psyctc.org/psyctc/glossary2/screening/">glossary</a> entry about the Bonferroni correction</a>.</li>
+   <li><a href="./apps/Create_univariate_data/">App to create samples of data from various population distributions</a>
+     Currently it has just Gaussian and uniform distributions as these are the most common in pure modelling distributions in our field.
+     You control the seed (to get replicable samples), the <i>n</i> and the population parameters and you can get the data as space,
+     comma, semicolon and tab spaced vectors or as a table that you can download in spreadsheet formats.  You can use this to generate data
+     to feed into other data crunching apps here as those expand.</i></li>
+   <li><a href="./apps/Screening/">Model of a simple screening design taking the n, prevalence and the sensitivity and specificity of the screening test.</a>
+     Gives full screening table and the PPV and NPV.  Changing the prevalence allows you to see how much this affects PPV and NPV. Created to complement
+     <a href="https://ombook.psyctc.org/book/">OMbook</a> <a hef = "https://www.psyctc.org/psyctc/glossary2/screening/">glossary</a> entry about screening</a>.</li>
+   <li><a href="./apps/Bonferroni/">Model of how the statistical power to detect an effect is affected by using the Bonferroni correction for multiple tests.</a>
+     Created to complement <a href="https://ombook.psyctc.org/book/">OMbook</a> <a hef = "https://www.psyctc.org/psyctc/glossary2/screening/">glossary</a>
+     entry about the Bonferroni correction</a>.</li>
          <br>  <br>
           </ul>
-        <li><b>Apps using uploaded file data</b>.  These apps can generally take data from CSV, TSV 
-              (Tab Separated Variables), R format, SPSS .sav file, 
+        <li><b>Apps using uploaded file data</b>.  These apps can generally take data from CSV, TSV (Tab Separated Variables), R format, SPSS .sav file, 
               Excel .xlsx and .xls or Libre/OpenOffice .ods files</li>
         <ul>
           <li><a href="./apps/Hashing_IDs/">App to give hashed values when pseudonymising data.</a>
-              You select a variable,
-              usually the ID variable you were using.  You give the app the hash key phrase you want used and it 
-              creates the hashed values and allows you to download the original ID code (as text values) and the 
-              hash values.</li>
+            You select a variable, usually the ID variable you were using.  You give the app the
+	    hash key phrase you want used and it creates the hashed values and allows you to download the original ID code (as text values)
+	    and the hashed values.</li>
           <li><a href="./apps/Histogram_and_summary1/">App that takes data from file upload for histogram and summary statistics</a>. 
               This gives a downloadable histogram with some configuration and downloadable summary statistics. 
               Non-numeric values and missing values are noted but ignored.</li>
-          <li><a href="./apps/ECDFplot/">App that gives you a confidence interval (CI) around observed quantiles of a distribution</a> given the data, the quantiles you want and the width of CI you want (usually .95, i.e. 95%) and the <i>n</i> of the dataset from which the alpha was obtained.  Uses Nyblom's method to get robust CIs for the quantiles. New version, as of 5.vi.24 allows uploading of data as well as just pasting it in.</li>
-          <li><a href="./apps/CORE-OM_scoring/">First app that scores CORE-OM item data </a>. This takes an Excel file of the format I created to score CORE-OM data collected with Microsoft forms.  This is proof of concept really and should be followed by apps allowing CORE-OM, and then other CORE measure, item scores to be uploaded and scored.  It gives all the CORE-OM scores including the CORE-6D utility score and also gives the scores for the embedded items of all the shorter adult measures that are derived from the CORE-OM. </li>
+          <li><a href="./apps/ECDFplot/">App that gives you a confidence interval (CI) around observed quantiles of a distribution</a> given
+	    the data, the quantiles you want and
+	    the width of CI you want (usually .95, i.e. 95%) and the <i>n</i> of the dataset from which the alpha was obtained.
+	    Uses Nyblom&apos;s method to get robust CIs for the quantiles. New version, as of 5.vi.24 allows uploading of data as well as just pasting it in.</li>
+          <li><a href="./apps/CORE-OM_scoring/">First app that scores CORE-OM item data </a>. This takes an Excel file of the format I created to score CORE-OM
+	    data collected with Microsoft forms.  This is proof of concept really and should be followed by apps allowing CORE-OM, and then other CORE measures&apos;,
+	    item scores to be uploaded and scored.  It gives all the CORE-OM scores including the CORE-6D utility score and also gives the scores for the embedded
+	    items of all the shorter adult measures that are derived from the CORE-OM. </li>
+
         </ul>
       
   </ul>
   <h2>Usage statistics</h2>
-For those with incurable geeky curiosity (OK, mostly for my insatiable geeky curiosity!) I have created a breakdown of the log data <a href="https://www.psyctc.org/Analysing_shiny_usage.html">here</a>.<br> 
-As above: do please <a href="https://www.psyctc.org/psyctc/contact-me/">contact me</a> if you hit problems or have questions.
+  For those with incurable geeky curiosity (OK, mostly for my insatiable geeky curiosity!) I have created a breakdown of the log data
+  <a href="https://www.psyctc.org/Analysing_shiny_usage.html">here</a>.<br> 
+  As above: do please <a href="https://www.psyctc.org/psyctc/contact-me/">contact me</a> if you hit problems or have questions.
   <h2>Email update list</h2>
   <p>There is now an Email announcement list, never updating more than monthly, where I will put up developments of new apps here but also a summary of updates to the 
   <a href="https://www.psyctc.org/psyctc/book/glossary/">online glossary</a> and new posts in 
