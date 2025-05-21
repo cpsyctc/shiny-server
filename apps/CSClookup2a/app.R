@@ -102,9 +102,15 @@ ui <- fluidPage(
                    min = 11,
                    max = 16,
                    width="100%"),
-      numericInput("YPscore",
-                   "The YP-CORE score",
+      numericInput("YPscore1",
+                   "A single YP-CORE score, perhaps the first",
                    value = .7,
+                   min = 0,
+                   max = 40,
+                   width="100%"),
+      numericInput("YPscore2",
+                   "Another YP-CORE score from the same person, perhaps the last",
+                   value = NA,
                    min = 0,
                    max = 40,
                    width="100%"),
@@ -130,7 +136,8 @@ ui <- fluidPage(
         "handle datasets of age, gender and score data ... however, I need to sort out data uploading to achieve that!"),
       p("App created by Chris Evans",
         a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/"),
-        "licenced under a ",
+        " 24.xii.24 and last updated (to handle two values) 21.v.25."),
+      p("  Licenced under a ",
         a("Creative Commons, Attribution Licence-ShareAlike",
           href="http://creativecommons.org/licenses/by-sa/1.0/"),
         " Please respect that and put an acknowledgement and link back to here if re-using anything from here."),
@@ -159,49 +166,95 @@ server <- function(input, output, session) {
   ### 
   ### now the functions adapted from CECPfuns plotCIcorrelation
   ###
-  getCSC <- function(YPscoreInp, GenderInp, AgeInp, Scoring, Lookup) {
+  
+  getCSC <- function(GenderInp, AgeInp, Scoring, Lookup) {
     GenderInp1 <- str_sub(GenderInp, 1, 1)
     tibLookup %>%
-    #   mutate(CSC = if_else(Scoring == "Clinical (10x item mean, range 0-40)",
-    #                        CSC = 10 * CSC, CSC)) %>%
       filter(Ref == Lookup) %>%
       filter(Gender == GenderInp1) %>%
       filter(Age == AgeInp) %>%
       select(CSC) %>%
       pull() -> CSC
-    
-
-    if (YPscoreInp >= CSC) {
-      CSCcategory <- "High"
-    } else {
-      CSCcategory <- "Low"
-    }
-    
-    retText <- paste0("Given:\n",
-                      "   YP-CORE score: ", YPscoreInp,"\n",
-                      "   Scoring: ", Scoring, "\n",
-                      "   Gender:", GenderInp, "\n",
-                      "   Age: ", AgeInp, "\n",
-                      "   and lookup to use: ", Lookup, ".\n",
-                      " Then the appropriate CSC is: ", CSC, "\n",
-                      " and so that score is: ", CSCcategory)
-    return(retText)
   }
   
-  output$res <- renderText({
+  CSC <-  reactive({
     validate(
       need(10 < input$Age,
            "Currently lookup data only exist for ages from 11 to 16 inclusive"),
       need(input$Age < 17,
            "Currently lookup data only exist for ages from 11 to 16 inclusive"),
-      need(checkScore(input$YPscore, input$Scoring),
+      need(checkScore(input$YPscore1, input$Scoring),
            "YP-CORE score is impossible for that scoring system")
     )
-    getCSC(input$YPscore,
-           input$Gender,
+    getCSC(input$Gender,
            input$Age,
            input$Scoring,
            input$Lookup)
+  })
+  
+  CSCtext <- reactive({
+    paste0(CSC(), 
+           " or ",
+           10 * CSC(),
+           " if using the 'clinical' scoring.")
+  })
+  
+  CSCval1 <- reactive({
+    validate(
+      need(10 < input$Age,
+           "Currently lookup data only exist for ages from 11 to 16 inclusive"),
+      need(input$Age < 17,
+           "Currently lookup data only exist for ages from 11 to 16 inclusive"),
+      need(checkScore(input$YPscore1, input$Scoring),
+           "YP-CORE score is impossible for that scoring system")
+    )
+    if (input$YPscore1 >= CSC()) {
+      CSCcategory <- "High"
+    } else {
+      CSCcategory <- "Low"
+    }
+    CSCcategory
+  })
+  
+  CSCval2 <- reactive({
+    validate(
+      need(10 < input$Age,
+           "Currently lookup data only exist for ages from 11 to 16 inclusive"),
+      need(input$Age < 17,
+           "Currently lookup data only exist for ages from 11 to 16 inclusive"),
+      need(checkScore(input$YPscore2, input$Scoring),
+           "YP-CORE score is impossible for that scoring system")
+    )
+    if (input$YPscore2 >= CSC()) {
+      CSCcategory <- "High"
+    } else {
+      CSCcategory <- "Low"
+    }
+    CSCcategory
+  })
+  
+  output$res <- renderText({
+    if (is.na(input$YPscore2)) {
+      paste0("Given:\n",
+             "   YP-CORE score: ", input$YPscore1,"\n",
+             "   Scoring: ", input$Scoring, "\n",
+             "   Gender:", input$Gender, "\n",
+             "   Age: ", input$Age, "\n",
+             "   and lookup to use: ", input$Lookup, ".\n",
+             " Then the appropriate CSC is: ", CSCtext(), "\n",
+             " and so the category of that first score is: ", CSCval1())
+    }  else {
+      paste0("Given:\n",
+             "   First YP-CORE score: ", input$YPscore1,"\n",
+             "   Second YP-CORE score: ", input$YPscore2, "\n",
+             "   Scoring: ", input$Scoring, "\n",
+             "   Gender:", input$Gender, "\n",
+             "   Age: ", input$Age, "\n",
+             "   and lookup to use: ", input$Lookup, ".\n",
+             " Then the appropriate CSC is: ", CSCtext(), "\n",
+             " and so that score first score is: ", CSCval1(),
+             " and the second score is: ", CSCval2())
+    }
   })
 }
 
