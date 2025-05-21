@@ -12,36 +12,40 @@ vecGender <- c("Female",
                "Male")
 vecScoring <- c("Item mean (range 0-4)", 
                 "Clinical (10x item mean, range 0-40)")
-vecLookup <- c("Blackshaw PhD (UK)", 
-               "Twigg et al., 2016 (UK & Ireland)", 
+vecLookup <- c("Blackshaw PhD (UK & Ireland)", 
+               "Twigg et al., 2016 (UK)", 
                "Di Biase et al., 2021 (Italy)")
 
 ### create the internal lookup table
 tribble(~Ref, ~Age,  ~Gender,  ~CSC,
-        "Blackshaw PhD (UK)", 11, "M", 1.0,
-        "Blackshaw PhD (UK)", 12, "M", 1.0,
-        "Blackshaw PhD (UK)", 13, "M", 1.0,
-        "Blackshaw PhD (UK)", 14, "M", 1.3,
-        "Blackshaw PhD (UK)", 15, "M", 1.4,
-        "Blackshaw PhD (UK)", 16, "M", 1.5,
-        "Blackshaw PhD (UK)", 11, "F", 1.1,
-        "Blackshaw PhD (UK)", 12, "F", 1.5,
-        "Blackshaw PhD (UK)", 13, "F", 1.4,
-        "Blackshaw PhD (UK)", 14, "F", 1.6,
-        "Blackshaw PhD (UK)", 15, "F", 1.6,
-        "Blackshaw PhD (UK)", 16, "F", 1.5,
-        "Twigg et al., 2016 (UK & Ireland)", 11, "M", 1.03,
-        "Twigg et al., 2016 (UK & Ireland)", 12, "M", 1.03,
-        "Twigg et al., 2016 (UK & Ireland)", 13, "M", 1.03,
-        "Twigg et al., 2016 (UK & Ireland)", 14, "M", 1.41,
-        "Twigg et al., 2016 (UK & Ireland)", 15, "M", 1.41,
-        "Twigg et al., 2016 (UK & Ireland)", 16, "M", 1.41,
-        "Twigg et al., 2016 (UK & Ireland)", 11, "F", 1.44,
-        "Twigg et al., 2016 (UK & Ireland)", 12, "F", 1.44,
-        "Twigg et al., 2016 (UK & Ireland)", 13, "F", 1.44,
-        "Twigg et al., 2016 (UK & Ireland)", 14, "F", 1.59,
-        "Twigg et al., 2016 (UK & Ireland)", 15, "F", 1.59,
-        "Twigg et al., 2016 (UK & Ireland)", 16, "F", 1.59,
+        "Blackshaw PhD (UK & Ireland)", 11, "F", 1.432,
+        "Blackshaw PhD (UK & Ireland)", 12, "F", 1.337,
+        "Blackshaw PhD (UK & Ireland)", 13, "F", 1.484,
+        "Blackshaw PhD (UK & Ireland)", 14, "F", 1.562,
+        "Blackshaw PhD (UK & Ireland)", 15, "F", 1.784,
+        "Blackshaw PhD (UK & Ireland)", 16, "F", 1.909,
+        "Blackshaw PhD (UK & Ireland)", 17, "F", 1.664,
+        "Blackshaw PhD (UK & Ireland)", 18, "F", 1.909,
+        "Blackshaw PhD (UK & Ireland)", 11, "M", 1.252,
+        "Blackshaw PhD (UK & Ireland)", 12, "M", 1.104,
+        "Blackshaw PhD (UK & Ireland)", 13, "M", 1.211,
+        "Blackshaw PhD (UK & Ireland)", 14, "M", 1.301,
+        "Blackshaw PhD (UK & Ireland)", 15, "M", 1.299,
+        "Blackshaw PhD (UK & Ireland)", 16, "M", 1.487,
+        "Blackshaw PhD (UK & Ireland)", 17, "M", 1.523 ,
+        "Blackshaw PhD (UK & Ireland)", 18, "M", 1.523,
+        "Twigg et al., 2016 (UK)", 11, "M", 1.03,
+        "Twigg et al., 2016 (UK)", 12, "M", 1.03,
+        "Twigg et al., 2016 (UK)", 13, "M", 1.03,
+        "Twigg et al., 2016 (UK)", 14, "M", 1.41,
+        "Twigg et al., 2016 (UK)", 15, "M", 1.41,
+        "Twigg et al., 2016 (UK)", 16, "M", 1.41,
+        "Twigg et al., 2016 (UK)", 11, "F", 1.44,
+        "Twigg et al., 2016 (UK)", 12, "F", 1.44,
+        "Twigg et al., 2016 (UK)", 13, "F", 1.44,
+        "Twigg et al., 2016 (UK)", 14, "F", 1.59,
+        "Twigg et al., 2016 (UK)", 15, "F", 1.59,
+        "Twigg et al., 2016 (UK)", 16, "F", 1.59,
         "Di Biase et al., 2021 (Italy)", 11, "F", 1.34,
         "Di Biase et al., 2021 (Italy)", 12, "F", 1.34,
         "Di Biase et al., 2021 (Italy)", 13, "F", 1.34,
@@ -56,22 +60,6 @@ tribble(~Ref, ~Age,  ~Gender,  ~CSC,
         "Di Biase et al., 2021 (Italy)", 15, "M", 1.23,
         "Di Biase et al., 2021 (Italy)", 16, "M", 1.18,
         "Di Biase et al., 2021 (Italy)", 17, "M", 1.18) -> tibLookup
-
-checkScore <- function(YPscore, Scoring) {
-  if(YPscore < 0) {
-    return(FALSE)
-  }
-  if(Scoring == "Clinical (10x item mean, range 0-40)") {
-    if (YPscore > 40) {
-      return(FALSE)
-    } 
-  } else {
-    if (YPscore > 4) {
-      return(FALSE)
-    }
-  }
-  TRUE
-}
 
 # Define UI for application that does the work
 ui <- fluidPage(
@@ -123,6 +111,8 @@ ui <- fluidPage(
     ),
     
     mainPanel(
+      h3("Your scoring and referential data"),
+      verbatimTextOutput("scoringAndLookup"),
       h3("Your input and results",align="center"),
       verbatimTextOutput("res"),
       p("This incredibly basic shiny app uses logic from the function lookupCSCgenderAndAge() from my package",
@@ -164,8 +154,24 @@ server <- function(input, output, session) {
   ### I don't think I actually use any these as I've now used numericInput() to set the ranges
   
   ### 
-  ### now the functions adapted from CECPfuns plotCIcorrelation
+  ### now the functions
   ###
+  
+  checkScore <- function(YPscore, Scoring) {
+    if(YPscore < 0) {
+      return(FALSE)
+    }
+    if(Scoring == "Clinical (10x item mean, range 0-40)") {
+      if (YPscore > 40) {
+        return(FALSE)
+      } 
+    } else {
+      if (YPscore > 4) {
+        return(FALSE)
+      }
+    }
+    TRUE
+  }
   
   getCSC <- function(GenderInp, AgeInp, Scoring, Lookup) {
     GenderInp1 <- str_sub(GenderInp, 1, 1)
@@ -181,8 +187,8 @@ server <- function(input, output, session) {
     validate(
       need(10 < input$Age,
            "Currently lookup data only exist for ages from 11 to 16 inclusive"),
-      need(input$Age < 17,
-           "Currently lookup data only exist for ages from 11 to 16 inclusive"),
+      need(input$Age < 19,
+           "Currently lookup data only exist for ages from 11 to 18 inclusive and that range only for the Blackshaw (2025) referential data"),
       need(checkScore(input$YPscore1, input$Scoring),
            "YP-CORE score is impossible for that scoring system")
     )
@@ -233,6 +239,30 @@ server <- function(input, output, session) {
     CSCcategory
   })
   
+  scoreRange <- reactive({
+    if(input$Scoring == "Clinical (10x item mean, range 0-40)") {
+      paste0(" so your score range is, \nas that says, from 0 to 40.  ",
+      "\nMake sure that's what you wanted as putting a score using mean scoring, ",
+      "\nwhich has range 0 to 4, in with this scoring is going to give you very ",
+      "\nwrong CSC categorisation!")
+    } else {
+      paste0(" so your score range is, as that says, from 0 to 4.  ",
+      "\nMake sure that's what you wanted as putting a score using mean scoring, ",
+      "\nwill give very wrong CSC categorisation if the scoring used was the ",
+      "\n'clinical' scoring: i.e. 10x the mean scoring and range 0 to 40!")
+    }
+  })
+  
+  output$scoringAndLookup <- renderText({
+    paste0("You are using ",
+           input$Scoring,
+           scoreRange(),
+           "\nAnd you are using the ",
+           input$Lookup,
+           " referential data.  \nMake sure that's sensible!"
+           )
+  })
+  
   output$res <- renderText({
     if (is.na(input$YPscore2)) {
       paste0("Given:\n",
@@ -253,7 +283,7 @@ server <- function(input, output, session) {
              "   and lookup to use: ", input$Lookup, ".\n",
              " Then the appropriate CSC is: ", CSCtext(), "\n",
              " and so that score first score is: ", CSCval1(),
-             " and the second score is: ", CSCval2())
+             " \nand the second score is: ", CSCval2())
     }
   })
 }
