@@ -158,6 +158,8 @@ ui <- fluidPage(
                   
                   tabPanel("CSCtable1",
                            value = 4,
+                           p("This tab gives a simple breakdown of the CSC categories: baseline, final and change counts"),
+                           p(" "),
                            p("Here is the breakdown of the initial CSC categories"),
                            p(" "),
                            uiOutput('CSCtable1'),
@@ -188,11 +190,8 @@ ui <- fluidPage(
                   
                   tabPanel("Explanation of analyses",
                            value = 6,
-                           p("What appears in the new dataset is the data for any rows that had any non-missing data"),
-                           p("Date and ID are converted to character data, scores are prorated by CORE rules and are as follows."),
-                           p("Probably need more here!"),
+                           p("Going to need a lot more here!"),
                            p(" "),
-                           includeHTML("Variable_List.Rhtml"),
                   ),
                   
                   
