@@ -177,7 +177,11 @@ ui <- fluidPage(
                   
                   tabPanel("Plot1",
                            value = 5,
-                           p("Probably need more here!"),
+                           p("This is a so-called 'cat's cradle' plot.",
+                             "It shows all the complete pairs of scores coloured by gender with connecting lines.",
+                             "The dashed horizontal reference line marks the mean baseline score and the black points,",
+                             "offset somewhat from the individual points, mark the mean baseline and later scores.  ",
+                             "The vertical lines through those are the bootstrap 95% confidence intervals."),
                            p(" "),
                            plotOutput('plot1'),
                   ),    
@@ -196,7 +200,7 @@ ui <- fluidPage(
                            value = 7,
                            p("App created 22.v.25 by Chris Evans at this point specifically for Oiatillo Temirov for checking his data.",
                              a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/")),
-                           p("Last updated 24.v.25."),
+                           p("Last updated 2.vi.25 fixing the initial CSC tabulations and the first cat's cradle plot."),
                            p("Licenced under a ",
                              a("Creative Commons, Attribution Licence-ShareAlike",
                                href="http://creativecommons.org/licenses/by-sa/1.0/"),
@@ -244,7 +248,7 @@ server <- function(input, output, session) {
     tibLookup %>%
       filter(Ref == input$Lookup)
   })
-
+  
   fullData <- reactive({
     suppressMessages(read.csv(file = fileSelected())) -> dataInput
     dataInput %>%
@@ -306,11 +310,11 @@ server <- function(input, output, session) {
              YPscore1toCSC = YPscore1 - CSC,
              YPscore2toCSC = YPscore2 - CSC,
              CSCcat1 = if_else(YPscore1 > CSC,
-                            "High",
-                            "Low"),
+                               "High",
+                               "Low"),
              CSCcat2 = if_else(YPscore2 > CSC,
-                            "High",
-                            "Low"),
+                               "High",
+                               "Low"),
              CSCchange = case_when(
                CSCcat1 == "High" & CSCcat2 == "High" ~ "Stayed high",
                CSCcat1 == "High" & CSCcat2 == "Low" ~ "High to low",
@@ -497,9 +501,9 @@ server <- function(input, output, session) {
                                                          searching = FALSE),
                                          )
   )
-
+  
   output$CSCtable1 <- renderUI({
-    dataInput %>%
+    fullData() %>%
       tabyl(CSCcat1) %>%
       mutate(percent = str_c(round(100 * percent, 1), "%"),
              valid_percent = str_c(round(100 * valid_percent, 1), "%")) %>%
@@ -507,10 +511,10 @@ server <- function(input, output, session) {
       colformat_char(j = 1,
                      na_str = "Missing") %>%
       htmltools_value()
-    })
+  })
   
   output$CSCtable2 <- renderUI({
-    dataInput %>%
+    fullData() %>%
       tabyl(CSCcat2) %>%
       mutate(percent = str_c(round(100 * percent, 1), "%"),
              valid_percent = str_c(round(100 * valid_percent, 1), "%")) %>%
@@ -521,7 +525,7 @@ server <- function(input, output, session) {
   })
   
   output$CSCtable3 <- renderUI({
-    dataInput %>%
+    fullData() %>%
       tabyl(CSCcat1, CSCcat2) %>%
       # mutate(percent = str_c(round(100 * percent, 1), "%"),
       #        valid_percent = str_c(round(100 * valid_percent, 1), "%")) %>%
@@ -535,7 +539,7 @@ server <- function(input, output, session) {
   })
   
   output$CSCtable4 <- renderUI({
-    dataInput %>%
+    fullData() %>%
       tabyl(CSCchange) %>%
       mutate(percent = str_c(round(100 * percent, 1), "%"),
              valid_percent = str_c(round(100 * valid_percent, 1), "%")) %>%
@@ -549,18 +553,20 @@ server <- function(input, output, session) {
   
   output$summaryStats1ByTher <- renderTable(summaryStats1ByTher())
   
-  output$plot1 <- renderPlot({
-    
-    print(longDat() %>% count(is.na(Score)))
-    print(longDat() %>% count(WhichScore))
-    
+  catsCradle1 <- reactive({
+    ### massage the data
     longDat() %>%
+      ### drop any missing scores
       filter(!is.na(Score)) %>%
+      ### remove the transition values as we don't want those
+      filter(!str_detect(WhichScore, fixed("toCSC"))) %>%
       mutate(WhichScore = str_remove(WhichScore, "YPscore"),
              WhichScore = as.numeric(WhichScore)) -> tmpTib
     
+    ### nudge value to offset the means either side of the raw values
     tmpNudge <- .03
     
+    ### get the means and their CIs
     tmpTib %>%
       group_by(WhichScore) %>%
       summarise(mean = list(getBootCImean(Score,
@@ -568,38 +574,44 @@ server <- function(input, output, session) {
                                           verbose = FALSE))) %>%
       unnest_wider(mean) %>%
       ungroup() %>%
-      mutate(WhichScore = if_else(WhichScore == 1,
-                                  WhichScore - tmpNudge,
-                                  WhichScore + tmpNudge)) -> tmpTibMeans
-
+      mutate(x = if_else(WhichScore == 1,
+                         WhichScore - tmpNudge,
+                         WhichScore + tmpNudge)) -> tmpTibMeans
     ggplot(data = tmpTib,
            aes(x = WhichScore, y = Score, group = RespondentID, colour = Gender)) +
-      geom_point() #+
-      # geom_line() +
-      # geom_point(data = tmpTibMeans,
-      #            inherit.aes = FALSE,
-      #            aes(x = WhichScore, y = obsmean),
-      #            size = 2) +
-      # geom_hline(yintercept = tmpTibMeans$obsmean[1],
-      #            linetype = 2) +
-      # geom_line(data = tmpTibMeans,
-      #           inherit.aes = FALSE,
-      #           aes(x = WhichScore, y = obsmean),
-      #           linewidth = 2,
-      #           linetype = 1) +
-      # geom_linerange(data = tmpTibMeans,
-      #                inherit.aes = FALSE,
-      #                aes(x = WhichScore, 
-      #                    ymin = LCLmean, ymax = UCLmean)) +
-      # ylab("Score") +
-      # scale_x_continuous("Occasion",
-      #                    breaks = 1:2) 
+      geom_point() +
+      geom_line() +
+      geom_point(data = tmpTibMeans,
+                 inherit.aes = FALSE,
+                 aes(x = x, y = obsmean),
+                 size = 2) +
+      geom_hline(yintercept = tmpTibMeans$obsmean[1],
+                 linetype = 2) +
+    geom_line(data = tmpTibMeans,
+              inherit.aes = FALSE,
+              aes(x = WhichScore, y = obsmean),
+              linewidth = 2,
+              linetype = 1) +
+    geom_linerange(data = tmpTibMeans,
+                   inherit.aes = FALSE,
+                   aes(x = x,
+                       ymin = LCLmean, ymax = UCLmean)) +
+    scale_y_continuous("YP-CORE score",
+                       breaks = seq(0, 4, .2),
+                       limits = c(0, 4)) +
+    scale_x_continuous("Occasion",
+                       breaks = 1:2)
   })
   
-  # Print the comment on the data 
-  # output$text2 <- renderPrint(comment1())
-  # output$text2 <- renderUI(comment1())
-  
+  output$plot1 <- renderPlot(
+    catsCradle1(),
+    ### now control the plot area
+    height = 800
+  )
+
+# Print the comment on the data 
+# output$text2 <- renderPrint(comment1())
+# output$text2 <- renderUI(comment1())
 }
 
 # Create Shiny app ----
