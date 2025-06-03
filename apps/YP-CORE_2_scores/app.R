@@ -14,6 +14,8 @@ theme_update(plot.title = element_text(hjust = .5),
              plot.subtitle = element_text(hjust = .5),
              text = element_text(size = 24))
 
+set_flextable_defaults(table_align = "left")
+
 vecScoring <- c("Item mean (range 0-4)", 
                 "Clinical (10x item mean, range 0-40)")
 vecLookup <- c("Blackshaw PhD (UK & Ireland)", 
@@ -89,19 +91,16 @@ ui <- fluidPage(
   setBackgroundColor("#ffff99"),
   h1(HTML("App to use dataset of two YP-CORE scores each from same person #1")),
   
-  p("This app uses data from the YP-CORE that has been put into the spreadsheet I created for this purpose",
-    "to collect CORE-OM data."),
-  p("You input data using the sidebar on the left to select your file you want to analyse",
-    "Then the data will appear in the Data tab to the right with the analyses.",
-    "Do allow time for the uploading and the analyses, if you have, say 2,500 rows of data it will definitely take a fair few seconds for the data."),
-  p("You can find example files with some artificial data: "),
-  p(a("Libre/OpenOffice format (.ods)",
+  p("This app uses data from a spreadsheet. "),
+  p("Here are example files with artificial data: "),
+  tags$ul(
+    tags$li(a("Libre/OpenOffice format (.ods)",
       href="https://www.coresystemtrust.org.uk/wp-content/uploads/2025/05/YP-CORE1.ods")),
-  p("or:"),
-  p(a("Excel format (.xlsx)",
+    tags$li(a("Excel format (.xlsx)",
       href="https://www.coresystemtrust.org.uk/wp-content/uploads/2025/05/YP-CORE1.xlsx")),
-  p("You can download either file to your own machine to test this app and you can empty the data",
-    "from the file and rename it and start putting your own data in that emptied file to use here."),
+  ),
+  p("Download one to your own machine to explore this app with those data.  Then delete the data",
+    "rename the file and start putting your own data into it to use here."),
   
   
   # Sidebar layout with input and output definitions ----
@@ -109,7 +108,8 @@ ui <- fluidPage(
     
     # Sidebar panel for inputs ----
     sidebarPanel(
-      
+      h2("Upload data"),
+      p("This is a paragraph!"),
       # Input: Select a file ----
       fileInput("file1", "Choose file to upload"),
       
@@ -136,29 +136,94 @@ ui <- fluidPage(
                   
                   tabPanel("Data", 
                            value = 1,
-                           # uiOutput('text2'),
+                           h2("Explanation"),
+                           p("This tables shows the data you uploaded plus the coding of that data."),
+                           tags$ul(tags$li("At the right of  the table the coding gives you the CSC categories of the YP-CORE scores (if there were any.)"),
+                                   tags$li("YPscore1toCSC is the difference between the first YP-SCORE and the CSC for that age and gender."),
+                                   tags$li("YPscore2toCSC is the same for the second YP-SCORE.  These will get used in some plots later, see todo list!"),
+                                   tags$li("The search box is a very simple inclusive search so if you put '62' in there the table will reduce to showing you ",
+                                           "any rows of data that contain '62' anywhere including say a participant ID of 62 or a score of 1.62.  "),
+                                   tags$li("The filter boxes at the top of each column allow you to search in that variable.  They will often show you a ",
+                                           "a drop down list of the values that exist in the data."),
+                                   tags$li("For the dates the search is of the stem you input ",
+                                           "so if you input '2024-04' it should show you all dates in April 2024."),
+                                   tags$li("The filtering is a Boolean AND which is to say that you will get to see the rows that fulfil all the constraints you input.")
+                           ),
                            p(" "),
+                           h2("This is work in progress!!"),
+                           p("Until such time as this is no longer true (!), this is work in progress like everything else in this app.",
+                             "This is the todo list for this tab as I see it at this point"),
+                           tags$ul(
+                             tags$li("Add buttons to download entire table as a file"),
+                             tags$li("And buttons to download selected rows from the interactive datatable"),
+                             tags$li("Probably have to add RCI at some point!")
+                           ),
+                           p(" "),
+                           h2("Searchable table of the data"),
                            p(" "),
                            DTOutput("compData"),    
                   ),
                   
                   tabPanel("Summary statistics",
                            value = 2,
-                           p("This is pretty indigestible but it gives all the summary statistics for all the variables across all clinicians."),
+                           h2("Explanation"),
+                           p("This is pretty indigestible but it gives all the summary statistics for all the variables across all clinicians.",
+                             "I think the naming of the statistics is pretty self-explanatory if not particularly easy on the eye."),
+                           p(" "),
+                           h2("This is work in progress!!"),
+                           p("Until such time as this is no longer true (!), this is work in progress like everything else in this app.",
+                             "This is the todo list for this tab as I see it at this point"),
+                           tags$ul(
+                             tags$li("Break this up into a series of tables with headings above each"),
+                             tags$li("Rather laboriously (!) add percentages where they make sense"),
+                             tags$li("Use flextable() to make it more digestible."),
+                             tags$li("Add button to download entire data behind the table as a file?"),
+                             tags$li("Probably have to add RCI at some point!")
+                           ),
+                           p(" "),
+                           h2("The summary stats"),
                            p(" "),
                            tableOutput('summaryStats1'),
                   ),    
                   
                   tabPanel("Summary statistics by clinician",
                            value = 3,
-                           p("This breaks down the summary statistics by clinician if you have more than one."),
+                           h2("Explanation"),
+                           p("As with the 'Summary statistics' tab this is pretty indigestible and gives all the same summary statistics ",
+                           "for all the variables across all clinicians.",
+                             "I think the naming of the statistics is pretty self-explanatory if not particularly easy on the eye."),
+                           p(" "),
+                           h2("This is work in progress!!"),
+                           p("Until such time as this is no longer true (!), this is work in progress like everything else in this app.",
+                             "This is the todo list for this tab as I see it at this point"),
+                           tags$ul(
+                             tags$li("Add button to download entire table as a file."),
+                             tags$li("Think how it could be made more digestible."),
+                             tags$li("Perhaps add percentages but they will only make sense for some of the statistics"),
+                             tags$li("Probably have to add RCI at some point!"),
+                             tags$li("Will it be useful to people to have more comparative analyses comparing clinicians?")
+                           ),
+                           p(" "),
+                           h2("Summary stats by clinician"),
                            p(" "),
                            tableOutput('summaryStats1ByTher'),
                   ),   
                   
                   tabPanel("CSCtable1",
                            value = 4,
+                           h2("Explanation"),
                            p("This tab gives a simple breakdown of the CSC categories: baseline, final and change counts"),
+                           p(" "),
+                           h2("This is work in progress!!"),
+                           p("Until such time as this is no longer true (!), this is work in progress like everything else in this app.",
+                             "This is the todo list for this tab as I see it at this point"),
+                           tags$ul(
+                             tags$li("Probably have to add RCI at some point!"),
+                             tags$li("Add options to break down by age, gender ...?"),
+                             tags$li("Will it be useful to people to have more comparative analyses comparing clinicians?")
+                           ),
+                           p(" "),
+                           h2("The CSC tabulations"),
                            p(" "),
                            p("Here is the breakdown of the initial CSC categories"),
                            p(" "),
@@ -179,6 +244,20 @@ ui <- fluidPage(
                   
                   tabPanel("Plot1",
                            value = 5,
+                           h2("Explanation"),
+                           p("This tab gives a simple breakdown of the CSC categories: baseline, final and change counts"),
+                           p(" "),
+                           h2("This is work in progress!!"),
+                           p("Until such time as this is no longer true (!), this is work in progress like everything else in this app.",
+                             "This is the todo list for this tab as I see it at this point"),
+                           tags$ul(
+                             tags$li("Add plotrix labelling of participants"),
+                             tags$li("Add options to break down by therapist, age, gender ...?"),
+                             tags$li("Buttons to download the plot")
+                           ),
+                           p(" "),
+                           h2("The cat''s cradle plot"),
+                           p(" "),
                            p("This is a so-called 'cat's cradle' plot.",
                              "It shows all the complete pairs of scores coloured by gender with connecting lines.",
                              "The dashed horizontal reference line marks the mean baseline score and the black points,",
@@ -329,22 +408,25 @@ server <- function(input, output, session) {
     
   })
   
-  displayData <- reactive({
+  displayData1 <- reactive({
     fullData() %>%
-      mutate(YPscore1 = round(YPscore1, input$dp),
-             YPscore2 = round(YPscore2, input$dp))
+      select(-c(Ref, CSC)) %>%
+      mutate(RespondentID = ordered(RespondentID),
+             TherapistID = ordered(TherapistID),
+             Gender = ordered(Gender),
+             Age = ordered(Age),
+             YPscore1 = round(YPscore1, input$dp),
+             YPscore2 = round(YPscore2, input$dp),
+             Change = round(Change, input$dp),
+             YPscore1toCSC = round(YPscore1toCSC, input$dp),
+             YPscore2toCSC = round(YPscore2toCSC, input$dp))
   })
   
   summaryStats1 <- reactive({
-    
-    print(nrow(longDat()))
-    
     fullData() %>%
       summarise(totalRecords = n(),
                 nClients = n_distinct(RespondentID),
                 nClinicians = n_distinct(TherapistID),
-                # firstDate = min(Start_date, na.rm = TRUE),
-                # lastDate = max(End_date, na.rm = TRUE),
                 nFemale = sum(Gender == "F", na.rm = TRUE),
                 nMale = sum(Gender == "M", na.rm = TRUE),
                 nOther = sum(Gender == "O", na.rm = TRUE),
@@ -396,7 +478,16 @@ server <- function(input, output, session) {
                 meanChange = mean(Change, na.rm = TRUE),
                 medianChange = median(Change, na.rm = TRUE),
                 maxChange = max(Change, na.rm = TRUE),
-                sdChange = sd(Change, na.rm = TRUE)) %>%
+                sdChange = sd(Change, na.rm = TRUE),
+                ### CSC
+                nCSCcat1high = sum(CSCcat1 == "High", na.rm = TRUE),
+                nCSCcat1low = sum(CSCcat1 == "Low", na.rm = TRUE),
+                nCSCcat2high = sum(CSCcat2 == "High", na.rm = TRUE),
+                nCSCcat2low = sum(CSCcat2 == "Low", na.rm = TRUE),
+                nCSCstayedHigh = sum(CSCchange == "Stayed high", na.rm = TRUE),
+                nCSCHighToLow = sum(CSCchange == "High to low", na.rm = TRUE),
+                nCSCstayedLow = sum(CSCchange == "Stayed low", na.rm = TRUE),
+                nCSCLowToHigh = sum(CSCchange == "Low to high", na.rm = TRUE)) %>%
       pivot_longer(cols = everything(), names_to = "Statistic")
   })
   
@@ -472,16 +563,9 @@ server <- function(input, output, session) {
     fileStubName
   })
   
-  # comment1 <- reactive({
-  #   req(fullData())
-  #   ifelse(nrow(fullData()) > 0, 
-  #          paste0("The buttons here allow you to export the entire dataset to the clipboard or to save in either CSV or Excel .xlsx format.\n",
-  #                 "You can use any one two or all three buttons in any order!"),
-  #          "")
-  # })
-  
   output$compData <- DT::renderDataTable(server = FALSE,
-                                         DT::datatable({displayData()},
+                                         DT::datatable({displayData1()},
+                                                       filter = "top",
                                                        extensions = "Buttons",
                                                        selection = "none",
                                                        options = list(
@@ -491,13 +575,16 @@ server <- function(input, output, session) {
                                                          ),
                                                          ### the important thing is that there is the l to allow for the lengthMenu 
                                                          ### https://stackoverflow.com/questions/52645959/r-datatables-do-not-display-buttons-and-length-menu-simultaneously
-                                                         dom = 'Blrtip',
-                                                         fixedColumns = list(leftColumns = 2, rightColumns = 6),
-                                                         pageLength = 20,
-                                                         autoWidth = TRUE,
-                                                         ordering = FALSE,
-                                                         editable = FALSE,
-                                                         searching = FALSE),
+                                                         # dom = 'Blrtip',
+                                                         dom = "Qlfrtip",
+                                                         searchBuilder = TRUE,
+                                                         autoWidth = TRUE),
+                                                       # fixedColumns = list(leftColumns = 2, rightColumns = 6),
+                                                       # pageLength = 20,
+                                                       # autoWidth = TRUE,
+                                                       # ordering = FALSE,
+                                                       # editable = FALSE,
+                                                       # searching = FALSE),
                                          )
   )
   
@@ -586,20 +673,20 @@ server <- function(input, output, session) {
                  size = 2) +
       geom_hline(yintercept = tmpTibMeans$obsmean[1],
                  linetype = 2) +
-    geom_line(data = tmpTibMeans,
-              inherit.aes = FALSE,
-              aes(x = WhichScore, y = obsmean),
-              linewidth = 2,
-              linetype = 1) +
-    geom_linerange(data = tmpTibMeans,
-                   inherit.aes = FALSE,
-                   aes(x = x,
-                       ymin = LCLmean, ymax = UCLmean)) +
-    scale_y_continuous("YP-CORE score",
-                       breaks = seq(0, 4, .2),
-                       limits = c(0, 4)) +
-    scale_x_continuous("Occasion",
-                       breaks = 1:2)
+      geom_line(data = tmpTibMeans,
+                inherit.aes = FALSE,
+                aes(x = WhichScore, y = obsmean),
+                linewidth = 2,
+                linetype = 1) +
+      geom_linerange(data = tmpTibMeans,
+                     inherit.aes = FALSE,
+                     aes(x = x,
+                         ymin = LCLmean, ymax = UCLmean)) +
+      scale_y_continuous("YP-CORE score",
+                         breaks = seq(0, 4, .2),
+                         limits = c(0, 4)) +
+      scale_x_continuous("Occasion",
+                         breaks = 1:2)
   })
   
   output$plot1 <- renderPlot(
@@ -607,10 +694,6 @@ server <- function(input, output, session) {
     ### now control the plot area
     height = 800
   )
-
-# Print the comment on the data 
-# output$text2 <- renderPrint(comment1())
-# output$text2 <- renderUI(comment1())
 }
 
 # Create Shiny app ----
