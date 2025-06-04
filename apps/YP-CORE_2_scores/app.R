@@ -67,6 +67,41 @@ tribble(~Ref, ~Age,  ~Gender,  ~CSC,
         "Di Biase et al., 2021 (Italy)", 16, "M", 1.18,
         "Di Biase et al., 2021 (Italy)", 17, "M", 1.18) -> tibLookup
 
+### vector of column names
+c("RespondentID", 
+  "TherapistID", 
+  "Gender", 
+  "Age", 
+  "YPmean1", 
+  "YPmean2", 
+  "YPclin1", 
+  "YPclin2", 
+  "Comment", 
+  "Start_date", 
+  "End_date", 
+  "nSessionsAttended", 
+  "nSessionsDNAed", 
+  "nSessionsCancelled", 
+  "nSessionsLate", 
+  "nWeeks") -> vecColNames
+
+### col_types of the input file, read_xlsx() style
+vecColTypes <- c("RespondentID" = "text", 
+                 "TherapistID" = "text",
+                 "Gender" = "text",
+                 "Age" = "numeric",
+                 "YPmean1" = "numeric",
+                 "YPmean2" = "numeric",
+                 "YPclin1" = "numeric",
+                 "YPclin2" = "numeric",
+                 "Comment" = "text",
+                 "Start_date" = "text",
+                 "End_date" = "text",
+                 "nSessionsAttended" = "numeric",
+                 "nSessionsDNAed" = "numeric",
+                 "nSessionsCancelled" = "numeric",
+                 "nSessionsLate" = "numeric",
+                 "nWeeks" = "numeric")
 
 ### 1. Initialize telemetry with default options (store to a local logfile)
 telemetry <- Telemetry$new(app_name = "CORE-OM_scoring",
@@ -282,7 +317,6 @@ ui <- fluidPage(
                            h2("Overall todo list"),
                            p("This is the todo list for this tab as I see it at this point"),
                            tags$ul(
-                             tags$li("Change the file upload to handle csv, xlsx, ods and Rda files."),
                              tags$li("Going to need to work out my position on the RCI and then include that."),
                              tags$li("Then will need new tabs including Jacobson plot")
                            ),
@@ -294,7 +328,7 @@ ui <- fluidPage(
                            value = 7,
                            p("App created 22.v.25 by Chris Evans at this point specifically for Oiatillo Temirov for checking his data.",
                              a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/")),
-                           p("Last updated 3.vi.25 adding a lot of minor tweaks and the Explanation and Todo list headings."),
+                           p("Last updated 4.vi.25 so upload handles csv, xlsx, ods and Rda files and adding column name check."),
                            p("Licenced under a ",
                              a("Creative Commons, Attribution Licence-ShareAlike",
                                href="http://creativecommons.org/licenses/by-sa/1.0/"),
@@ -344,7 +378,49 @@ server <- function(input, output, session) {
   })
   
   fullData <- reactive({
-    suppressMessages(read.csv(file = fileSelected())) -> dataInput
+    ### work out file format 
+    str_replace(fileSelected(), "^(.)*?(\\.)(.*$)", "\\3") %>%
+      str_to_lower() -> fileType
+    ### read in the data
+    if(fileType == "csv") {
+      suppressMessages(read.csv(file = fileSelected())) %>%
+        as_tibble() -> dataInput
+    }
+    if(fileType == "rda") {
+      suppressMessages(load(file = fileSelected()))
+      tibYPwide2 -> dataInput
+      rm(tibYPwide2)
+    }
+    if(fileType == "xlsx") {
+      suppressMessages(readxl::read_xlsx(path = fileSelected(),
+                                         col_types = vecColTypes)) -> dataInput
+    }
+    if(fileType == "ods") {
+      ### col_types of the input file
+      lisColTypes <- cols("RespondentID" = "c", 
+                          "TherapistID" = "c",
+                          "Gender" = "c",
+                          "Age" = "i",
+                          "YPmean1" = "d",
+                          "YPmean2" = "d",
+                          "YPclin1" = "d",
+                          "YPclin2" = "d",
+                          "Comment" = "c",
+                          "Start_date" = "c",
+                          "End_date" = "c",
+                          "nSessionsAttended" = "i",
+                          "nSessionsDNAed" = "i",
+                          "nSessionsCancelled" = "i",
+                          "nSessionsLate" = "i",
+                          "nWeeks" = "i")
+      
+      suppressMessages(suppressWarnings(readODS::read_ods(path = fileSelected(),
+                                         col_types = lisColTypes))) -> dataInput
+    }
+    
+    validate(need(colnames(dataInput) == vecColNames,
+             "Your data don't seem to have the correct column names.  Sorry, aborting!"))
+    
     dataInput %>%
       as_tibble() %>%
       ### cleaning 
