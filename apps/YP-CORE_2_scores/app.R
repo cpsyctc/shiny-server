@@ -126,23 +126,7 @@ ui <- fluidPage(
   setBackgroundColor("#ffff99"),
   h1(HTML("App to use dataset of two YP-CORE scores each from same person #1")),
   
-  p("This app uses data from a spreadsheet. "),
-  p("Here are example files with artificial data: ",
-    a("CSV format (.csv)",
-      href="https://www.coresystemtrust.org.uk/wp-content/uploads/2025/06/YPwide2.csv"),
-    ", ",
-    a("Libre/OpenOffice format (.ods)",
-      href="https://www.coresystemtrust.org.uk/wp-content/uploads/2025/06/YPwide2.ods"),
-    ", ",
-    a("Excel format (.xlsx)",
-      " or ",
-      href="https://www.coresystemtrust.org.uk/wp-content/uploads/2025/06/YPwide2.xlsx"),
-    a("R data format (.Rda)",
-      href="https://www.coresystemtrust.org.uk/wp-content/uploads/2025/06/YPwide2.rda"),
-  ),
-  p("Download one to your own machine to explore this app with those data.  Then delete the data",
-    "rename the file and start putting your own data into it to use here."),
-  
+  p("This app uses data from a spreadsheet. See first tab on the right."),
   
   # Sidebar layout with input and output definitions ----
   sidebarLayout(
@@ -175,8 +159,35 @@ ui <- fluidPage(
     mainPanel(
       tabsetPanel(type = "tabs",
                   
-                  tabPanel("Data", 
+                  tabPanel("Introduction",
                            value = 1,
+                           h2("Introduction"),
+                           p(" "),
+                           p("This app takes YP-CORE data which will typically be one row per client with two values, usually baseline and last session.  ",
+                             "(An app that will take many rows of scores per client should follow soon.  ",
+                             "The data have to be uploaded in either CSV (Comma Separated Variables) format, R's Rda format, Excel .xlsx or Libre/OpenOffice .ods formats.  ",
+                             "The column names must be RespondentID, TherapistID, Gender, Age, YPmean1, YPmean2, YPclin1, YPclin2, Comment, Start_date, End_date, ",
+                             "nSessionsAttended, nSessionsDNAed, nSessionsCancelled, nSessionsLate and nWeeks. ",
+                             "It is safest and easiest to start with one of thes example files containing artificial data: "),
+                           tags$ul(
+                             tags$li(a("CSV format (.csv)",
+                                       href="https://www.coresystemtrust.org.uk/wp-content/uploads/2025/06/YPwide2.csv")),
+                             tags$li(a("Libre/OpenOffice format (.ods)",
+                                       href="https://www.coresystemtrust.org.uk/wp-content/uploads/2025/06/YPwide2.ods")),
+                             tags$li(a("Excel format (.xlsx)",
+                                       href="https://www.coresystemtrust.org.uk/wp-content/uploads/2025/06/YPwide2.xlsx"),
+                                     " or "),
+                             tags$li(a("R data format (.Rda)",
+                                       href="https://www.coresystemtrust.org.uk/wp-content/uploads/2025/06/YPwide2.rda")),
+                           ),
+                           p("Download one to your own machine to explore this app with those data.  Then delete the data",
+                             "rename the file and start putting your own data into it to use here."),
+                           p(" "),
+                           p("First upload your data in one of those formats, the analyses then appear in the tabs after this one.")
+                  ),
+                  
+                  tabPanel("Data", 
+                           value = 2,
                            h2("Explanation"),
                            p("This tables shows the data you uploaded plus the coding of that data."),
                            tags$ul(tags$li("At the right of  the table the coding gives you the CSC categories of the YP-CORE scores (if there were any.)"),
@@ -206,7 +217,7 @@ ui <- fluidPage(
                   ),
                   
                   tabPanel("Summary statistics",
-                           value = 2,
+                           value = 3,
                            h2("Explanation"),
                            p("This is pretty indigestible but it gives all the summary statistics for all the variables across all clinicians.",
                              "I think the naming of the statistics is pretty self-explanatory if not particularly easy on the eye."),
@@ -228,7 +239,7 @@ ui <- fluidPage(
                   ),    
                   
                   tabPanel("Summary statistics by clinician",
-                           value = 3,
+                           value = 4,
                            h2("Explanation"),
                            p("As with the 'Summary statistics' tab this is pretty indigestible and gives all the same summary statistics ",
                              "for all the variables across all clinicians.",
@@ -252,7 +263,7 @@ ui <- fluidPage(
                   ),   
                   
                   tabPanel("CSCtable1",
-                           value = 4,
+                           value = 5,
                            h2("Explanation"),
                            p("This tab gives a simple breakdown of the CSC categories: baseline, final and change counts"),
                            p(" "),
@@ -285,7 +296,7 @@ ui <- fluidPage(
                   ),    
                   
                   tabPanel("Plot1",
-                           value = 5,
+                           value = 6,
                            h2("Explanation"),
                            p("This tab gives a simple breakdown of the CSC categories: baseline, final and change counts"),
                            p(" "),
@@ -310,9 +321,9 @@ ui <- fluidPage(
                   ),    
                   
                   tabPanel("Explanation of the app",
-                           value = 6,
+                           value = 7,
                            h2("Explanation"),
-                           p("This app is definitely work in progress at the moment and not yet in any sort of alpha/beta testing release even."),
+                           p("This app is definitely work in progress at the moment."),
                            p(" "),
                            h2("Overall todo list"),
                            p("This is the todo list for this tab as I see it at this point"),
@@ -325,7 +336,7 @@ ui <- fluidPage(
                   
                   
                   tabPanel("Background", 
-                           value = 7,
+                           value = 8,
                            p("App created 22.v.25 by Chris Evans at this point specifically for Oiatillo Temirov for checking his data.",
                              a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/")),
                            p("Last updated 4.vi.25 so upload handles csv, xlsx, ods and Rda files and adding column name check."),
@@ -415,11 +426,11 @@ server <- function(input, output, session) {
                           "nWeeks" = "i")
       
       suppressMessages(suppressWarnings(readODS::read_ods(path = fileSelected(),
-                                         col_types = lisColTypes))) -> dataInput
+                                                          col_types = lisColTypes))) -> dataInput
     }
     
     validate(need(colnames(dataInput) == vecColNames,
-             "Your data don't seem to have the correct column names.  Sorry, aborting!"))
+                  "Your data don't seem to have the correct column names.  Sorry, aborting!"))
     
     dataInput %>%
       as_tibble() %>%
