@@ -7,6 +7,7 @@ suppressMessages(library(DT)) # for interactive tables
 suppressMessages(library(janitor)) # for tabyl
 suppressMessages(library(flextable)) # for non-interactive tables
 suppressMessages(library(CECPfuns)) # for some utility functions
+suppressMessages(library(plotly)) # for interactivity in the graphics
 
 ### set ggplot defaults
 theme_set(theme_bw())
@@ -23,49 +24,51 @@ vecLookup <- c("Blackshaw PhD (UK & Ireland)",
                "Di Biase et al., 2021 (Italy)")
 
 ### create the internal lookup table
-tribble(~Ref, ~Age,  ~Gender,  ~CSC,
-        "Blackshaw PhD (UK & Ireland)", 11, "F", 1.432,
-        "Blackshaw PhD (UK & Ireland)", 12, "F", 1.337,
-        "Blackshaw PhD (UK & Ireland)", 13, "F", 1.484,
-        "Blackshaw PhD (UK & Ireland)", 14, "F", 1.562,
-        "Blackshaw PhD (UK & Ireland)", 15, "F", 1.784,
-        "Blackshaw PhD (UK & Ireland)", 16, "F", 1.909,
-        "Blackshaw PhD (UK & Ireland)", 17, "F", 1.664,
-        "Blackshaw PhD (UK & Ireland)", 18, "F", 1.909,
-        "Blackshaw PhD (UK & Ireland)", 11, "M", 1.252,
-        "Blackshaw PhD (UK & Ireland)", 12, "M", 1.104,
-        "Blackshaw PhD (UK & Ireland)", 13, "M", 1.211,
-        "Blackshaw PhD (UK & Ireland)", 14, "M", 1.301,
-        "Blackshaw PhD (UK & Ireland)", 15, "M", 1.299,
-        "Blackshaw PhD (UK & Ireland)", 16, "M", 1.487,
-        "Blackshaw PhD (UK & Ireland)", 17, "M", 1.523 ,
-        "Blackshaw PhD (UK & Ireland)", 18, "M", 1.523,
-        "Twigg et al., 2016 (UK)", 11, "M", 1.03,
-        "Twigg et al., 2016 (UK)", 12, "M", 1.03,
-        "Twigg et al., 2016 (UK)", 13, "M", 1.03,
-        "Twigg et al., 2016 (UK)", 14, "M", 1.41,
-        "Twigg et al., 2016 (UK)", 15, "M", 1.41,
-        "Twigg et al., 2016 (UK)", 16, "M", 1.41,
-        "Twigg et al., 2016 (UK)", 11, "F", 1.44,
-        "Twigg et al., 2016 (UK)", 12, "F", 1.44,
-        "Twigg et al., 2016 (UK)", 13, "F", 1.44,
-        "Twigg et al., 2016 (UK)", 14, "F", 1.59,
-        "Twigg et al., 2016 (UK)", 15, "F", 1.59,
-        "Twigg et al., 2016 (UK)", 16, "F", 1.59,
-        "Di Biase et al., 2021 (Italy)", 11, "F", 1.34,
-        "Di Biase et al., 2021 (Italy)", 12, "F", 1.34,
-        "Di Biase et al., 2021 (Italy)", 13, "F", 1.34,
-        "Di Biase et al., 2021 (Italy)", 14, "F", 1.34,
-        "Di Biase et al., 2021 (Italy)", 15, "F", 1.47,
-        "Di Biase et al., 2021 (Italy)", 16, "F", 1.47,
-        "Di Biase et al., 2021 (Italy)", 17, "F", 1.47,
-        "Di Biase et al., 2021 (Italy)", 11, "M", 1.18,
-        "Di Biase et al., 2021 (Italy)", 12, "M", 1.18,
-        "Di Biase et al., 2021 (Italy)", 13, "M", 1.18,
-        "Di Biase et al., 2021 (Italy)", 14, "M", 1.18,
-        "Di Biase et al., 2021 (Italy)", 15, "M", 1.23,
-        "Di Biase et al., 2021 (Italy)", 16, "M", 1.18,
-        "Di Biase et al., 2021 (Italy)", 17, "M", 1.18) -> tibLookup
+tribble(~Ref, ~Age,  ~Gender,  ~CSC, ~RCI, ~refAlpha, ~refSD,
+        "Blackshaw PhD (UK & Ireland)", 11, "F", 1.432, .892, NA, NA,
+        "Blackshaw PhD (UK & Ireland)", 12, "F", 1.337, .911, NA, NA,
+        "Blackshaw PhD (UK & Ireland)", 13, "F", 1.484, .884, NA, NA,
+        "Blackshaw PhD (UK & Ireland)", 14, "F", 1.562, .883, NA, NA,
+        "Blackshaw PhD (UK & Ireland)", 15, "F", 1.784, .882, NA, NA,
+        "Blackshaw PhD (UK & Ireland)", 16, "F", 1.909, .860, NA, NA,
+        "Blackshaw PhD (UK & Ireland)", 17, "F", 1.664, .909, NA, NA,
+        "Blackshaw PhD (UK & Ireland)", 18, "F", 1.909, .947, NA, NA,
+        "Blackshaw PhD (UK & Ireland)", 11, "M", 1.252, .969, NA, NA,
+        "Blackshaw PhD (UK & Ireland)", 12, "M", 1.104, .929, NA, NA,
+        "Blackshaw PhD (UK & Ireland)", 13, "M", 1.211, .928, NA, NA,
+        "Blackshaw PhD (UK & Ireland)", 14, "M", 1.301, .909, NA, NA,
+        "Blackshaw PhD (UK & Ireland)", 15, "M", 1.299, .897, NA, NA,
+        "Blackshaw PhD (UK & Ireland)", 16, "M", 1.487, .907, NA, NA,
+        "Blackshaw PhD (UK & Ireland)", 17, "M", 1.523, .910, NA, NA,
+        "Blackshaw PhD (UK & Ireland)", 18, "M", 1.523, 1.156, NA, NA,
+        "Twigg et al., 2016 (UK)", 11, "M", 1.03, .83, .71, .69,
+        "Twigg et al., 2016 (UK)", 12, "M", 1.03, .83, .71, .68,
+        "Twigg et al., 2016 (UK)", 13, "M", 1.03, .83, .71, .64,
+        "Twigg et al., 2016 (UK)", 14, "M", 1.41, .80, .74, .67,
+        "Twigg et al., 2016 (UK)", 15, "M", 1.41, .80, .74, .71,
+        "Twigg et al., 2016 (UK)", 16, "M", 1.41, .80, .74, .61,
+        "Twigg et al., 2016 (UK)", 11, "F", 1.44, .80, .79, .74,
+        "Twigg et al., 2016 (UK)", 12, "F", 1.44, .80, .79, .69,
+        "Twigg et al., 2016 (UK)", 13, "F", 1.44, .80, .79, .79,
+        "Twigg et al., 2016 (UK)", 14, "F", 1.59, .74, .81, .74,
+        "Twigg et al., 2016 (UK)", 15, "F", 1.59, .74, .81, .72,
+        "Twigg et al., 2016 (UK)", 16, "F", 1.59, .74, .81, .73,
+        "Di Biase et al., 2021 (Italy)", 11, "F", 1.34, .82, .80, .837,
+        "Di Biase et al., 2021 (Italy)", 12, "F", 1.34, .82, .80, .837,
+        "Di Biase et al., 2021 (Italy)", 13, "F", 1.34, .82, .80, .837,
+        "Di Biase et al., 2021 (Italy)", 14, "F", 1.34, .82, .80, .837,
+        "Di Biase et al., 2021 (Italy)", 15, "F", 1.47, .82, .83, .727,
+        "Di Biase et al., 2021 (Italy)", 16, "F", 1.47, .82, .83, .727,
+        "Di Biase et al., 2021 (Italy)", 17, "F", 1.47, .82, .83, .727,
+        "Di Biase et al., 2021 (Italy)", 11, "M", 1.18, .82, .69, .626,
+        "Di Biase et al., 2021 (Italy)", 12, "M", 1.18, .82, .69, .626,
+        "Di Biase et al., 2021 (Italy)", 13, "M", 1.18, .82, .69, .626,
+        "Di Biase et al., 2021 (Italy)", 14, "M", 1.18, .82, .69, .626,
+        "Di Biase et al., 2021 (Italy)", 15, "M", 1.23, .82, .81, .727,
+        "Di Biase et al., 2021 (Italy)", 16, "M", 1.18, .82, .81, .727,
+        "Di Biase et al., 2021 (Italy)", 17, "M", 1.18, .82, .81, .727) %>%
+  mutate(Age = ordered(Age,
+                       levels = 11:18))-> tibLookup
 
 ### vector of column names
 c("RespondentID", 
@@ -124,7 +127,7 @@ ui <- fluidPage(
   use_telemetry(), # 2. Add necessary Javascript to Shiny
   
   setBackgroundColor("#ffff99"),
-  h1(HTML("App to use dataset of two YP-CORE scores each from same person #1")),
+  h1(HTML("App to use dataset of two YP-CORE scores each from same person")),
   
   p("This app uses data from a spreadsheet. See first tab on the right."),
   
@@ -183,7 +186,13 @@ ui <- fluidPage(
                            p("Download one to your own machine to explore this app with those data.  Then delete the data",
                              "rename the file and start putting your own data into it to use here."),
                            p(" "),
-                           p("First upload your data in one of those formats, the analyses then appear in the tabs after this one.")
+                           p("First upload your data in one of those formats, the analyses then appear in the tabs after this one."),
+                           p(" "),
+                           h2("This is work in progress!!"),
+                           p("This is work in progress like everything else in this app.",
+                             "Each tab has a todo list for what's to come for that tab and the explanation tab has a general todo list."),
+                           
+                           p(" "),
                   ),
                   
                   tabPanel("Data", 
@@ -203,7 +212,7 @@ ui <- fluidPage(
                            ),
                            p(" "),
                            h2("This is work in progress!!"),
-                           p("Until such time as this is no longer true (!), this is work in progress like everything else in this app.",
+                           p("This is work in progress like everything else in this app.",
                              "This is the todo list for this tab as I see it at this point"),
                            tags$ul(
                              tags$li("Add buttons to download entire table as a file"),
@@ -223,7 +232,7 @@ ui <- fluidPage(
                              "I think the naming of the statistics is pretty self-explanatory if not particularly easy on the eye."),
                            p(" "),
                            h2("Todo list"),
-                           p("This is work in progress. Until such time as this is no longer true (when?!), this is work in progress like everything else in this app.",
+                           p("This is work in progress like everything else in this app.",
                              "This is the todo list for this tab as I see it at this point"),
                            tags$ul(
                              tags$li("Break this up into a series of tables with headings above each"),
@@ -268,7 +277,7 @@ ui <- fluidPage(
                            p("This tab gives a simple breakdown of the CSC categories: baseline, final and change counts"),
                            p(" "),
                            h2("Todo list"),
-                           p("This is work in progress. Until such time as this is no longer true (when?!), this is work in progress like everything else in this app.",
+                           p("This is work in progress like everything else in this app.",
                              "This is the todo list for this tab as I see it at this point"),
                            tags$ul(
                              tags$li("Probably have to add RCI at some point!"),
@@ -286,7 +295,7 @@ ui <- fluidPage(
                            p(" "),
                            uiOutput('CSCtable2'),
                            p(" ") ,
-                           p("This is the crosstabulation of the firtst and 2nd/final categories"),
+                           p("This is the crosstabulation of the first and 2nd/final categories"),
                            p(" "),
                            uiOutput('CSCtable3'),
                            p(" ") ,
@@ -298,18 +307,22 @@ ui <- fluidPage(
                   tabPanel("Plot1",
                            value = 6,
                            h2("Explanation"),
-                           p("This tab gives a simple breakdown of the CSC categories: baseline, final and change counts"),
+                           p("This tab gives a cat's cradle plot of the data"),
                            p(" "),
+                           p("A cat's cradle plot ignores any respondent with only one usable score and shows ",
+                             "the change in scores as a line.  You can identify the points by hovering over them ",
+                             "when you will see a 'tooltip'",
+                             "giving you the YP-CORE score, the respondent ID, therpist ID and the category ",
+                             "of the CSC change."),
                            h2("Todo list"),
-                           p("This is work in progress. Until such time as this is no longer true (when?!), this is work in progress like everything else in this app.",
+                           p("This is work in progress like everything else in this app.",
                              "This is the todo list for this tab as I see it at this point"),
                            tags$ul(
-                             tags$li("Add plotrix labelling of participants"),
-                             tags$li("Add options to break down by therapist, age, gender ...?"),
+                             tags$li("Add options to break down by therapist, age, gender ..."),
                              tags$li("Buttons to download the plot")
                            ),
                            p(" "),
-                           h2("The cat''s cradle plot"),
+                           h2("The cat's cradle plot"),
                            p(" "),
                            p("This is a so-called 'cat's cradle' plot.",
                              "It shows all the complete pairs of scores coloured by gender with connecting lines.",
@@ -317,11 +330,40 @@ ui <- fluidPage(
                              "offset somewhat from the individual points, mark the mean baseline and later scores.  ",
                              "The vertical lines through those are the bootstrap 95% confidence intervals."),
                            p(" "),
-                           plotOutput('plot1'),
+                           plotlyOutput('plot1',
+                                        height = "100%"),
                   ),    
                   
-                  tabPanel("Explanation of the app",
+                  tabPanel("Plot2",
                            value = 7,
+                           h2("Explanation"),
+                           p("This tab gives a cat's cradle plot against dates (if given)"),
+                           p(" "),
+                           p("This is very similar to the previous plot but the x axis is by date, not occasion.",
+                             "This gives a better picture of the work over time and Again, you can identify the points by hovering over them ",
+                             "when you will see a 'tooltip'",
+                             "giving you the YP-CORE score, the respondent ID, therpist ID and the category ",
+                             "of the CSC change."),
+                           h2("Todo list"),
+                           p("This is work in progress like everything else in this app.",
+                             "This is the todo list for this tab as I see it at this point"),
+                           tags$ul(
+                             tags$li("Add options to break down by therapist, age, gender ..."),
+                             tags$li("Buttons to download the plot")
+                           ),
+                           p(" "),
+                           h2("The plot"),
+                           p(" "),
+                           p("This shows all the complete pairs of scores coloured by therapist ID with connecting lines ",
+                             "plotted against episode start and finish dates (if given).  If you hover over a point you ",
+                             "should be shown the respondent ID, gender and CSC change category."),
+                           p(" "),
+                           plotlyOutput('plot2',
+                                        height = "100%"),
+                  ),  
+                  
+                  tabPanel("Explanation of the app",
+                           value = 8,
                            h2("Explanation"),
                            p("This app is definitely work in progress at the moment."),
                            p(" "),
@@ -336,10 +378,10 @@ ui <- fluidPage(
                   
                   
                   tabPanel("Background", 
-                           value = 8,
+                           value = 9,
                            p("App created 22.v.25 by Chris Evans at this point specifically for Oiatillo Temirov for checking his data.",
                              a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/")),
-                           p("Last updated 4.vi.25 so upload handles csv, xlsx, ods and Rda files and adding column name check."),
+                           p("Last updated 5.vi.25 with various currently invisible changes, a new cat's cradle plot against dates and labelling of points in both plots."),
                            p("Licenced under a ",
                              a("Creative Commons, Attribution Licence-ShareAlike",
                                href="http://creativecommons.org/licenses/by-sa/1.0/"),
@@ -359,6 +401,9 @@ server <- function(input, output, session) {
   session$onSessionEnded(function() {
     stopApp()
   })
+  
+  ### get session parameters
+  lisSessionData <- session$clientData
   
   telemetry$start_session(track_inputs = TRUE, track_values = FALSE) # 3. Track basics and inputs and input values
   
@@ -469,7 +514,16 @@ server <- function(input, output, session) {
       ### deal with out of range ages
       mutate(Age = if_else(Age < 11 | Age > 25,
                            NA_integer_,
-                           Age)) -> dataInput
+                           Age)) %>%
+      ### massage dates
+      mutate(Start_date = as.Date(Start_date, format = "%Y-%m-%d"),
+             End_date = as.Date(End_date, format = "%Y-%m-%d")) %>%
+      ### massage variables we need as factors
+      mutate(RespondentID = ordered(RespondentID),
+             TherapistID = ordered(TherapistID),
+             Gender = ordered(Gender),
+             Age = ordered(Age,
+                           levels = 11:18)) -> dataInput
     
     if (input$Scoring == "Item mean (range 0-4)") {
       dataInput %>%
@@ -513,12 +567,8 @@ server <- function(input, output, session) {
   
   displayData1 <- reactive({
     fullData() %>%
-      select(-c(Ref, CSC)) %>%
-      mutate(RespondentID = ordered(RespondentID),
-             TherapistID = ordered(TherapistID),
-             Gender = ordered(Gender),
-             Age = ordered(Age),
-             YPscore1 = round(YPscore1, input$dp),
+      select(-c(Ref, CSC, RCI, refAlpha, refSD)) %>%
+      mutate(YPscore1 = round(YPscore1, input$dp),
              YPscore2 = round(YPscore2, input$dp),
              Change = round(Change, input$dp),
              YPscore1toCSC = round(YPscore1toCSC, input$dp),
@@ -752,6 +802,12 @@ server <- function(input, output, session) {
       mutate(WhichScore = str_remove(WhichScore, "YPscore"),
              WhichScore = as.numeric(WhichScore)) -> tmpTib
     
+    if(input$Scoring == "Item mean (range 0-4)") {
+      yLims <- c(0, 4)
+    } else {
+      yLims <- c(0, 40)
+    }
+    ySteps <- yLims[2] / 20
     ### nudge value to offset the means either side of the raw values
     tmpNudge <- .03
     
@@ -766,8 +822,10 @@ server <- function(input, output, session) {
       mutate(x = if_else(WhichScore == 1,
                          WhichScore - tmpNudge,
                          WhichScore + tmpNudge)) -> tmpTibMeans
+
     ggplot(data = tmpTib,
-           aes(x = WhichScore, y = Score, group = RespondentID, colour = Gender)) +
+           aes(x = WhichScore, y = Score, group = RespondentID, colour = Gender,
+               label2 = TherapistID, label3 = CSCchange)) +
       geom_point() +
       geom_line() +
       geom_point(data = tmpTibMeans,
@@ -786,16 +844,74 @@ server <- function(input, output, session) {
                      aes(x = x,
                          ymin = LCLmean, ymax = UCLmean)) +
       scale_y_continuous("YP-CORE score",
-                         breaks = seq(0, 4, .2),
-                         limits = c(0, 4)) +
+                         breaks = seq(0, 
+                                      yLims[2], 
+                                      ySteps),
+                         limits = yLims) +
       scale_x_continuous("Occasion",
-                         breaks = 1:2)
+                         breaks = 1:2) 
+    
+      ggplotly(tooltip = c("RespondentID", 
+                           "TherapistID", 
+                           "Score",
+                           "label2",
+                           "label3"),
+               width = lisSessionData$output_pid_width, height = 800)
   })
   
-  output$plot1 <- renderPlot(
-    catsCradle1(),
-    ### now control the plot area
-    height = 800
+  output$plot1 <- renderPlotly(
+    catsCradle1()
+  )
+  
+  catsCradle2 <- reactive({
+    ### massage the data
+    fullData() %>%
+      select(-Age) %>%
+      ### drop any missing scores
+      filter(!is.na(YPscore1)) %>%
+      filter(!is.na(YPscore2)) %>%
+      filter(!is.na(Start_date)) %>%
+      filter(!is.na(End_date)) -> tmpTib
+    
+    print(tmpTib)
+    
+    if(input$Scoring == "Item mean (range 0-4)") {
+      yLims <- c(0, 4)
+    } else {
+      yLims <- c(0, 40)
+    }
+    ySteps <- yLims[2] / 20
+
+    ggplot(data = tmpTib,
+           aes(x = Start_date, y = YPscore1, group = RespondentID, colour = TherapistID,
+               label1 = RespondentID,
+               label2 = Gender,
+               label3 = YPscore1,
+               label4 = YPscore2, 
+               label5 = CSCchange)) +
+      geom_point(shape = 22) +
+      geom_point(aes(x = End_date, y = YPscore2),
+                 shape = 23) +
+      geom_segment(aes(x = Start_date, xend = End_date,
+                       y = YPscore1, yend = YPscore2)) +
+      xlab("Date") +
+      scale_y_continuous("YP-CORE score",
+                         breaks = seq(0,
+                                      yLims[2],
+                                      ySteps),
+                         limits = yLims) 
+      
+
+    ggplotly(tooltip = c("label1",
+                         "label2",
+                         "label3",
+                         "label4",
+                         "label5"),
+             width = lisSessionData$output_pid_width, height = 800)
+  })
+  
+  output$plot2 <- renderPlotly(
+    catsCradle2()
   )
 }
 
