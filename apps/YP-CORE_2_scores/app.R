@@ -68,7 +68,7 @@ tribble(~Ref, ~Age,  ~Gender,  ~CSC, ~RCI, ~refAlpha, ~refSD,
         "Di Biase et al., 2021 (Italy)", 16, "M", 1.18, .82, .81, .727,
         "Di Biase et al., 2021 (Italy)", 17, "M", 1.18, .82, .81, .727) %>%
   mutate(ordAge = ordered(Age,
-                       levels = 11:18))-> tibLookup
+                          levels = 11:18))-> tibLookup
 
 ### vector of column names
 c("RespondentID", 
@@ -121,7 +121,7 @@ itemStem <- "COREOM"
 ### to read data efficiently
 itemsCOREOM <- paste(itemStem, sprintf("%02.0f", 1:34), sep = "")
 
-# Define UI for data upload app ----
+# Define UI for app ----
 ui <- fluidPage(
   
   use_telemetry(), # 2. Add necessary Javascript to Shiny
@@ -129,296 +129,304 @@ ui <- fluidPage(
   setBackgroundColor("#ffff99"),
   h1(HTML("App to use dataset of two YP-CORE scores each from same person")),
   
-  p("This app uses data from a spreadsheet. See first tab on the right."),
+  p("This app uses data from a spreadsheet which you upload below. This is then analysed with findings in the various tabs to the right of this."),
   
-  # Sidebar layout with input and output definitions ----
-  sidebarLayout(
-    
-    # Sidebar panel for inputs ----
-    sidebarPanel(
-      h2("Upload data"),
-      p("This is a paragraph!"),
-      # Input: Select a file ----
-      fileInput("file1", "Choose file to upload"),
-      
-      radioButtons("Lookup",
-                   "Which lookup data do you want to use for the CSC?",
-                   vecLookup),
-      radioButtons("Scoring",
-                   "Which scoring do you want to use (data can be input in either or mix)?",
-                   vecScoring),
-      numericInput("dp",
-                   "Number of decimal places for the scores",
-                   value = 2,
-                   min = 0,
-                   max = 5,
-                   width = "100%"),
-      helpText("You can change this before or after data has been selected."),
-      helpText("The data will take a few seconds to appear in the 'Computed scores' tab: be patient!!"),
-      
-    ),
-    
-    # Main panel for displaying outputs ----
-    mainPanel(
-      tabsetPanel(type = "tabs",
-                  
-                  tabPanel("Introduction",
-                           value = 1,
-                           h2("Introduction"),
-                           p(" "),
-                           p("This app takes YP-CORE data which will typically be one row per client with two values, usually baseline and last session.  ",
-                             "(An app that will take many rows of scores per client should follow soon.  ",
-                             "The data have to be uploaded in either CSV (Comma Separated Variables) format, R's Rda format, Excel .xlsx or Libre/OpenOffice .ods formats.  ",
-                             "The column names must be RespondentID, TherapistID, Gender, Age, YPmean1, YPmean2, YPclin1, YPclin2, Comment, Start_date, End_date, ",
-                             "nSessionsAttended, nSessionsDNAed, nSessionsCancelled, nSessionsLate and nWeeks. ",
-                             "It is safest and easiest to start with one of thes example files containing artificial data: "),
-                           tags$ul(
-                             tags$li(a("CSV format (.csv)",
-                                       href="https://www.coresystemtrust.org.uk/wp-content/uploads/2025/06/YPwide2.csv")),
-                             tags$li(a("Libre/OpenOffice format (.ods)",
-                                       href="https://www.coresystemtrust.org.uk/wp-content/uploads/2025/06/YPwide2.ods")),
-                             tags$li(a("Excel format (.xlsx)",
-                                       href="https://www.coresystemtrust.org.uk/wp-content/uploads/2025/06/YPwide2.xlsx"),
-                                     " or "),
-                             tags$li(a("R data format (.Rda)",
-                                       href="https://www.coresystemtrust.org.uk/wp-content/uploads/2025/06/YPwide2.rda")),
-                           ),
-                           p("Download one to your own machine to explore this app with those data.  Then delete the data",
-                             "rename the file and start putting your own data into it to use here."),
-                           p(" "),
-                           p("First upload your data in one of those formats, the analyses then appear in the tabs after this one."),
-                           p(" "),
-                           h2("This is work in progress!!"),
-                           p("This is work in progress like everything else in this app.",
-                             "Each tab has a todo list for what's to come for that tab and the explanation tab has a general todo list."),
+  # Main panel
+  mainPanel(
+    tabsetPanel(type = "tabs",
+                
+                tabPanel("Introduction",
+                         value = 1,
+                         h2("Introduction"),
+                         p(" "),
+                         p("This app takes YP-CORE data in rows each with one or two scores.  These will typically be one row per usually baseline and last session.  ",
+                           "(An app that will take many rows of scores per client should follow soon.  ",
+                           "The data can be uploaded in CSV (Comma Separated Variables) format, R's Rda format, Excel .xlsx or Libre/OpenOffice .ods formats.  ",
+                           "The column names must be RespondentID, TherapistID, Gender, Age, YPmean1, YPmean2, YPclin1, YPclin2, Comment, Start_date, End_date, ",
+                           "nSessionsAttended, nSessionsDNAed, nSessionsCancelled, nSessionsLate and nWeeks but you can have your own variables to right of those ",
+                           "required variables.  You don't have to fill in all the variables nor, of course, do data have to be complete.  Naturally, the more data ",
+                           "you have the more useful and informative the analyses will be."),
+                         p(" "),
+                         p("It is safest and easiest to start with one of thes example files containing artificial data: "),
+                         tags$ul(
+                           tags$li(a("CSV format (.csv)",
+                                     href="https://www.coresystemtrust.org.uk/wp-content/uploads/2025/06/YPwide2.csv")),
+                           tags$li(a("Libre/OpenOffice format (.ods)",
+                                     href="https://www.coresystemtrust.org.uk/wp-content/uploads/2025/06/YPwide2.ods")),
+                           tags$li(a("Excel format (.xlsx)",
+                                     href="https://www.coresystemtrust.org.uk/wp-content/uploads/2025/06/YPwide2.xlsx"),
+                                   " or "),
+                           tags$li(a("R data format (.Rda)",
+                                     href="https://www.coresystemtrust.org.uk/wp-content/uploads/2025/06/YPwide2.rda")),
+                         ),
+                         p("Download one to your own machine to explore this app with those data.  Then delete the data",
+                           "rename the file and start putting your own data into it to use here."),
+                         p(" "),
+                         p("First upload your data in one of those formats, the analyses then appear in the tabs after this one."),
+                         p(" "),
+                         h2("This is work in progress!!"),
+                         p("This is work in progress like everything else in this app.",
+                           "Each tab has a todo list for what's to come for that tab and the explanation tab has a general todo list."),
+                         
+                         p(" "),
+                         h2("Upload data"),
+                         p("This is a paragraph!"),
+                         # Input: Select a file ----
+                         fileInput("file1", 
+                                   "Choose file to upload",
+                                   accept = c(".csv", ".rda", ".xlsx", ".ods")),
+                         
+                         helpText("Once you have uploaded your data, choose the appropriate referential values to use with it..."),
+                         
+                         radioButtons("Lookup",
+                                      "Which lookup data do you want to use for the CSC?",
+                                      vecLookup),
+                         helpText("This shows the lookup table you selected"),
+                         
+                         uiOutput("lookupTable1"),
+                         
+                         helpText("Scores can be displayed using either 'clinical' or 'mean' scoring"),
+                         radioButtons("Scoring",
+                                      "Which scoring do you want to use (data can be input in either or mix)?",
+                                      vecScoring),
+                         numericInput("dp",
+                                      "Number of decimal places for the scores",
+                                      value = 2,
+                                      min = 0,
+                                      max = 5,
+                                      width = "100%"),
+                         helpText("You can change this before or after data has been selected."),
+                         helpText("If your spreadsheet is large the data may take a few seconds for the 'Data uploaded' message to appear above: be patient!!"),
+                         helpText("When the data has uploaded you can explore it in the 'Data' tab to the right and the analyses and plots will be in the ",
+                                  "other tabs to the right.")
+               ),
+                
+                tabPanel("Data", 
+                         value = 2,
+                         h2("Explanation"),
+                         p("This tables shows the data you uploaded plus the coding of that data."),
+                         tags$ul(tags$li("At the right of  the table the coding gives you the CSC categories of the YP-CORE scores (if there were any.)"),
+                                 tags$li("YPscore1toCSC is the difference between the first YP-SCORE and the CSC for that age and gender."),
+                                 tags$li("YPscore2toCSC is the same for the second YP-SCORE.  These will get used in some plots later, see todo list!"),
+                                 tags$li("The search box is a very simple inclusive search so if you put '62' in there the table will reduce to showing you ",
+                                         "any rows of data that contain '62' anywhere including say a participant ID of 62 or a score of 1.62.  "),
+                                 tags$li("The filter boxes at the top of each column allow you to search in that variable.  They will often show you a ",
+                                         "a drop down list of the values that exist in the data."),
+                                 tags$li("For the dates the search is of the stem you input ",
+                                         "so if you input '2024-04' it should show you all dates in April 2024."),
+                                 tags$li("The filtering is a Boolean AND which is to say that you will get to see the rows that fulfil all the constraints you input.")
+                         ),
+                         p(" "),
+                         h2("This is work in progress!!"),
+                         p("This is work in progress like everything else in this app.",
+                           "This is the todo list for this tab as I see it at this point"),
+                         tags$ul(
+                           tags$li("Add buttons to download entire table as a file"),
+                           tags$li("And buttons to download selected rows from the interactive datatable"),
+                           tags$li("Probably have to add RCI at some point!")
+                         ),
+                         p(" "),
+                         h2("Searchable table of the data"),
+                         p(" "),
+                         DTOutput("compData"),    
+                ),
+                
+                tabPanel("Summary statistics",
+                         value = 3,
+                         h2("Explanation"),
+                         p("This is pretty indigestible but it gives all the summary statistics for all the variables across all clinicians.",
+                           "I think the naming of the statistics is pretty self-explanatory if not particularly easy on the eye."),
+                         p(" "),
+                         h2("Todo list"),
+                         p("This is work in progress like everything else in this app.",
+                           "This is the todo list for this tab as I see it at this point"),
+                         tags$ul(
+                           tags$li("Break this up into a series of tables with headings above each"),
+                           tags$li("Rather laboriously (!) add percentages where they make sense"),
+                           tags$li("Use flextable() to make it more digestible."),
+                           tags$li("Add button to download entire data behind the table as a file?"),
+                           tags$li("Probably have to add RCI at some point!")
+                         ),
+                         p(" "),
+                         h2("The summary stats"),
+                         p(" "),
+                         htmlOutput("summaryStatsText1"),
+                         p(" "),
+                         tableOutput('summaryStats1'),
+                ),    
+                
+                tabPanel("Summary statistics by clinician",
+                         value = 4,
+                         h2("Explanation"),
+                         p("As with the 'Summary statistics' tab this is pretty indigestible and gives all the same summary statistics ",
+                           "for all the variables across all clinicians.",
+                           "I think the naming of the statistics is pretty self-explanatory if not particularly easy on the eye."),
+                         p(" "),
+                         h2("Todo list"),
+                         p("This is work in progress. Until such time as this is no longer true (when?!), this is work in progress like everything else in this app.",
                            
-                           p(" "),
-                  ),
-                  
-                  tabPanel("Data", 
-                           value = 2,
-                           h2("Explanation"),
-                           p("This tables shows the data you uploaded plus the coding of that data."),
-                           tags$ul(tags$li("At the right of  the table the coding gives you the CSC categories of the YP-CORE scores (if there were any.)"),
-                                   tags$li("YPscore1toCSC is the difference between the first YP-SCORE and the CSC for that age and gender."),
-                                   tags$li("YPscore2toCSC is the same for the second YP-SCORE.  These will get used in some plots later, see todo list!"),
-                                   tags$li("The search box is a very simple inclusive search so if you put '62' in there the table will reduce to showing you ",
-                                           "any rows of data that contain '62' anywhere including say a participant ID of 62 or a score of 1.62.  "),
-                                   tags$li("The filter boxes at the top of each column allow you to search in that variable.  They will often show you a ",
-                                           "a drop down list of the values that exist in the data."),
-                                   tags$li("For the dates the search is of the stem you input ",
-                                           "so if you input '2024-04' it should show you all dates in April 2024."),
-                                   tags$li("The filtering is a Boolean AND which is to say that you will get to see the rows that fulfil all the constraints you input.")
-                           ),
-                           p(" "),
-                           h2("This is work in progress!!"),
-                           p("This is work in progress like everything else in this app.",
-                             "This is the todo list for this tab as I see it at this point"),
-                           tags$ul(
-                             tags$li("Add buttons to download entire table as a file"),
-                             tags$li("And buttons to download selected rows from the interactive datatable"),
-                             tags$li("Probably have to add RCI at some point!")
-                           ),
-                           p(" "),
-                           h2("Searchable table of the data"),
-                           p(" "),
-                           DTOutput("compData"),    
-                  ),
-                  
-                  tabPanel("Summary statistics",
-                           value = 3,
-                           h2("Explanation"),
-                           p("This is pretty indigestible but it gives all the summary statistics for all the variables across all clinicians.",
-                             "I think the naming of the statistics is pretty self-explanatory if not particularly easy on the eye."),
-                           p(" "),
-                           h2("Todo list"),
-                           p("This is work in progress like everything else in this app.",
-                             "This is the todo list for this tab as I see it at this point"),
-                           tags$ul(
-                             tags$li("Break this up into a series of tables with headings above each"),
-                             tags$li("Rather laboriously (!) add percentages where they make sense"),
-                             tags$li("Use flextable() to make it more digestible."),
-                             tags$li("Add button to download entire data behind the table as a file?"),
-                             tags$li("Probably have to add RCI at some point!")
-                           ),
-                           p(" "),
-                           h2("The summary stats"),
-                           p(" "),
-                           htmlOutput("summaryStatsText1"),
-                           p(" "),
-                           tableOutput('summaryStats1'),
-                  ),    
-                  
-                  tabPanel("Summary statistics by clinician",
-                           value = 4,
-                           h2("Explanation"),
-                           p("As with the 'Summary statistics' tab this is pretty indigestible and gives all the same summary statistics ",
-                             "for all the variables across all clinicians.",
-                             "I think the naming of the statistics is pretty self-explanatory if not particularly easy on the eye."),
-                           p(" "),
-                           h2("Todo list"),
-                           p("This is work in progress. Until such time as this is no longer true (when?!), this is work in progress like everything else in this app.",
-                             
-                             "This is the todo list for this tab as I see it at this point"),
-                           tags$ul(
-                             tags$li("Add button to download entire table as a file."),
-                             tags$li("Think how it could be made more digestible."),
-                             tags$li("Perhaps add percentages but they will only make sense for some of the statistics"),
-                             tags$li("Probably have to add RCI at some point!"),
-                             tags$li("Will it be useful to people to have more comparative analyses comparing clinicians?")
-                           ),
-                           p(" "),
-                           h2("Summary stats by clinician"),
-                           p(" "),
-                           tableOutput('summaryStats1ByTher'),
-                  ),   
-                 
-                   tabPanel("Histogram of session count",
-                           value = 5,
-                           h2("Explanation"),
-                           p("This tab gives a histogram of the numbers of sessions attended"),
-                           p(" "),
-                           h2("Todo list"),
-                           p("This is work in progress like everything else in this app.",
-                             "This is the todo list for this tab as I see it at this point"),
-                           tags$ul(
-                             tags$li("Put statistics into the plot, top right"),
-                             tags$li("Add options to break down by clinician and perhaps by age, gender ...?"),
-                             tags$li("Add options to count or add n(DNA), n(Cancelled) and n(Late)?"),
-                             tags$li("Will it be useful to people to have more comparative analyses comparing clinicians?")
-                           ),
-                           p(" "),
-                           h2("The histogram"),
-                           p(" "),
-                           p("Here is the histogram of the numbers of sessions attended"),
-                           p(" "),
-                           plotOutput('histogram1'),
-                           p(" ") ,
-                          
-                  ),    
-                  
-                  
-                  tabPanel("CSCtable1",
-                           value = 6,
-                           h2("Explanation"),
-                           p("This tab gives a simple breakdown of the CSC categories: baseline, final and change counts"),
-                           p(" "),
-                           h2("Todo list"),
-                           p("This is work in progress like everything else in this app.",
-                             "This is the todo list for this tab as I see it at this point"),
-                           tags$ul(
-                             tags$li("Probably have to add RCI at some point!"),
-                             tags$li("Add options to break down by age, gender ...?"),
-                             tags$li("Will it be useful to people to have more comparative analyses comparing clinicians?")
-                           ),
-                           p(" "),
-                           h2("The CSC tabulations"),
-                           p(" "),
-                           p("Here is the breakdown of the initial CSC categories"),
-                           p(" "),
-                           uiOutput('CSCtable1'),
-                           p(" ") ,
-                           p("And now the breakdown of the 2nd/final CSC categories"),
-                           p(" "),
-                           uiOutput('CSCtable2'),
-                           p(" ") ,
-                           p("This is the crosstabulation of the first and 2nd/final categories"),
-                           p(" "),
-                           uiOutput('CSCtable3'),
-                           p(" ") ,
-                           p("And this is the breakdown of the CSC classification changes"),
-                           p(" "),
-                           uiOutput('CSCtable4'),
-                  ),    
-                  
-                  tabPanel("Plot1",
-                           value = 7,
-                           h2("Explanation"),
-                           p("This tab gives a cat's cradle plot of the data"),
-                           p(" "),
-                           p("A cat's cradle plot ignores any respondent with only one usable score and shows ",
-                             "the change in scores as a line.  You can identify the points by hovering over them ",
-                             "when you will see a 'tooltip'",
-                             "giving you the YP-CORE score, the respondent ID, therpist ID and the category ",
-                             "of the CSC change."),
-                           h2("Todo list"),
-                           p("This is work in progress like everything else in this app.",
-                             "This is the todo list for this tab as I see it at this point"),
-                           tags$ul(
-                             tags$li("Add options to break down by therapist, age, gender ..."),
-                             tags$li("Buttons to download the plot")
-                           ),
-                           p(" "),
-                           h2("The cat's cradle plot"),
-                           p(" "),
-                           p("This is a so-called 'cat's cradle' plot.",
-                             "It shows all the complete pairs of scores coloured by gender with connecting lines.",
-                             "The dashed horizontal reference line marks the mean baseline score and the black points,",
-                             "offset somewhat from the individual points, mark the mean baseline and later scores.  ",
-                             "The vertical lines through those are the bootstrap 95% confidence intervals."),
-                           p(" "),
-                           plotlyOutput('plot1',
-                                        height = "100%"),
-                  ),    
-                  
-                  tabPanel("Plot2",
-                           value = 8,
-                           h2("Explanation"),
-                           p("This tab gives a cat's cradle plot against dates (if given)"),
-                           p(" "),
-                           p("This is very similar to the previous plot but the x axis is by date, not occasion.",
-                             "This gives a better picture of the work over time and Again, you can identify the points by hovering over them ",
-                             "when you will see a 'tooltip'",
-                             "giving you the YP-CORE score, the respondent ID, therpist ID and the category ",
-                             "of the CSC change."),
-                           h2("Todo list"),
-                           p("This is work in progress like everything else in this app.",
-                             "This is the todo list for this tab as I see it at this point"),
-                           tags$ul(
-                             tags$li("Add options to break down by therapist, age, gender ..."),
-                             tags$li("Buttons to download the plot")
-                           ),
-                           p(" "),
-                           h2("The plot"),
-                           p(" "),
-                           p("This shows all the complete pairs of scores coloured by therapist ID with connecting lines ",
-                             "plotted against episode start and finish dates (if given).  If you hover over a point you ",
-                             "should be shown the respondent ID, gender and CSC change category."),
-                           p(" "),
-                           plotlyOutput('plot2',
-                                        height = "100%"),
-                  ),  
-                  
-                  tabPanel("Explanation of the app",
-                           value = 9,
-                           h2("Explanation"),
-                           p("This app is definitely work in progress at the moment."),
-                           p(" "),
-                           h2("Overall todo list"),
-                           p("This is the todo list for this tab as I see it at this point"),
-                           tags$ul(
-                             tags$li("Going to need to work out my position on the RCI and then include that."),
-                             tags$li("Then will need new tabs including Jacobson plot")
-                           ),
-                           p(" "),
-                  ),
-                  
-                  
-                  tabPanel("Background", 
-                           value = 10,
-                           p("App created 22.v.25 by Chris Evans at this point specifically for Oiatillo Temirov for checking his data.",
-                             a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/")),
-                           p("Last updated 8.vi.25: added histogram of sessions attended"),
-                           p("Licenced under a ",
-                             a("Creative Commons, Attribution Licence-ShareAlike",
-                               href="http://creativecommons.org/licenses/by-sa/1.0/"),
-                             " Please respect that and put an acknowledgement and link back to here if re-using anything from here."),
-                           includeHTML("https://shiny.psyctc.org/boilerplate.html")),
-                  
-                  id = "tabSelected"),
-    )
+                           "This is the todo list for this tab as I see it at this point"),
+                         tags$ul(
+                           tags$li("Add button to download entire table as a file."),
+                           tags$li("Think how it could be made more digestible."),
+                           tags$li("Perhaps add percentages but they will only make sense for some of the statistics"),
+                           tags$li("Probably have to add RCI at some point!"),
+                           tags$li("Will it be useful to people to have more comparative analyses comparing clinicians?")
+                         ),
+                         p(" "),
+                         h2("Summary stats by clinician"),
+                         p(" "),
+                         tableOutput('summaryStats1ByTher'),
+                ),   
+                
+                tabPanel("Histogram of session count",
+                         value = 5,
+                         h2("Explanation"),
+                         p("This tab gives a histogram of the numbers of sessions attended"),
+                         p(" "),
+                         h2("Todo list"),
+                         p("This is work in progress like everything else in this app.",
+                           "This is the todo list for this tab as I see it at this point"),
+                         tags$ul(
+                           tags$li("Put statistics into the plot, top right"),
+                           tags$li("Add options to break down by clinician and perhaps by age, gender ...?"),
+                           tags$li("Add options to count or add n(DNA), n(Cancelled) and n(Late)?"),
+                           tags$li("Will it be useful to people to have more comparative analyses comparing clinicians?")
+                         ),
+                         p(" "),
+                         h2("The histogram"),
+                         p(" "),
+                         p("Here is the histogram of the numbers of sessions attended"),
+                         p(" "),
+                         plotOutput('histogram1'),
+                         p(" ") ,
+                         
+                ),    
+                
+                
+                tabPanel("CSCtable1",
+                         value = 6,
+                         h2("Explanation"),
+                         p("This tab gives a simple breakdown of the CSC categories: baseline, final and change counts"),
+                         p(" "),
+                         h2("Todo list"),
+                         p("This is work in progress like everything else in this app.",
+                           "This is the todo list for this tab as I see it at this point"),
+                         tags$ul(
+                           tags$li("Probably have to add RCI at some point!"),
+                           tags$li("Add options to break down by age, gender ...?"),
+                           tags$li("Will it be useful to people to have more comparative analyses comparing clinicians?")
+                         ),
+                         p(" "),
+                         h2("The CSC tabulations"),
+                         p(" "),
+                         p("Here is the breakdown of the initial CSC categories"),
+                         p(" "),
+                         uiOutput('CSCtable1'),
+                         p(" ") ,
+                         p("And now the breakdown of the 2nd/final CSC categories"),
+                         p(" "),
+                         uiOutput('CSCtable2'),
+                         p(" ") ,
+                         p("This is the crosstabulation of the first and 2nd/final categories"),
+                         p(" "),
+                         uiOutput('CSCtable3'),
+                         p(" ") ,
+                         p("And this is the breakdown of the CSC classification changes"),
+                         p(" "),
+                         uiOutput('CSCtable4'),
+                ),    
+                
+                tabPanel("Plot1",
+                         value = 7,
+                         h2("Explanation"),
+                         p("This tab gives a cat's cradle plot of the data"),
+                         p(" "),
+                         p("A cat's cradle plot ignores any respondent with only one usable score and shows ",
+                           "the change in scores as a line.  You can identify the points by hovering over them ",
+                           "when you will see a 'tooltip'",
+                           "giving you the YP-CORE score, the respondent ID, therpist ID and the category ",
+                           "of the CSC change."),
+                         h2("Todo list"),
+                         p("This is work in progress like everything else in this app.",
+                           "This is the todo list for this tab as I see it at this point"),
+                         tags$ul(
+                           tags$li("Add options to break down by therapist, age, gender ..."),
+                           tags$li("Buttons to download the plot")
+                         ),
+                         p(" "),
+                         h2("The cat's cradle plot"),
+                         p(" "),
+                         p("This is a so-called 'cat's cradle' plot.",
+                           "It shows all the complete pairs of scores coloured by gender with connecting lines.",
+                           "The dashed horizontal reference line marks the mean baseline score and the black points,",
+                           "offset somewhat from the individual points, mark the mean baseline and later scores.  ",
+                           "The vertical lines through those are the bootstrap 95% confidence intervals."),
+                         p(" "),
+                         plotlyOutput('plot1',
+                                      height = "100%"),
+                ),    
+                
+                tabPanel("Plot2",
+                         value = 8,
+                         h2("Explanation"),
+                         p("This tab gives a cat's cradle plot against dates (if given)"),
+                         p(" "),
+                         p("This is very similar to the previous plot but the x axis is by date, not occasion.",
+                           "This gives a better picture of the work over time and Again, you can identify the points by hovering over them ",
+                           "when you will see a 'tooltip'",
+                           "giving you the YP-CORE score, the respondent ID, therpist ID and the category ",
+                           "of the CSC change."),
+                         h2("Todo list"),
+                         p("This is work in progress like everything else in this app.",
+                           "This is the todo list for this tab as I see it at this point"),
+                         tags$ul(
+                           tags$li("Add options to break down by therapist, age, gender ..."),
+                           tags$li("Buttons to download the plot")
+                         ),
+                         p(" "),
+                         h2("The plot"),
+                         p(" "),
+                         p("This shows all the complete pairs of scores coloured by therapist ID with connecting lines ",
+                           "plotted against episode start and finish dates (if given).  If you hover over a point you ",
+                           "should be shown the respondent ID, gender and CSC change category."),
+                         p(" "),
+                         plotlyOutput('plot2',
+                                      height = "100%"),
+                ),  
+                
+                tabPanel("Explanation of the app",
+                         value = 9,
+                         h2("Explanation"),
+                         p("This app is definitely work in progress at the moment."),
+                         p(" "),
+                         h2("Overall todo list"),
+                         p("This is the todo list for this tab as I see it at this point"),
+                         tags$ul(
+                           tags$li("Going to need to work out my position on the RCI and then include that."),
+                           tags$li("Then will need new tabs including Jacobson plot which will need to be rescaled using (score - CSC)/RCI ",
+                                   "so that the differing CSCs and RCIs rescale things so that the CSC lines are on y = 0 and x = 0 and there ",
+                                   "can be a single pair of RCI tramlines.")
+                         ),
+                         p(" "),
+                ),
+                
+                
+                tabPanel("Background", 
+                         value = 10,
+                         p("App created 22.v.25 by Chris Evans at this point specifically for Oiatillo Temirov for checking his data.",
+                           a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/")),
+                         p("Last updated 8.vi.25: added histogram of sessions attended and ditched the sidebar layout."),
+                         p("Licenced under a ",
+                           a("Creative Commons, Attribution Licence-ShareAlike",
+                             href="http://creativecommons.org/licenses/by-sa/1.0/"),
+                           " Please respect that and put an acknowledgement and link back to here if re-using anything from here."),
+                         includeHTML("https://shiny.psyctc.org/boilerplate.html")),
+                
+                id = "tabSelected"),
   )
 )
+#)
 
 
 # Define server logic to read selected file ----
@@ -459,6 +467,32 @@ server <- function(input, output, session) {
     tibLookup %>%
       filter(Ref == input$Lookup)
   })
+  
+  showLookup <- reactive({
+    if(input$Scoring == "Clinical (10x item mean, range 0-40)") {
+      tibLookup2() %>%
+        mutate(CSC = 10 * CSC,
+               RCI = 10 * RCI,
+               refSD = 10 * refSD) -> tmpTibLookup
+    } else {
+      tibLookup2() -> tmpTibLookup
+    }
+    
+    tmpTibLookup %>%
+      select(-ordAge) %>%
+      select(Ref, Age, Gender, everything()) %>%
+      arrange(Age, Gender) %>%
+      flextable() %>%
+      autofit()
+  })
+  
+  output$lookupTable1 <- renderUI({
+    showLookup() %>%
+      colformat_char(j = 1,
+                     na_str = "Missing") %>%
+      htmltools_value()
+  })
+  
   
   fullData <- reactive({
     ### work out file format 
@@ -579,7 +613,7 @@ server <- function(input, output, session) {
                CSCcat1 == "High" & CSCcat2 == "Low" ~ "High to low",
                CSCcat1 == "Low" & CSCcat2 == "High" ~ "Low to high",
                CSCcat1 == "Low" & CSCcat2 == "Low" ~ "Stayed low")) %>%
-    
+      
       ### get RC categories
       mutate(RelChange = case_when(
         changeMeanScoring >= RCI ~ "Reliable deterioration",
@@ -598,7 +632,7 @@ server <- function(input, output, session) {
         CSCchange == "Stayed low" & RelChange == "No reliable change" ~ "Stayed low and no reliable change",
         CSCchange == "Stayed low" & RelChange == "Reliable improvement" ~ "Stayed low AND reliable improvement",
       ))
-      
+    
   })
   
   
@@ -692,7 +726,7 @@ server <- function(input, output, session) {
                 nCSCstayedLow = sum(CSCchange == "Stayed low", na.rm = TRUE),
                 nCSCLowToHigh = sum(CSCchange == "Low to high", na.rm = TRUE))
   })
-    
+  
   summaryStats1 <- reactive({
     tibSummaryStatsWide() %>%
       pivot_longer(cols = everything(), names_to = "Statistic")
@@ -887,7 +921,7 @@ server <- function(input, output, session) {
       mutate(x = if_else(WhichScore == 1,
                          WhichScore - tmpNudge,
                          WhichScore + tmpNudge)) -> tmpTibMeans
-
+    
     ggplot(data = tmpTib,
            aes(x = WhichScore, y = Score, group = RespondentID, colour = Gender,
                label2 = TherapistID, label3 = CSCchange)) +
@@ -916,12 +950,12 @@ server <- function(input, output, session) {
       scale_x_continuous("Occasion",
                          breaks = 1:2) 
     
-      ggplotly(tooltip = c("RespondentID", 
-                           "TherapistID", 
-                           "Score",
-                           "label2",
-                           "label3"),
-               width = lisSessionData$output_pid_width, height = 800)
+    ggplotly(tooltip = c("RespondentID", 
+                         "TherapistID", 
+                         "Score",
+                         "label2",
+                         "label3"),
+             width = lisSessionData$output_pid_width, height = 800)
   })
   
   output$plot1 <- renderPlotly(
@@ -937,14 +971,14 @@ server <- function(input, output, session) {
       filter(!is.na(YPscore2)) %>%
       filter(!is.na(Start_date)) %>%
       filter(!is.na(End_date)) -> tmpTib
-
+    
     if(input$Scoring == "Item mean (range 0-4)") {
       yLims <- c(0, 4)
     } else {
       yLims <- c(0, 40)
     }
     ySteps <- yLims[2] / 20
-
+    
     ggplot(data = tmpTib,
            aes(x = Start_date, y = YPscore1, group = RespondentID, colour = TherapistID,
                label1 = RespondentID,
@@ -963,8 +997,8 @@ server <- function(input, output, session) {
                                       yLims[2],
                                       ySteps),
                          limits = yLims) 
-      
-
+    
+    
     ggplotly(tooltip = c("label1",
                          "label2",
                          "label3",
@@ -1001,8 +1035,8 @@ server <- function(input, output, session) {
   
   output$histogram1 <- renderPlot(histo1(),
                                   height = 800)
-
-### end server
+  
+  ### end server
 }
 
 # Create Shiny app ----
