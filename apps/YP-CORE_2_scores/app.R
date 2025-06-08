@@ -67,7 +67,7 @@ tribble(~Ref, ~Age,  ~Gender,  ~CSC, ~RCI, ~refAlpha, ~refSD,
         "Di Biase et al., 2021 (Italy)", 15, "M", 1.23, .82, .81, .727,
         "Di Biase et al., 2021 (Italy)", 16, "M", 1.18, .82, .81, .727,
         "Di Biase et al., 2021 (Italy)", 17, "M", 1.18, .82, .81, .727) %>%
-  mutate(Age = ordered(Age,
+  mutate(ordAge = ordered(Age,
                        levels = 11:18))-> tibLookup
 
 ### vector of column names
@@ -244,6 +244,8 @@ ui <- fluidPage(
                            p(" "),
                            h2("The summary stats"),
                            p(" "),
+                           htmlOutput("summaryStatsText1"),
+                           p(" "),
                            tableOutput('summaryStats1'),
                   ),    
                   
@@ -270,9 +272,34 @@ ui <- fluidPage(
                            p(" "),
                            tableOutput('summaryStats1ByTher'),
                   ),   
+                 
+                   tabPanel("Histogram of session count",
+                           value = 5,
+                           h2("Explanation"),
+                           p("This tab gives a histogram of the numbers of sessions attended"),
+                           p(" "),
+                           h2("Todo list"),
+                           p("This is work in progress like everything else in this app.",
+                             "This is the todo list for this tab as I see it at this point"),
+                           tags$ul(
+                             tags$li("Put statistics into the plot, top right"),
+                             tags$li("Add options to break down by clinician and perhaps by age, gender ...?"),
+                             tags$li("Add options to count or add n(DNA), n(Cancelled) and n(Late)?"),
+                             tags$li("Will it be useful to people to have more comparative analyses comparing clinicians?")
+                           ),
+                           p(" "),
+                           h2("The histogram"),
+                           p(" "),
+                           p("Here is the histogram of the numbers of sessions attended"),
+                           p(" "),
+                           plotOutput('histogram1'),
+                           p(" ") ,
+                          
+                  ),    
+                  
                   
                   tabPanel("CSCtable1",
-                           value = 5,
+                           value = 6,
                            h2("Explanation"),
                            p("This tab gives a simple breakdown of the CSC categories: baseline, final and change counts"),
                            p(" "),
@@ -305,7 +332,7 @@ ui <- fluidPage(
                   ),    
                   
                   tabPanel("Plot1",
-                           value = 6,
+                           value = 7,
                            h2("Explanation"),
                            p("This tab gives a cat's cradle plot of the data"),
                            p(" "),
@@ -335,7 +362,7 @@ ui <- fluidPage(
                   ),    
                   
                   tabPanel("Plot2",
-                           value = 7,
+                           value = 8,
                            h2("Explanation"),
                            p("This tab gives a cat's cradle plot against dates (if given)"),
                            p(" "),
@@ -363,7 +390,7 @@ ui <- fluidPage(
                   ),  
                   
                   tabPanel("Explanation of the app",
-                           value = 8,
+                           value = 9,
                            h2("Explanation"),
                            p("This app is definitely work in progress at the moment."),
                            p(" "),
@@ -378,10 +405,10 @@ ui <- fluidPage(
                   
                   
                   tabPanel("Background", 
-                           value = 9,
+                           value = 10,
                            p("App created 22.v.25 by Chris Evans at this point specifically for Oiatillo Temirov for checking his data.",
                              a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/")),
-                           p("Last updated 5.vi.25 with various currently invisible changes, a new cat's cradle plot against dates and labelling of points in both plots."),
+                           p("Last updated 8.vi.25: added histogram of sessions attended"),
                            p("Licenced under a ",
                              a("Creative Commons, Attribution Licence-ShareAlike",
                                href="http://creativecommons.org/licenses/by-sa/1.0/"),
@@ -521,40 +548,57 @@ server <- function(input, output, session) {
       ### massage variables we need as factors
       mutate(RespondentID = ordered(RespondentID),
              TherapistID = ordered(TherapistID),
-             Gender = ordered(Gender),
-             Age = ordered(Age,
-                           levels = 11:18)) -> dataInput
+             Gender = ordered(Gender)) -> dataInput
     
     if (input$Scoring == "Item mean (range 0-4)") {
       dataInput %>%
-        select(-starts_with("YPclin")) %>%
-        rename(YPscore1 = YPmean1,
+        mutate(YPscore1 = YPmean1,
                YPscore2 = YPmean2) -> dataInput
     } else {
       dataInput %>%
-        select(-starts_with("YPmean")) %>%
-        rename(YPscore1 = YPclin1,
+        mutate(YPscore1 = YPclin1,
                YPscore2 = YPclin2) -> dataInput
     }
     
-    ### get CSC values per row
+    ### get CSC categories per row using matching age & gender
     dataInput %>%
       left_join(tibLookup2(),
                 by = c("Gender", "Age")) %>%
       mutate(Change = YPscore2 - YPscore1,
+             changeMeanScoring = YPmean2 - YPmean1,
              YPscore1toCSC = YPscore1 - CSC,
              YPscore2toCSC = YPscore2 - CSC,
-             CSCcat1 = if_else(YPscore1 > CSC,
+             CSCcat1 = if_else(YPmean1 > CSC,
                                "High",
                                "Low"),
-             CSCcat2 = if_else(YPscore2 > CSC,
+             CSCcat2 = if_else(YPmean2 > CSC,
                                "High",
                                "Low"),
              CSCchange = case_when(
                CSCcat1 == "High" & CSCcat2 == "High" ~ "Stayed high",
                CSCcat1 == "High" & CSCcat2 == "Low" ~ "High to low",
                CSCcat1 == "Low" & CSCcat2 == "High" ~ "Low to high",
-               CSCcat1 == "Low" & CSCcat2 == "Low" ~ "Stayed low"))
+               CSCcat1 == "Low" & CSCcat2 == "Low" ~ "Stayed low")) %>%
+    
+      ### get RC categories
+      mutate(RelChange = case_when(
+        changeMeanScoring >= RCI ~ "Reliable deterioration",
+        abs(changeMeanScoring) < RCI ~ "No reliable change",
+        changeMeanScoring <= RCI ~ "Reliable improvement")) %>%
+      
+      ### get RCSC categories
+      mutate(RCSCcat = case_when(
+        CSCchange == "Stayed high" & RelChange == "Reliable deterioration" ~ "Stayed high AND reliable deterioration",
+        CSCchange == "Stayed high" & RelChange == "No reliable change" ~ "Stayed high, no reliable change",
+        CSCchange == "High to low" & RelChange == "Reliable improvement" ~ "Reliable and clinically significant improvement",
+        CSCchange == "High to low" & RelChange == "No reliable change" ~ "Clinically significant improvement but no reliable change",
+        CSCchange == "Low to high" & RelChange == "Reliable deterioration" ~ "Clinically significant AND reliable deterioration",
+        CSCchange == "Low to high" & RelChange == "No reliable change" ~ "Clinically significant deterioration but no reliable change",
+        CSCchange == "Stayed low" & RelChange == "Reliable deterioration" ~ "Stayed low BUT reliable deterioration",
+        CSCchange == "Stayed low" & RelChange == "No reliable change" ~ "Stayed low and no reliable change",
+        CSCchange == "Stayed low" & RelChange == "Reliable improvement" ~ "Stayed low AND reliable improvement",
+      ))
+      
   })
   
   
@@ -567,7 +611,13 @@ server <- function(input, output, session) {
   
   displayData1 <- reactive({
     fullData() %>%
-      select(-c(Ref, CSC, RCI, refAlpha, refSD)) %>%
+      select(-c(Ref, CSC, RCI, refAlpha, refSD,
+                YPmean1, YPmean2, YPclin1, YPclin2,
+                changeMeanScoring)) %>%
+      rename(nSessAtt = nSessionsAttended,
+             nSessDNA = nSessionsDNAed,
+             nSessCanc = nSessionsCancelled,
+             nSessLate = nSessionsLate) %>%
       mutate(YPscore1 = round(YPscore1, input$dp),
              YPscore2 = round(YPscore2, input$dp),
              Change = round(Change, input$dp),
@@ -575,7 +625,7 @@ server <- function(input, output, session) {
              YPscore2toCSC = round(YPscore2toCSC, input$dp))
   })
   
-  summaryStats1 <- reactive({
+  tibSummaryStatsWide <- reactive({
     fullData() %>%
       summarise(totalRecords = n(),
                 nClients = n_distinct(RespondentID),
@@ -640,9 +690,24 @@ server <- function(input, output, session) {
                 nCSCstayedHigh = sum(CSCchange == "Stayed high", na.rm = TRUE),
                 nCSCHighToLow = sum(CSCchange == "High to low", na.rm = TRUE),
                 nCSCstayedLow = sum(CSCchange == "Stayed low", na.rm = TRUE),
-                nCSCLowToHigh = sum(CSCchange == "Low to high", na.rm = TRUE)) %>%
+                nCSCLowToHigh = sum(CSCchange == "Low to high", na.rm = TRUE))
+  })
+    
+  summaryStats1 <- reactive({
+    tibSummaryStatsWide() %>%
       pivot_longer(cols = everything(), names_to = "Statistic")
   })
+  
+  summaryStatsText1  <- reactive({
+    str_c("You have uploaded ",
+          tibSummaryStatsWide()$totalRecords,
+          " rows of data, with information from ",
+          tibSummaryStatsWide()$nClients,
+          " different client IDs and ",
+          tibSummaryStatsWide()$nClinicians,
+          " different clinicians")
+  })
+  output$summaryStatsText1 <- renderText(summaryStatsText1())
   
   summaryStats1ByTher <- reactive({
     fullData() %>%
@@ -872,9 +937,7 @@ server <- function(input, output, session) {
       filter(!is.na(YPscore2)) %>%
       filter(!is.na(Start_date)) %>%
       filter(!is.na(End_date)) -> tmpTib
-    
-    print(tmpTib)
-    
+
     if(input$Scoring == "Item mean (range 0-4)") {
       yLims <- c(0, 4)
     } else {
@@ -913,6 +976,33 @@ server <- function(input, output, session) {
   output$plot2 <- renderPlotly(
     catsCradle2()
   )
+  
+  ### create histogram
+  histo1 <- reactive({
+    fullData() %>%
+      filter(!is.na(nSessionsAttended)) %>%
+      summarise(nOK = n(),
+                min = min(nSessionsAttended),
+                mean = mean(nSessionsAttended),
+                median = median(nSessionsAttended),
+                max = max(nSessionsAttended)) -> tmpTibStats
+    
+    ggplot(data = fullData(),
+           aes(x = nSessionsAttended)) +
+      geom_histogram(fill = "grey") +
+      geom_vline(xintercept = tmpTibStats$mean,
+                 colour = "blue") +
+      geom_vline(xintercept = tmpTibStats$median,
+                 colour = "green") +
+      xlab("n(Sessions attended)") +
+      ggtitle("Histogram of numbers of sessions attended",
+              subtitle = "Vertical reference lines: blue = mean, green = median")
+  })
+  
+  output$histogram1 <- renderPlot(histo1(),
+                                  height = 800)
+
+### end server
 }
 
 # Create Shiny app ----
