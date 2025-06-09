@@ -106,6 +106,48 @@ vecColTypes <- c("RespondentID" = "text",
                  "nSessionsLate" = "numeric",
                  "nWeeks" = "numeric")
 
+vecCSCcategoriesOrdered <- c("Clinically significant AND reliable deterioration",
+                             "Stayed high AND reliable deterioration",
+                             "Clinically significant deterioration but no reliable change",
+                             "Stayed high, no reliable change",
+                             "Stayed low BUT reliable deterioration",
+                             "Stayed low and no reliable change",
+                             "Clinically significant improvement but no reliable change",
+                             "Stayed low AND reliable improvement",
+                             "Reliable and clinically significant improvement")
+
+### function(s)
+flexTabulateWithCI <- function(tibDat, varName){
+  tibDat %>%
+    count({{varName}}) %>%
+    mutate(nTot = sum(n),
+           nUsable = nTot - last(n)) %>%
+    rowwise() %>%
+    mutate(PercAll = round(100 * n / nTot, 1),
+           CI = list(Hmisc::binconf(n, nUsable)[1, ])) %>%
+    ungroup() %>%
+    unnest_wider(CI) %>%
+    # select(-totN) %>%
+    rename(PercUsable = PointEst,
+           LCL = Lower,
+           UCL = Upper) %>%
+    mutate(across(PercUsable : UCL, ~ round(.x * 100, 1))) %>%
+    mutate(PercAll = str_c(PercAll, "%"),
+           PercUsable = str_c(PercUsable, "%"),
+           CI = str_c(LCL, 
+                      " to ",
+                      UCL,
+                      "%"),
+           CI = if_else(is.na({{varName}}),
+                        NA_character_,
+                        CI)) %>%
+    select(-c(LCL, UCL)) %>%
+    flextable() %>%
+    autofit() %>%
+    align(j = 3 : 4, align = "right")
+}
+
+
 ### 1. Initialize telemetry with default options (store to a local logfile)
 telemetry <- Telemetry$new(app_name = "CORE-OM_scoring",
                            data_storage = DataStorageSQLite$new(db_path = file.path("../../telemetry.sqlite")))
@@ -170,7 +212,6 @@ ui <- fluidPage(
                          
                          p(" "),
                          h2("Upload data"),
-                         p("This is a paragraph!"),
                          # Input: Select a file ----
                          fileInput("file1", 
                                    "Choose file to upload",
@@ -303,49 +344,15 @@ ui <- fluidPage(
                          
                 ),    
                 
-                
-                tabPanel("CSCtable1",
-                         value = 6,
-                         h2("Explanation"),
-                         p("This tab gives a simple breakdown of the CSC categories: baseline, final and change counts"),
-                         p(" "),
-                         h2("Todo list"),
-                         p("This is work in progress like everything else in this app.",
-                           "This is the todo list for this tab as I see it at this point"),
-                         tags$ul(
-                           tags$li("Probably have to add RCI at some point!"),
-                           tags$li("Add options to break down by age, gender ...?"),
-                           tags$li("Will it be useful to people to have more comparative analyses comparing clinicians?")
-                         ),
-                         p(" "),
-                         h2("The CSC tabulations"),
-                         p(" "),
-                         p("Here is the breakdown of the initial CSC categories"),
-                         p(" "),
-                         uiOutput('CSCtable1'),
-                         p(" ") ,
-                         p("And now the breakdown of the 2nd/final CSC categories"),
-                         p(" "),
-                         uiOutput('CSCtable2'),
-                         p(" ") ,
-                         p("This is the crosstabulation of the first and 2nd/final categories"),
-                         p(" "),
-                         uiOutput('CSCtable3'),
-                         p(" ") ,
-                         p("And this is the breakdown of the CSC classification changes"),
-                         p(" "),
-                         uiOutput('CSCtable4'),
-                ),    
-                
                 tabPanel("Plot1",
-                         value = 7,
+                         value = 6,
                          h2("Explanation"),
                          p("This tab gives a cat's cradle plot of the data"),
                          p(" "),
                          p("A cat's cradle plot ignores any respondent with only one usable score and shows ",
                            "the change in scores as a line.  You can identify the points by hovering over them ",
                            "when you will see a 'tooltip'",
-                           "giving you the YP-CORE score, the respondent ID, therpist ID and the category ",
+                           "giving you the YP-CORE score, the respondent ID, therapist ID and the category ",
                            "of the CSC change."),
                          h2("Todo list"),
                          p("This is work in progress like everything else in this app.",
@@ -368,14 +375,14 @@ ui <- fluidPage(
                 ),    
                 
                 tabPanel("Plot2",
-                         value = 8,
+                         value = 7,
                          h2("Explanation"),
                          p("This tab gives a cat's cradle plot against dates (if given)"),
                          p(" "),
                          p("This is very similar to the previous plot but the x axis is by date, not occasion.",
                            "This gives a better picture of the work over time and Again, you can identify the points by hovering over them ",
                            "when you will see a 'tooltip'",
-                           "giving you the YP-CORE score, the respondent ID, therpist ID and the category ",
+                           "giving you the YP-CORE score, the respondent ID, therapist ID and the category ",
                            "of the CSC change."),
                          h2("Todo list"),
                          p("This is work in progress like everything else in this app.",
@@ -394,19 +401,123 @@ ui <- fluidPage(
                          plotlyOutput('plot2',
                                       height = "100%"),
                 ),  
+               
+               tabPanel("RCSC analyses",
+                         value = 6,
+                         h2("Explanation"),
+                         p("This tab gives a simple breakdown of the CSC categories: baseline, final and change counts"),
+                         p(" "),
+                         h2("Todo list"),
+                         p("This is work in progress like everything else in this app.",
+                           "This is the todo list for this tab as I see it at this point"),
+                         tags$ul(
+                           tags$li("Probably have to add RCI at some point!"),
+                           tags$li("Add options to break down by age, gender ...?"),
+                           tags$li("Will it be useful to people to have more comparative analyses comparing clinicians?")
+                         ),
+                         p(" "),
+                         h2("The CSC tabulations"),
+                         p(" "),
+                         p("I can see that this might be a bit overwhelming at first sight. Play around with it and it will get ",
+                           "familiar and you will learn which of these values are really of interest to you.  The confidence intervals ",
+                           "(CI) may be unfamiliar so you can ignore them at least first but they are useful as they indicate how we ",
+                           "should see these observed rates as predictors of the likely long term values for your services.",
+                           "The larger the number of clients with data the better your observed values become as predictores of future ",
+                           "values.  For the background on CIs see ",
+                           a("this entry in my OMbook glossary",
+                             href="https://www.psyctc.org/psyctc/glossary2/confidence-intervals-cis/"),
+                           " and ",
+                           a("this page on my PSYCTC.org site",
+                             href="https://www.psyctc.org/psyctc/root/stats/rcsc/"),),
+                         p(" "),
+                         h3("CSC analyses"),
+                         p("Here is the breakdown of the initial CSC categories"),
+                         p(" "),
+                         uiOutput('CSCtable1'),
+                         p(" ") ,
+                         p("And now the breakdown of the 2nd/final CSC categories"),
+                         p(" "),
+                         uiOutput('CSCtable2'),
+                         p(" ") ,
+                         p("This is the crosstabulation of the first and 2nd/final categories (where you have both scores)"),
+                         p(" "),
+                         uiOutput('CSCtable3'),
+                         p(" ") ,
+                         p("And this is the breakdown of the CSC classification changes (basically the crosstabulation above unwrapped)."),
+                         p(" "),
+                         uiOutput('CSCtable4'),
+                         h3("RCI analyses"),
+                         p("Now the breakdown of the RCI change categories"),
+                         p(" "),
+                         uiOutput('RCItable1'),
+                         h3("And finally: the full RCSC analyses"),
+                         p(" "),
+                         p("Crosstabulation of CSC and RCI change categories"),
+                         uiOutput('RCSCcrosstable1'),
+                         p(" "),
+                         p("Essentially the same unfolded with CIs"),
+                         uiOutput('RCSCtable1'),
+                         p(" "),
+                         p("It is, of course, impossible to achieve clinically significant improvement if you start below the CSC ",
+                           "for this reason people sometimes report the CSC restricting to the participants who start above the CSC.",
+                           "Here is RCS crosstabulation for that, censored, dataset."),
+                         uiOutput('RCSCcrosstable2'),
+                         p(" "),
+                         p("The same unfolded with CIs"),
+                         uiOutput('RCSCtable2'),
+                         p(" "),
+                ),    
+               
+               tabPanel("Jacobson plot",
+                        value = 9,
+                        h2("Explanation"),
+                        p("This tab gives a scaled Jacobon plot"),
+                        p(" "),
+                        p("The Jacobson plot plots the 2nd/final score against the first. Points lying on the leading diagonal mark clients ",
+                          "whose last YP-CORE score is exactly the same as their fist score.  Points below the leading diagonal have lower ",
+                          "last scores than their first scores, points above the leading diagonal, <i>vice versa</i>."),
+                        p("The 'tramlines' either side of the leading diagonal mark the RCI for the YP-CORE for that person's age and gender.",
+                          "As the scores have been rescaled here everyone, regardless of age or gender, has tramlines on 1 above or 1 below ",
+                          "the leading diagonal.  Points inside the tramlines mark people whose scores changed but less than the RCI ",
+                          "(or RCC: Reliable Change Criterion), i.e. 'no reliable change'.  Points below the lower tramline come from people ",
+                          "whose YP-CORE scores improved more than the RCI and those above the upper tramline deteriorated more than the RCI."),
+                        p("The black vertical and horizontal lines mark the CSC.  Points to the left of the vertical line started below the ",
+                          "CSC, those to the right started above it.  Similarly, points above the horizontal line finished above the CSC and ",
+                          "those below it finished below the CSC"),
+                        p("As in previous plots you can identify the points by hovering over them ",
+                          "when you will see a 'tooltip'",
+                          "giving you the person's gender, age, first and last YP-CORE scores (not rescaled), the respondent ID and therapist ID."),
+                        h2("Todo list"),
+                        p("This is work in progress like everything else in this app.",
+                          "This is the todo list for this tab as I see it at this point"),
+                        tags$ul(
+                          tags$li("Add options to colour the points by therapist, age, gender ..."),
+                          tags$li("And perhaps facetting by those variables or to change the plot by those variables."),
+                          tags$li("Add buttons to download the plot.")
+                        ),
+                        p(" "),
+                        h2("The plot"),
+                        p(" "),
+                        div(style="width:100%;height:0;padding-top:100%;position:relative;",
+                            div(style="position: absolute;
+                                      top: 0;
+                                      left: 0;
+                                      width: 100%;
+                                      height: 100%;",
+                                plotlyOutput("Jacobson1", height="100%")))
+               ),
+                
                 
                 tabPanel("Explanation of the app",
-                         value = 9,
+                         value = 10,
                          h2("Explanation"),
                          p("This app is definitely work in progress at the moment."),
                          p(" "),
                          h2("Overall todo list"),
                          p("This is the todo list for this tab as I see it at this point"),
                          tags$ul(
-                           tags$li("Going to need to work out my position on the RCI and then include that."),
-                           tags$li("Then will need new tabs including Jacobson plot which will need to be rescaled using (score - CSC)/RCI ",
-                                   "so that the differing CSCs and RCIs rescale things so that the CSC lines are on y = 0 and x = 0 and there ",
-                                   "can be a single pair of RCI tramlines.")
+                           tags$li("Better cross-referencing to supporting documents"),
+                           tags$li("Ideally some recorded 'talk-you-through' pocasts?")
                          ),
                          p(" "),
                 ),
@@ -416,7 +527,7 @@ ui <- fluidPage(
                          value = 10,
                          p("App created 22.v.25 by Chris Evans at this point specifically for Oiatillo Temirov for checking his data.",
                            a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/")),
-                         p("Last updated 8.vi.25: added histogram of sessions attended and ditched the sidebar layout."),
+                         p("Last updated 9.vi.25: Improvements to RCSC tables, added Jacobson plot."),
                          p("Licenced under a ",
                            a("Creative Commons, Attribution Licence-ShareAlike",
                              href="http://creativecommons.org/licenses/by-sa/1.0/"),
@@ -602,6 +713,8 @@ server <- function(input, output, session) {
              changeMeanScoring = YPmean2 - YPmean1,
              YPscore1toCSC = YPscore1 - CSC,
              YPscore2toCSC = YPscore2 - CSC,
+             YPscaled1toCSC = YPscore1toCSC / RCI,
+             YPscaled2toCSC = YPscore2toCSC / RCI,
              CSCcat1 = if_else(YPmean1 > CSC,
                                "High",
                                "Low"),
@@ -841,49 +954,89 @@ server <- function(input, output, session) {
   )
   
   output$CSCtable1 <- renderUI({
-    fullData() %>%
-      tabyl(CSCcat1) %>%
-      mutate(percent = str_c(round(100 * percent, 1), "%"),
-             valid_percent = str_c(round(100 * valid_percent, 1), "%")) %>%
-      flextable() %>%
-      colformat_char(j = 1,
-                     na_str = "Missing") %>%
+    flexTabulateWithCI(fullData(), CSCcat1) %>%
       htmltools_value()
   })
   
   output$CSCtable2 <- renderUI({
-    fullData() %>%
-      tabyl(CSCcat2) %>%
-      mutate(percent = str_c(round(100 * percent, 1), "%"),
-             valid_percent = str_c(round(100 * valid_percent, 1), "%")) %>%
-      flextable() %>%
-      colformat_char(j = 1,
-                     na_str = "Missing") %>%
+    flexTabulateWithCI(fullData(), CSCcat2) %>%
       htmltools_value()
   })
   
   output$CSCtable3 <- renderUI({
     fullData() %>%
+      filter(!is.na(CSCcat1) & !is.na(CSCcat2)) %>%
       tabyl(CSCcat1, CSCcat2) %>%
-      # mutate(percent = str_c(round(100 * percent, 1), "%"),
-      #        valid_percent = str_c(round(100 * valid_percent, 1), "%")) %>%
-      rename(`Missing 2nd value` = "NA_",
-             `1st value` = CSCcat1) %>%
+      # rename(`Missing 2nd value` = "NA_",
+      #        `1st value` = CSCcat1) %>%
       flextable() %>%
-      colformat_char(j = 1,
-                     na_str = "Missing 1st value") %>%
+      # colformat_char(j = 1,
+      #                na_str = "Missing 1st value") %>%
       autofit() %>%
       htmltools_value()
   })
   
   output$CSCtable4 <- renderUI({
+    flexTabulateWithCI(fullData(), CSCchange) %>%
+      htmltools_value()
+  })
+  
+  output$RCItable1 <- renderUI({
+    flexTabulateWithCI(fullData(), RelChange) %>%
+      htmltools_value()
+  })
+  
+  output$RCSCcrosstable1 <- renderUI({
     fullData() %>%
-      tabyl(CSCchange) %>%
-      mutate(percent = str_c(round(100 * percent, 1), "%"),
-             valid_percent = str_c(round(100 * valid_percent, 1), "%")) %>%
+      filter(!is.na(CSCchange) & !is.na(RelChange)) %>%
+      mutate(CSCchange = ordered(CSCchange,
+                                 levels = c("Stayed high",
+                                            "High to low",
+                                            "Low to high",
+                                            "Stayed low")),
+             Relchange = ordered(RelChange,
+                                 levels = c("Reliable deterioation",
+                                            "No reliable change",
+                                            "Reliable improvement"))) %>%
+      tabyl(CSCchange, RelChange) %>%
       flextable() %>%
-      colformat_char(j = 1,
-                     na_str = "Missing") %>%
+      htmltools_value()
+  })
+  
+  output$RCSCtable1 <- renderUI({
+    fullData() %>%
+      mutate(RCSCcat = ordered(RCSCcat,
+                               levels = vecCSCcategoriesOrdered)) %>%
+      select(RCSCcat) -> tmpTib
+    
+    flexTabulateWithCI(tmpTib, RCSCcat) %>%
+      htmltools_value()
+  })
+  
+  output$RCSCcrosstable2 <- renderUI({
+    fullData() %>%
+      filter(!is.na(CSCchange) & !is.na(RelChange)) %>%
+      filter(CSCcat1 == "High") %>%
+      mutate(CSCchange = ordered(CSCchange,
+                                 levels = c("Stayed high",
+                                            "High to low")),
+             Relchange = ordered(RelChange,
+                                 levels = c("Reliable deterioation",
+                                            "No reliable change",
+                                            "Reliable improvement"))) %>%
+      tabyl(CSCchange, RelChange) %>%
+      flextable() %>%
+      htmltools_value()
+  })
+  
+  output$RCSCtable2 <- renderUI({
+    fullData() %>%
+      filter(CSCcat1 == "High") %>%
+      mutate(RCSCcat = ordered(RCSCcat,
+                               levels = vecCSCcategoriesOrdered)) %>%
+      select(RCSCcat) -> tmpTib
+    
+    flexTabulateWithCI(tmpTib, RCSCcat) %>%
       htmltools_value()
   })
   
@@ -1035,6 +1188,52 @@ server <- function(input, output, session) {
   
   output$histogram1 <- renderPlot(histo1(),
                                   height = 800)
+  
+  jacobson1 <- reactive({
+    fullData() %>%
+      select(RespondentID, TherapistID, Gender, Age, YPscore1, YPscore2, YPscaled1toCSC, YPscaled2toCSC) -> tmpTib
+
+    tmpTib %>%
+      summarise(min = min(c(min(YPscaled1toCSC),
+                            min(YPscaled2toCSC))),
+                max = max(c(max(YPscaled1toCSC),
+                            max(YPscaled2toCSC)))) -> tmpTibLimits
+    
+    ggplot(tmpTib,
+           aes(x = YPscaled1toCSC,
+               y = YPscaled2toCSC,
+               colour = Gender,
+               label1 = Age,
+               label2 = RespondentID,
+               label3 = TherapistID,
+               label4 = YPscore1,
+               label5 = YPscore2)) +
+      geom_point() +
+      geom_vline(xintercept = 0) +
+      geom_hline(yintercept = 0) +
+      geom_abline(slope = 1, intercept = 0) +
+      geom_abline(slope = 1, intercept = 1,
+                  linetype = 3) +
+      geom_abline(slope = 1, intercept = -1,
+                  linetype = 3) +
+      ggtitle("Jacobson plot of YP-CORE score change") +
+      scale_x_continuous("First YP-CORE score, rescaled",
+                         limits = c(tmpTibLimits$min, 
+                                    tmpTibLimits$max)) +
+      scale_y_continuous("Second YP-CORE score, rescaled",
+                         limits = c(tmpTibLimits$min, 
+                                    tmpTibLimits$max)) 
+    
+    ggplotly(tooltip = c("Gender",
+                         "label1", 
+                         "label2",
+                         "label3", 
+                         "label4",
+                         "label5"),
+             width = lisSessionData$output_pid_width, height = 800)
+  })
+  
+  output$Jacobson1 <- renderPlotly(jacobson1())
   
   ### end server
 }
