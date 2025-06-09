@@ -240,7 +240,7 @@ ui <- fluidPage(
                          helpText("If your spreadsheet is large the data may take a few seconds for the 'Data uploaded' message to appear above: be patient!!"),
                          helpText("When the data has uploaded you can explore it in the 'Data' tab to the right and the analyses and plots will be in the ",
                                   "other tabs to the right.")
-               ),
+                ),
                 
                 tabPanel("Data", 
                          value = 2,
@@ -272,7 +272,7 @@ ui <- fluidPage(
                          DTOutput("compData"),    
                 ),
                 
-                tabPanel("Summary statistics",
+                tabPanel("Dataset descriptives",
                          value = 3,
                          h2("Explanation"),
                          p("This is pretty indigestible but it gives all the summary statistics for all the variables across all clinicians.",
@@ -293,7 +293,21 @@ ui <- fluidPage(
                          p(" "),
                          htmlOutput("summaryStatsText1"),
                          p(" "),
-                         tableOutput('summaryStats1'),
+                         p("The gender breakdown is as follows."),
+                         uiOutput("Gender1"),
+                         p(" "),
+                         htmlOutput("AgeText1"),
+                         p(" "),
+                         uiOutput("ageTable"),
+                         p(" "),
+                         p("Here is a histogram of the ages.  I don't think it's particularly likely ",
+                           "that the ages would be equally represented but that is the only plausible ",
+                           "reference line for now."),
+                         plotOutput("ageHist"),
+                         p(" "),
+                         p(" "),
+                         p(" "),
+                         tableOutput('summaryStats1long'),
                 ),    
                 
                 tabPanel("Summary statistics by clinician",
@@ -317,13 +331,18 @@ ui <- fluidPage(
                          p(" "),
                          h2("Summary stats by clinician"),
                          p(" "),
-                         tableOutput('summaryStats1ByTher'),
+                         tableOutput('summaryStats1longByTher'),
                 ),   
                 
-                tabPanel("Histogram of session count",
+                tabPanel("Attendance data",
                          value = 5,
                          h2("Explanation"),
-                         p("This tab gives a histogram of the numbers of sessions attended"),
+                         p("This tab gives the statistics about attendance.  These are often undervalued and people focus ",
+                         "largely on the scores and score changes.  This is a pity as it's hard to learn from scores if we ",
+                         "completely ignore attendance.  However, it is undoubtedly the case that understanding score changes ",
+                         "taking patterns of attendance and possible markers of ambivalence/conflict about change in the ",
+                         "attendance data is complicated.  I hope to add more analyses later that may help bring score change ",
+                         "and attendance information together but this is a start!"),
                          p(" "),
                          h2("Todo list"),
                          p("This is work in progress like everything else in this app.",
@@ -331,20 +350,36 @@ ui <- fluidPage(
                          tags$ul(
                            tags$li("Put statistics into the plot, top right"),
                            tags$li("Add options to break down by clinician and perhaps by age, gender ...?"),
-                           tags$li("Add options to count or add n(DNA), n(Cancelled) and n(Late)?"),
-                           tags$li("Will it be useful to people to have more comparative analyses comparing clinicians?")
+                           tags$li("Think more about graphing and analyses to extract more from these variables."),
+                           tags$li("Will it be useful to people to have more comparative analyses comparing clinicians?"),
+                           tags$li("Start to add analyses that look at change in the light of attendance statistics.")
                          ),
                          p(" "),
-                         h2("The histogram"),
+                         h2("Summarising attendance data"),
                          p(" "),
+                         p("The variables relating to attendance are: nSessionsAttended, nSessionsDNAed, nSessionsCancelled, nSessionsLate, nWeeks. ",
+                           "Here is the breakdown of any missingness across those variables."),
+                         uiOutput("TableAttendanceMissingness"),
+                         p(" "),
+                         p("Here are the summary statistics for each of those variables across all clients."),
+                         p(" "),
+                         uiOutput("TableAttendanceStats"),
+                         p(" "),
+                         p("I have assumed that you have counted the late attendances within the total number of attendances ",
+                           "for each client so the total of sessions offered = nSessionsAttended + nSessionsDNAed + nSessionsCancelled ",
+                           "so we can calculate per client the proportion of sessions offered that were attended, attended late, DNAed ",
+                           "and cancelled.  Here is the summary statistics for those per client values."),
+                         uiOutput("TableAttendanceStats2"),
+                         
+                         h2("Histogram of session count"),
                          p("Here is the histogram of the numbers of sessions attended"),
                          p(" "),
-                         plotOutput('histogram1'),
+                         plotOutput('attendanceHistogram1'),
                          p(" ") ,
                          
                 ),    
                 
-                tabPanel("Plot1",
+                tabPanel("Scores (a)",
                          value = 6,
                          h2("Explanation"),
                          p("This tab gives a cat's cradle plot of the data"),
@@ -374,7 +409,7 @@ ui <- fluidPage(
                                       height = "100%"),
                 ),    
                 
-                tabPanel("Plot2",
+                tabPanel("Scores (b)",
                          value = 7,
                          h2("Explanation"),
                          p("This tab gives a cat's cradle plot against dates (if given)"),
@@ -401,8 +436,8 @@ ui <- fluidPage(
                          plotlyOutput('plot2',
                                       height = "100%"),
                 ),  
-               
-               tabPanel("RCSC analyses",
+                
+                tabPanel("RCSC analyses",
                          value = 6,
                          h2("Explanation"),
                          p("This tab gives a simple breakdown of the CSC categories: baseline, final and change counts"),
@@ -467,45 +502,45 @@ ui <- fluidPage(
                          uiOutput('RCSCtable2'),
                          p(" "),
                 ),    
-               
-               tabPanel("Jacobson plot",
-                        value = 9,
-                        h2("Explanation"),
-                        p("This tab gives a scaled Jacobon plot"),
-                        p(" "),
-                        p("The Jacobson plot plots the 2nd/final score against the first. Points lying on the leading diagonal mark clients ",
-                          "whose last YP-CORE score is exactly the same as their fist score.  Points below the leading diagonal have lower ",
-                          "last scores than their first scores, points above the leading diagonal, <i>vice versa</i>."),
-                        p("The 'tramlines' either side of the leading diagonal mark the RCI for the YP-CORE for that person's age and gender.",
-                          "As the scores have been rescaled here everyone, regardless of age or gender, has tramlines on 1 above or 1 below ",
-                          "the leading diagonal.  Points inside the tramlines mark people whose scores changed but less than the RCI ",
-                          "(or RCC: Reliable Change Criterion), i.e. 'no reliable change'.  Points below the lower tramline come from people ",
-                          "whose YP-CORE scores improved more than the RCI and those above the upper tramline deteriorated more than the RCI."),
-                        p("The black vertical and horizontal lines mark the CSC.  Points to the left of the vertical line started below the ",
-                          "CSC, those to the right started above it.  Similarly, points above the horizontal line finished above the CSC and ",
-                          "those below it finished below the CSC"),
-                        p("As in previous plots you can identify the points by hovering over them ",
-                          "when you will see a 'tooltip'",
-                          "giving you the person's gender, age, first and last YP-CORE scores (not rescaled), the respondent ID and therapist ID."),
-                        h2("Todo list"),
-                        p("This is work in progress like everything else in this app.",
-                          "This is the todo list for this tab as I see it at this point"),
-                        tags$ul(
-                          tags$li("Add options to colour the points by therapist, age, gender ..."),
-                          tags$li("And perhaps facetting by those variables or to change the plot by those variables."),
-                          tags$li("Add buttons to download the plot.")
-                        ),
-                        p(" "),
-                        h2("The plot"),
-                        p(" "),
-                        div(style="width:100%;height:0;padding-top:100%;position:relative;",
-                            div(style="position: absolute;
+                
+                tabPanel("Jacobson plot",
+                         value = 9,
+                         h2("Explanation"),
+                         p("This tab gives a scaled Jacobon plot"),
+                         p(" "),
+                         p("The Jacobson plot plots the 2nd/final score against the first. Points lying on the leading diagonal mark clients ",
+                           "whose last YP-CORE score is exactly the same as their fist score.  Points below the leading diagonal have lower ",
+                           "last scores than their first scores, points above the leading diagonal, <i>vice versa</i>."),
+                         p("The 'tramlines' either side of the leading diagonal mark the RCI for the YP-CORE for that person's age and gender.",
+                           "As the scores have been rescaled here everyone, regardless of age or gender, has tramlines on 1 above or 1 below ",
+                           "the leading diagonal.  Points inside the tramlines mark people whose scores changed but less than the RCI ",
+                           "(or RCC: Reliable Change Criterion), i.e. 'no reliable change'.  Points below the lower tramline come from people ",
+                           "whose YP-CORE scores improved more than the RCI and those above the upper tramline deteriorated more than the RCI."),
+                         p("The black vertical and horizontal lines mark the CSC.  Points to the left of the vertical line started below the ",
+                           "CSC, those to the right started above it.  Similarly, points above the horizontal line finished above the CSC and ",
+                           "those below it finished below the CSC"),
+                         p("As in previous plots you can identify the points by hovering over them ",
+                           "when you will see a 'tooltip'",
+                           "giving you the person's gender, age, first and last YP-CORE scores (not rescaled), the respondent ID and therapist ID."),
+                         h2("Todo list"),
+                         p("This is work in progress like everything else in this app.",
+                           "This is the todo list for this tab as I see it at this point"),
+                         tags$ul(
+                           tags$li("Add options to colour the points by therapist, age, gender ..."),
+                           tags$li("And perhaps facetting by those variables or to change the plot by those variables."),
+                           tags$li("Add buttons to download the plot.")
+                         ),
+                         p(" "),
+                         h2("The plot"),
+                         p(" "),
+                         div(style="width:100%;height:0;padding-top:100%;position:relative;",
+                             div(style="position: absolute;
                                       top: 0;
                                       left: 0;
                                       width: 100%;
                                       height: 100%;",
-                                plotlyOutput("Jacobson1", height="100%")))
-               ),
+                                 plotlyOutput("Jacobson1", height="100%")))
+                ),
                 
                 
                 tabPanel("Explanation of the app",
@@ -537,7 +572,6 @@ ui <- fluidPage(
                 id = "tabSelected"),
   )
 )
-#)
 
 
 # Define server logic to read selected file ----
@@ -840,7 +874,7 @@ server <- function(input, output, session) {
                 nCSCLowToHigh = sum(CSCchange == "Low to high", na.rm = TRUE))
   })
   
-  summaryStats1 <- reactive({
+  summaryStats1long <- reactive({
     tibSummaryStatsWide() %>%
       pivot_longer(cols = everything(), names_to = "Statistic")
   })
@@ -856,7 +890,101 @@ server <- function(input, output, session) {
   })
   output$summaryStatsText1 <- renderText(summaryStatsText1())
   
-  summaryStats1ByTher <- reactive({
+  genderStatsText1 <- reactive({
+    fullData() %>%
+      mutate(Gender = ordered(Gender,
+                              levels = c("F", "M", "O"))) %>%
+      flexTabulateWithCI(Gender) %>%
+      autofit() %>%
+      htmltools_value()
+  })
+  output$Gender1 <- renderUI(genderStatsText1())
+  
+  summaryStatsTextAge1  <- reactive({
+    str_c("There were ",
+          getNNA(fullData()$Age),
+          " rows with missing ages.  Ages for the remaining records ranged from ",
+          min(fullData()$Age, na.rm = TRUE),
+          " to ",
+          max(fullData()$Age, na.rm = TRUE),
+          " with mean ",
+          round(mean(fullData()$Age, na.rm = TRUE), input$dp),
+          ", median ",
+          round(median(fullData()$Age, na.rm = TRUE), input$dp),
+          " and, for what's worth here, SD ",
+          round(sd(fullData()$Age, na.rm = TRUE), input$dp),
+          ".  Here is the table of ages.")
+  })
+  output$AgeText1 <- renderText(summaryStatsTextAge1())
+  
+  tableAges <- reactive({
+    summaryStats1long() %>%
+      filter(str_sub(Statistic, 1, 4) == "nAge") %>%
+      rename(n = value) %>%
+      mutate(nUsable = sum(n)) %>%
+      rowwise() %>%
+      mutate(CI = list(Hmisc::binconf(n, nUsable)[1, ])) %>%
+      ungroup() %>%
+      unnest_wider(CI) %>%
+      mutate(across(PointEst : Upper, ~ .x * 100),
+             across(PointEst : Upper, ~ round(.x, input$dp))) %>%
+      rename(Perc = PointEst,
+             LCL = Lower,
+             UCL = Upper) %>%
+      mutate(Perc = str_c(Perc, "%"),
+             CI = str_c(LCL,
+                        " to ",
+                        UCL,
+                        "%")) %>%
+      select(-c(LCL, UCL)) %>%
+      flextable() %>%
+      autofit() %>%
+      align(j = 4 :5,
+            align = "right") %>%
+      htmltools_value()
+  })
+  output$ageTable <- renderUI(tableAges())
+  
+  ageHisto <- reactive({
+    summaryStats1long() %>%
+      filter(str_sub(Statistic, 1, 4) == "nAge") %>%
+      rename(Age = Statistic,
+             n = value) %>%
+      mutate(Age = as.numeric(str_remove(Age, fixed("nAge"))),
+             nUsable = sum(n)) %>%
+      rowwise() %>%
+      mutate(CI = list(Hmisc::binconf(n, nUsable)[1, ])) %>%
+      ungroup() %>%
+      unnest_wider(CI) %>%
+      mutate(across(PointEst : Upper, ~ .x * nUsable)) %>%
+      rename(Perc = PointEst,
+             LCL = Lower,
+             UCL = Upper) -> tmpTib
+    
+    print(tmpTib)
+    tmpTib %>%
+      reframe(meanN = nUsable / n()) %>%
+      select(meanN) %>%
+      pull() -> tmpValMeanN
+    
+    ggplot(data = tmpTib,
+           aes(x = Age,
+               y = n)) +
+      geom_point() +
+      geom_bar(stat = "identity",
+               fill = "grey") +
+      geom_linerange(aes(ymin = LCL, ymax = UCL)) +
+      geom_hline(yintercept = tmpValMeanN,
+                 linetype = 3) +
+      ggtitle("Barchart of ages",
+              subtitle = str_c("Horizontal reference line is mean n had ages been equally frequent",
+                               "\nVertical reference lines are binomial 95% CIs for observed n values."))
+  })
+  output$ageHist <- renderPlot(ageHisto(),
+                               height = 600)
+  
+  ### tab ...
+  summaryStats1longByTher <- reactive({
     fullData() %>%
       group_by(TherapistID) %>%
       summarise(totalRecords = n(),
@@ -967,11 +1095,7 @@ server <- function(input, output, session) {
     fullData() %>%
       filter(!is.na(CSCcat1) & !is.na(CSCcat2)) %>%
       tabyl(CSCcat1, CSCcat2) %>%
-      # rename(`Missing 2nd value` = "NA_",
-      #        `1st value` = CSCcat1) %>%
       flextable() %>%
-      # colformat_char(j = 1,
-      #                na_str = "Missing 1st value") %>%
       autofit() %>%
       htmltools_value()
   })
@@ -995,7 +1119,7 @@ server <- function(input, output, session) {
                                             "Low to high",
                                             "Stayed low")),
              Relchange = ordered(RelChange,
-                                 levels = c("Reliable deterioation",
+                                 levels = c("Reliable deterioration",
                                             "No reliable change",
                                             "Reliable improvement"))) %>%
       tabyl(CSCchange, RelChange) %>%
@@ -1021,7 +1145,7 @@ server <- function(input, output, session) {
                                  levels = c("Stayed high",
                                             "High to low")),
              Relchange = ordered(RelChange,
-                                 levels = c("Reliable deterioation",
+                                 levels = c("Reliable deterioration",
                                             "No reliable change",
                                             "Reliable improvement"))) %>%
       tabyl(CSCchange, RelChange) %>%
@@ -1040,9 +1164,9 @@ server <- function(input, output, session) {
       htmltools_value()
   })
   
-  output$summaryStats1 <- renderTable(summaryStats1())
+  output$summaryStats1long <- renderTable(summaryStats1long())
   
-  output$summaryStats1ByTher <- renderTable(summaryStats1ByTher())
+  output$summaryStats1longByTher <- renderTable(summaryStats1longByTher())
   
   catsCradle1 <- reactive({
     ### massage the data
@@ -1164,8 +1288,71 @@ server <- function(input, output, session) {
     catsCradle2()
   )
   
-  ### create histogram
-  histo1 <- reactive({
+  
+  ### attendance tab
+  attendanceDataCounts <- reactive({
+    fullData() %>%
+      select(nSessionsAttended, nSessionsDNAed, nSessionsCancelled, nSessionsLate, nWeeks) %>%
+      pivot_longer(everything(), names_to = "Variable") %>%
+      group_by(Variable) %>%
+      summarise(n = n(),
+                nMissing = getNNA(value),
+                nOK = getNOK(value)) %>%
+      mutate(percMissing = str_c(round(100 * nMissing / n, input$dp), "%"),
+             percOK = str_c(round(100 * nOK / n, input$dp), "%")) %>%
+      select(Variable, n, nMissing, percMissing, nOK, percOK) %>%
+      flextable() %>%
+      align(j = c(4, 6),
+            align = "right") %>%
+      autofit() %>%
+      htmltools_value()
+  })
+  output$TableAttendanceMissingness <- renderUI(attendanceDataCounts())
+  
+  attendanceDataStats <- reactive({
+    fullData() %>%
+      select(nSessionsAttended, nSessionsDNAed, nSessionsCancelled, nSessionsLate, nWeeks) %>%
+      pivot_longer(everything(), names_to = "Variable") %>%
+      group_by(Variable) %>%
+      summarise(nOK = getNOK(value),
+                min = min(value, na.rm = TRUE),
+                mean = round(mean(value, na.rm = TRUE), input$dp),
+                median = round(median(value, na.rm = TRUE), input$dp),
+                SD = sd(mean(value, na.rm = TRUE), input$dp),
+                max = max(value, na.rm = TRUE)) %>%
+      flextable() %>%
+      autofit() %>%
+      htmltools_value()
+  })
+  output$TableAttendanceStats <- renderUI(attendanceDataStats())
+  
+  attendanceDataStats2 <- reactive({
+    fullData() %>%
+      select(nSessionsAttended, nSessionsDNAed, nSessionsCancelled, nSessionsLate, nWeeks) %>%
+      rowwise() %>%
+      mutate(nSessionsOffered = sum(nSessionsAttended, nSessionsDNAed, nSessionsLate, na.rm = FALSE)) %>%
+      ungroup() %>%
+      mutate(percSessAtt = round(100 * nSessionsAttended / nSessionsOffered, input$dp),
+             percSessDNA = round(100 * nSessionsDNAed / nSessionsOffered, input$dp),
+             percSessCanc = round(100 * nSessionsCancelled / nSessionsOffered, input$dp),
+             percSessAttLate = round(100 * nSessionsLate / nSessionsAttended, input$dp)) %>%
+      select(starts_with("perc")) %>%
+      pivot_longer(cols = everything(),
+                   names_to = "Variable") %>%
+      group_by(Variable) %>%
+      summarise(min = round(min(value, na.rm = TRUE), input$dp),
+                mean = round(mean(value, na.rm = TRUE), input$dp),
+                median = round(median(value, na.rm = TRUE), input$dp),
+                SD = round(sd(value, na.rm = TRUE), input$dp),
+                max = round(max(value, na.rm = TRUE), input$dp)) %>%
+      flextable() %>%
+      autofit() %>%
+      htmltools_value()
+  })
+  output$TableAttendanceStats2 <- renderUI(attendanceDataStats2())
+  
+  ### create attendance histogram
+  attendanceHisto1 <- reactive({
     fullData() %>%
       filter(!is.na(nSessionsAttended)) %>%
       summarise(nOK = n(),
@@ -1176,23 +1363,25 @@ server <- function(input, output, session) {
     
     ggplot(data = fullData(),
            aes(x = nSessionsAttended)) +
-      geom_histogram(fill = "grey") +
+      geom_histogram(fill = "grey",
+                     center = 0) +
       geom_vline(xintercept = tmpTibStats$mean,
                  colour = "blue") +
       geom_vline(xintercept = tmpTibStats$median,
                  colour = "green") +
-      xlab("n(Sessions attended)") +
+      scale_x_continuous("n(Sessions attended)",
+                         breaks = seq(0, tmpTibStats$max)) +
       ggtitle("Histogram of numbers of sessions attended",
               subtitle = "Vertical reference lines: blue = mean, green = median")
   })
   
-  output$histogram1 <- renderPlot(histo1(),
+  output$attendanceHistogram1 <- renderPlot(attendanceHisto1(),
                                   height = 800)
   
   jacobson1 <- reactive({
     fullData() %>%
       select(RespondentID, TherapistID, Gender, Age, YPscore1, YPscore2, YPscaled1toCSC, YPscaled2toCSC) -> tmpTib
-
+    
     tmpTib %>%
       summarise(min = min(c(min(YPscaled1toCSC),
                             min(YPscaled2toCSC))),
