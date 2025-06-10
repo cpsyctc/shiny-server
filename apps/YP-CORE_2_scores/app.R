@@ -272,7 +272,7 @@ ui <- fluidPage(
                          DTOutput("compData"),    
                 ),
                 
-                tabPanel("Dataset descriptives",
+                tabPanel("Sociodemographics",
                          value = 3,
                          h2("Explanation"),
                          p("This is pretty indigestible but it gives all the summary statistics for all the variables across all clinicians.",
@@ -305,9 +305,6 @@ ui <- fluidPage(
                            "reference line for now."),
                          plotOutput("ageHist"),
                          p(" "),
-                         p(" "),
-                         p(" "),
-                         tableOutput('summaryStats1long'),
                 ),    
                 
                 tabPanel("Summary statistics by clinician",
@@ -334,7 +331,7 @@ ui <- fluidPage(
                          tableOutput('summaryStats1longByTher'),
                 ),   
                 
-                tabPanel("Attendance data",
+                tabPanel("Attendance",
                          value = 5,
                          h2("Explanation"),
                          p("This tab gives the statistics about attendance.  These are often undervalued and people focus ",
@@ -379,8 +376,30 @@ ui <- fluidPage(
                          
                 ),    
                 
-                tabPanel("Scores (a)",
+                tabPanel("Scores",
                          value = 6,
+                         h2("Explanation"),
+                         p("This tab gives descriptive statistics about the scores"),
+                         p(" "),
+                         p("Very much work in progress."),
+                         h2("Todo list"),
+                         p("This is work in progress like everything else in this app.",
+                           "This is the todo list for this tab as I see it at this point"),
+                         tags$ul(
+                           tags$li("Add histograms of t1 scores, t2 scores and change"),
+                           tags$li("Add analyses of all three by gender, age ..."),
+                           tags$li("... and therapist?")
+                         ),
+                         p(" "),
+                         h2("The YP-CORE scores"),
+                         p(" "),
+                         htmlOutput("summaryScoresTxt1"),
+                         p(" "),
+                         uiOutput("scoreStatsTable1"),
+                ),   
+                
+                tabPanel("Change (a)",
+                         value = 7,
                          h2("Explanation"),
                          p("This tab gives a cat's cradle plot of the data"),
                          p(" "),
@@ -409,8 +428,8 @@ ui <- fluidPage(
                                       height = "100%"),
                 ),    
                 
-                tabPanel("Scores (b)",
-                         value = 7,
+                tabPanel("Change (b)",
+                         value = 8,
                          h2("Explanation"),
                          p("This tab gives a cat's cradle plot against dates (if given)"),
                          p(" "),
@@ -438,7 +457,7 @@ ui <- fluidPage(
                 ),  
                 
                 tabPanel("RCSC analyses",
-                         value = 6,
+                         value = 9,
                          h2("Explanation"),
                          p("This tab gives a simple breakdown of the CSC categories: baseline, final and change counts"),
                          p(" "),
@@ -504,7 +523,7 @@ ui <- fluidPage(
                 ),    
                 
                 tabPanel("Jacobson plot",
-                         value = 9,
+                         value = 10,
                          h2("Explanation"),
                          p("This tab gives a scaled Jacobon plot"),
                          p(" "),
@@ -526,7 +545,7 @@ ui <- fluidPage(
                          p("This is work in progress like everything else in this app.",
                            "This is the todo list for this tab as I see it at this point"),
                          tags$ul(
-                           tags$li("Add options to colour the points by therapist, age, gender ..."),
+                           tags$li("Add options to colour the points by age and therapist instead of gender ..."),
                            tags$li("And perhaps facetting by those variables or to change the plot by those variables."),
                            tags$li("Add buttons to download the plot.")
                          ),
@@ -544,7 +563,7 @@ ui <- fluidPage(
                 
                 
                 tabPanel("Explanation of the app",
-                         value = 10,
+                         value = 11,
                          h2("Explanation"),
                          p("This app is definitely work in progress at the moment."),
                          p(" "),
@@ -559,10 +578,11 @@ ui <- fluidPage(
                 
                 
                 tabPanel("Background", 
-                         value = 10,
+                         value = 12,
                          p("App created 22.v.25 by Chris Evans at this point specifically for Oiatillo Temirov for checking his data.",
                            a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/")),
-                         p("Last updated 9.vi.25: Improvements to RCSC tables, added Jacobson plot."),
+                         p("Last updated 10.vi.25: simplified tab names, improved statistics in the renamed sociodemographics tab and created new tab: scores",
+                           "much work still to do!"),
                          p("Licenced under a ",
                            a("Creative Commons, Attribution Licence-ShareAlike",
                              href="http://creativecommons.org/licenses/by-sa/1.0/"),
@@ -848,6 +868,7 @@ server <- function(input, output, session) {
                 ### scores
                 nYP1valid = getNOK(YPscore1),
                 nYP2valid = getNOK(YPscore2),
+                nYPbothValid = sum(!is.na(YPscore1) & !is.na(YPscore2)),
                 minYP1 = min(YPscore1, na.rm = TRUE),
                 meanYP1 = mean(YPscore1, na.rm = TRUE),
                 medianYP1 = median(YPscore1, na.rm = TRUE),
@@ -890,6 +911,8 @@ server <- function(input, output, session) {
   })
   output$summaryStatsText1 <- renderText(summaryStatsText1())
   
+  
+  ### tab: sociodemographics
   genderStatsText1 <- reactive({
     fullData() %>%
       mutate(Gender = ordered(Gender,
@@ -961,7 +984,6 @@ server <- function(input, output, session) {
              LCL = Lower,
              UCL = Upper) -> tmpTib
     
-    print(tmpTib)
     tmpTib %>%
       reframe(meanN = nUsable / n()) %>%
       select(meanN) %>%
@@ -983,7 +1005,7 @@ server <- function(input, output, session) {
   output$ageHist <- renderPlot(ageHisto(),
                                height = 600)
   
-  ### tab ...
+  ### tab: stats by therapist
   summaryStats1longByTher <- reactive({
     fullData() %>%
       group_by(TherapistID) %>%
@@ -1056,6 +1078,8 @@ server <- function(input, output, session) {
     fileStubName
   })
   
+  
+  ### tab: data
   output$compData <- DT::renderDataTable(server = FALSE,
                                          DT::datatable({displayData1()},
                                                        filter = "top",
@@ -1289,7 +1313,7 @@ server <- function(input, output, session) {
   )
   
   
-  ### attendance tab
+  ### tab: attendance
   attendanceDataCounts <- reactive({
     fullData() %>%
       select(nSessionsAttended, nSessionsDNAed, nSessionsCancelled, nSessionsLate, nWeeks) %>%
@@ -1378,6 +1402,57 @@ server <- function(input, output, session) {
   output$attendanceHistogram1 <- renderPlot(attendanceHisto1(),
                                   height = 800)
   
+  ### tab: scores
+  summaryScoresTxt1  <- reactive({
+    
+    str_c("Across your ",
+          tibSummaryStatsWide()$totalRecords,
+          " and ",
+          tibSummaryStatsWide()$nClinicians,
+          " different clinicians you have ",
+          tibSummaryStatsWide()$nYP1valid,
+          " usable initial scores, ",
+          tibSummaryStatsWide()$nYP2valid,
+          " usable t2 scores and ",
+          tibSummaryStatsWide()$nYPbothValid,
+          " usable on both occasions.  ",
+          "Here is a table of some summary statistics for the scores.  ",
+          "'LCLmean' is the lower 95% confidence limit of the mean ",
+          "and 'UCLmean' the upper CL calculated using the percentile bootstrap.")
+  })
+  output$summaryScoresTxt1 <- renderText(summaryScoresTxt1())
+  
+  scoreStatsTable1 <- reactive({
+    fullData() %>%
+      select(YPscore1, YPscore2, Change) %>%
+      pivot_longer(cols = everything(),
+                   names_to = "Score") %>%
+      mutate(Score = case_when(
+        Score == "YPscore1" ~ "Occasion 1",
+        Score == "YPscore2" ~ "Occasion 2",
+        Score == "Change" ~ "Change"),
+        Score = ordered(Score,
+                        levels = c("Occasion 1",
+                                   "Occasion 2",
+                                   "Change"))) %>%
+      group_by(Score) %>%
+      reframe(nOK = getNOK(value),
+                min = min(value, na.rm = TRUE),
+                CI = list(getBootCImean(value)),
+                median = median(value, na.rm = TRUE),
+                max = max(value, na.rm = TRUE),
+                sd = sd(value, na.rm = TRUE)) %>%
+      unnest_wider(CI) %>%
+      flextable() %>%
+      colformat_double(digits = input$dp) %>%
+      autofit() %>%
+      htmltools_value()
+  })
+  output$scoreStatsTable1 <- renderUI(scoreStatsTable1())
+  
+  
+  
+  ### tab: Jacobson
   jacobson1 <- reactive({
     fullData() %>%
       select(RespondentID, TherapistID, Gender, Age, YPscore1, YPscore2, YPscaled1toCSC, YPscaled2toCSC) -> tmpTib
