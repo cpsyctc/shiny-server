@@ -177,7 +177,7 @@ ui <- fluidPage(
   mainPanel(
     tabsetPanel(type = "tabs",
                 
-                tabPanel("Introduction",
+                tabPanel("Upload",
                          value = 1,
                          h2("Introduction"),
                          p(" "),
@@ -268,6 +268,7 @@ ui <- fluidPage(
                          ),
                          p(" "),
                          h2("Searchable table of the data"),
+                         uiOutput("uploadStatusData"),
                          p(" "),
                          DTOutput("compData"),    
                 ),
@@ -290,6 +291,7 @@ ui <- fluidPage(
                          ),
                          p(" "),
                          h2("The summary stats"),
+                         uiOutput("uploadStatusSocioDem"),
                          p(" "),
                          htmlOutput("summaryStatsText1"),
                          p(" "),
@@ -327,6 +329,7 @@ ui <- fluidPage(
                          ),
                          p(" "),
                          h2("Summary stats by clinician"),
+                         uiOutput("uploadStatusStatsByClin"),
                          p(" "),
                          tableOutput('summaryStats1longByTher'),
                 ),   
@@ -353,6 +356,7 @@ ui <- fluidPage(
                          ),
                          p(" "),
                          h2("Summarising attendance data"),
+                         uiOutput("uploadStatusAttendance"),
                          p(" "),
                          p("The variables relating to attendance are: nSessionsAttended, nSessionsDNAed, nSessionsCancelled, nSessionsLate, nWeeks. ",
                            "Here is the breakdown of any missingness across those variables."),
@@ -386,16 +390,25 @@ ui <- fluidPage(
                          p("This is work in progress like everything else in this app.",
                            "This is the todo list for this tab as I see it at this point"),
                          tags$ul(
-                           tags$li("Add histograms of t1 scores, t2 scores and change"),
-                           tags$li("Add analyses of all three by gender, age ..."),
+                           tags$li("Add analyses of all t1, t2 and change by gender, age ..."),
                            tags$li("... and therapist?")
                          ),
                          p(" "),
                          h2("The YP-CORE scores"),
+                         uiOutput("uploadStatusScores"),
                          p(" "),
                          htmlOutput("summaryScoresTxt1"),
                          p(" "),
                          uiOutput("scoreStatsTable1"),
+                         p(" "),
+                         plotOutput("histScores1",
+                                    height = 600),
+                         p(" "),
+                         plotOutput("histScores2",
+                                    height = 600),
+                         p(" "),
+                         plotOutput("histChange",
+                                    height = 600),
                 ),   
                 
                 tabPanel("Change (a)",
@@ -417,6 +430,7 @@ ui <- fluidPage(
                          ),
                          p(" "),
                          h2("The cat's cradle plot"),
+                         uiOutput("uploadStatusChangeA"),
                          p(" "),
                          p("This is a so-called 'cat's cradle' plot.",
                            "It shows all the complete pairs of scores coloured by gender with connecting lines.",
@@ -447,6 +461,7 @@ ui <- fluidPage(
                          ),
                          p(" "),
                          h2("The plot"),
+                         uiOutput("uploadStatusChangeB"),
                          p(" "),
                          p("This shows all the complete pairs of scores coloured by therapist ID with connecting lines ",
                            "plotted against episode start and finish dates (if given).  If you hover over a point you ",
@@ -471,6 +486,7 @@ ui <- fluidPage(
                          ),
                          p(" "),
                          h2("The CSC tabulations"),
+                         uiOutput("uploadStatusRCSC"),
                          p(" "),
                          p("I can see that this might be a bit overwhelming at first sight. Play around with it and it will get ",
                            "familiar and you will learn which of these values are really of interest to you.  The confidence intervals ",
@@ -551,6 +567,7 @@ ui <- fluidPage(
                          ),
                          p(" "),
                          h2("The plot"),
+                         uiOutput("uploadStatusJacobson"),
                          p(" "),
                          div(style="width:100%;height:0;padding-top:100%;position:relative;",
                              div(style="position: absolute;
@@ -581,7 +598,7 @@ ui <- fluidPage(
                          value = 12,
                          p("App created 22.v.25 by Chris Evans at this point specifically for Oiatillo Temirov for checking his data.",
                            a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/")),
-                         p("Last updated 10.vi.25: simplified tab names, improved statistics in the renamed sociodemographics tab and created new tab: scores",
+                         p("Last updated 11.vi.25: added output$uploadStatusXXX for each tab to flag if no data uploaded yet and histograms in scores tab",
                            "much work still to do!"),
                          p("Licenced under a ",
                            a("Creative Commons, Attribution Licence-ShareAlike",
@@ -629,11 +646,13 @@ server <- function(input, output, session) {
   })
   
   tibLookup2 <- reactive({
+    req(input$file1)
     tibLookup %>%
       filter(Ref == input$Lookup)
   })
   
   showLookup <- reactive({
+    req(input$file1)
     if(input$Scoring == "Clinical (10x item mean, range 0-40)") {
       tibLookup2() %>%
         mutate(CSC = 10 * CSC,
@@ -651,7 +670,28 @@ server <- function(input, output, session) {
       autofit()
   })
   
+  ### tabs: all
+  uploadPlease <- reactive({
+    if(is.null(input$file1)) {
+      txt <- HTML("<b>No data uploaded yet, go to upload tab and upload some data please!</b>")
+    } else {
+      txt <- HTML("  ")
+    }
+  })
+  ### you have to have separate calls for each tab
+  output$uploadStatusData <- renderUI(uploadPlease())
+  output$uploadStatusSocioDem <- renderUI(uploadPlease())
+  output$uploadStatusStatsByClin <- renderUI(uploadPlease())
+  output$uploadStatusAttendance <- renderUI(uploadPlease())
+  output$uploadStatusScores <- renderUI(uploadPlease())
+  output$uploadStatusChangeA <- renderUI(uploadPlease())
+  output$uploadStatusChangeB <- renderUI(uploadPlease())
+  output$uploadStatusRCSC <- renderUI(uploadPlease())
+  output$uploadStatusJacobson <- renderUI(uploadPlease())
+  
+  ### tab: sociodemographics
   output$lookupTable1 <- renderUI({
+    req(input$file1)
     showLookup() %>%
       colformat_char(j = 1,
                      na_str = "Missing") %>%
@@ -660,6 +700,7 @@ server <- function(input, output, session) {
   
   
   fullData <- reactive({
+    # req(input$file1)
     ### work out file format 
     str_replace(fileSelected(), "^(.)*?(\\.)(.*$)", "\\3") %>%
       str_to_lower() -> fileType
@@ -702,7 +743,7 @@ server <- function(input, output, session) {
     
     validate(need(colnames(dataInput) == vecColNames,
                   "Your data don't seem to have the correct column names.  Sorry, aborting!"))
-    
+
     dataInput %>%
       as_tibble() %>%
       ### cleaning 
@@ -805,12 +846,14 @@ server <- function(input, output, session) {
   
   ### get the data in long format
   longDat <- reactive({
+    req(input$file1)
     fullData() %>%
       pivot_longer(cols = starts_with("YPscore"), names_to = "WhichScore", values_to = "Score") 
     
   })
   
   displayData1 <- reactive({
+    req(input$file1)
     fullData() %>%
       select(-c(Ref, CSC, RCI, refAlpha, refSD,
                 YPmean1, YPmean2, YPclin1, YPclin2,
@@ -827,6 +870,7 @@ server <- function(input, output, session) {
   })
   
   tibSummaryStatsWide <- reactive({
+    req(input$file1)
     fullData() %>%
       summarise(totalRecords = n(),
                 nClients = n_distinct(RespondentID),
@@ -896,11 +940,13 @@ server <- function(input, output, session) {
   })
   
   summaryStats1long <- reactive({
+    req(input$file1)
     tibSummaryStatsWide() %>%
       pivot_longer(cols = everything(), names_to = "Statistic")
   })
   
   summaryStatsText1  <- reactive({
+    req(input$file1)
     str_c("You have uploaded ",
           tibSummaryStatsWide()$totalRecords,
           " rows of data, with information from ",
@@ -914,6 +960,7 @@ server <- function(input, output, session) {
   
   ### tab: sociodemographics
   genderStatsText1 <- reactive({
+    req(input$file1)
     fullData() %>%
       mutate(Gender = ordered(Gender,
                               levels = c("F", "M", "O"))) %>%
@@ -924,6 +971,7 @@ server <- function(input, output, session) {
   output$Gender1 <- renderUI(genderStatsText1())
   
   summaryStatsTextAge1  <- reactive({
+    req(input$file1)
     str_c("There were ",
           getNNA(fullData()$Age),
           " rows with missing ages.  Ages for the remaining records ranged from ",
@@ -941,6 +989,7 @@ server <- function(input, output, session) {
   output$AgeText1 <- renderText(summaryStatsTextAge1())
   
   tableAges <- reactive({
+    req(input$file1)
     summaryStats1long() %>%
       filter(str_sub(Statistic, 1, 4) == "nAge") %>%
       rename(n = value) %>%
@@ -969,6 +1018,7 @@ server <- function(input, output, session) {
   output$ageTable <- renderUI(tableAges())
   
   ageHisto <- reactive({
+    req(input$file1)
     summaryStats1long() %>%
       filter(str_sub(Statistic, 1, 4) == "nAge") %>%
       rename(Age = Statistic,
@@ -1007,6 +1057,7 @@ server <- function(input, output, session) {
   
   ### tab: stats by therapist
   summaryStats1longByTher <- reactive({
+    req(input$file1)
     fullData() %>%
       group_by(TherapistID) %>%
       summarise(totalRecords = n(),
@@ -1193,6 +1244,7 @@ server <- function(input, output, session) {
   output$summaryStats1longByTher <- renderTable(summaryStats1longByTher())
   
   catsCradle1 <- reactive({
+    req(input$file1)
     ### massage the data
     longDat() %>%
       ### drop any missing scores
@@ -1214,9 +1266,9 @@ server <- function(input, output, session) {
     ### get the means and their CIs
     tmpTib %>%
       group_by(WhichScore) %>%
-      summarise(mean = list(getBootCImean(Score,
+      summarise(mean = list(suppressMessages(getBootCImean(Score,
                                           nLT20err = FALSE,
-                                          verbose = FALSE))) %>%
+                                          verbose = FALSE)))) %>%
       unnest_wider(mean) %>%
       ungroup() %>%
       mutate(x = if_else(WhichScore == 1,
@@ -1264,6 +1316,7 @@ server <- function(input, output, session) {
   )
   
   catsCradle2 <- reactive({
+    req(input$file1)
     ### massage the data
     fullData() %>%
       select(-Age) %>%
@@ -1315,6 +1368,7 @@ server <- function(input, output, session) {
   
   ### tab: attendance
   attendanceDataCounts <- reactive({
+    req(input$file1)
     fullData() %>%
       select(nSessionsAttended, nSessionsDNAed, nSessionsCancelled, nSessionsLate, nWeeks) %>%
       pivot_longer(everything(), names_to = "Variable") %>%
@@ -1334,6 +1388,7 @@ server <- function(input, output, session) {
   output$TableAttendanceMissingness <- renderUI(attendanceDataCounts())
   
   attendanceDataStats <- reactive({
+    req(input$file1)
     fullData() %>%
       select(nSessionsAttended, nSessionsDNAed, nSessionsCancelled, nSessionsLate, nWeeks) %>%
       pivot_longer(everything(), names_to = "Variable") %>%
@@ -1351,6 +1406,7 @@ server <- function(input, output, session) {
   output$TableAttendanceStats <- renderUI(attendanceDataStats())
   
   attendanceDataStats2 <- reactive({
+    req(input$file1)
     fullData() %>%
       select(nSessionsAttended, nSessionsDNAed, nSessionsCancelled, nSessionsLate, nWeeks) %>%
       rowwise() %>%
@@ -1377,6 +1433,7 @@ server <- function(input, output, session) {
   
   ### create attendance histogram
   attendanceHisto1 <- reactive({
+    req(input$file1)
     fullData() %>%
       filter(!is.na(nSessionsAttended)) %>%
       summarise(nOK = n(),
@@ -1404,7 +1461,7 @@ server <- function(input, output, session) {
   
   ### tab: scores
   summaryScoresTxt1  <- reactive({
-    
+    req(input$file1)
     str_c("Across your ",
           tibSummaryStatsWide()$totalRecords,
           " and ",
@@ -1438,7 +1495,7 @@ server <- function(input, output, session) {
       group_by(Score) %>%
       reframe(nOK = getNOK(value),
                 min = min(value, na.rm = TRUE),
-                CI = list(getBootCImean(value)),
+                CI = list(suppressMessages(getBootCImean(value))),
                 median = median(value, na.rm = TRUE),
                 max = max(value, na.rm = TRUE),
                 sd = sd(value, na.rm = TRUE)) %>%
@@ -1450,10 +1507,73 @@ server <- function(input, output, session) {
   })
   output$scoreStatsTable1 <- renderUI(scoreStatsTable1())
   
+  histScores1 <- reactive({
+    req(input$file1)
+    fullData() %>%
+      summarise(mean = mean(YPscore1, na.rm = TRUE),
+                median = median(YPscore1, na.rm = TRUE)) -> tmpTibStats
+    
+    ggplot(data = fullData(),
+           aes(x = YPscore1)) +
+      geom_histogram(fill = "grey",
+                     center = 0) +
+      geom_vline(xintercept = tmpTibStats$mean,
+                 colour = "blue") +
+      geom_vline(xintercept = tmpTibStats$median,
+                 colour = "green") +
+      scale_x_continuous("First YP-CORE scores",
+                         breaks = seq(0, 4, .2),
+                         limits = c(0, 4)) +
+      ggtitle("Histogram of first YP-CORE scores",
+              subtitle = "Blue vertical reference line is mean, green is median")
+  })
+  output$histScores1 <- renderPlot(histScores1())
   
+  histScores2 <- reactive({
+    req(input$file1)
+    fullData() %>%
+      summarise(mean = mean(YPscore2, na.rm = TRUE),
+                median = median(YPscore2, na.rm = TRUE)) -> tmpTibStats
+    
+    ggplot(data = fullData(),
+           aes(x = YPscore2)) +
+      geom_histogram(fill = "grey",
+                     center = 0) +
+      geom_vline(xintercept = tmpTibStats$mean,
+                 colour = "blue") +
+      geom_vline(xintercept = tmpTibStats$median,
+                 colour = "green") +
+      scale_x_continuous("Second YP-CORE scores",
+                         breaks = seq(0, 4, .2),
+                         limits = c(0, 4)) +
+      ggtitle("Histogram of second YP-CORE scores",
+              subtitle = "Blue vertical reference line is mean, green is median")
+  })
+  output$histScores2 <- renderPlot(histScores2())
+  
+  histChange <- reactive({
+    req(input$file1)
+    fullData() %>%
+      summarise(mean = mean(Change, na.rm = TRUE),
+                median = median(Change, na.rm = TRUE)) -> tmpTibStats
+    
+    ggplot(data = fullData(),
+           aes(x = Change)) +
+      geom_histogram(fill = "grey",
+                     center = 0) +
+      geom_vline(xintercept = tmpTibStats$mean,
+                 colour = "blue") +
+      geom_vline(xintercept = tmpTibStats$median,
+                 colour = "green") +
+      scale_x_continuous("Change scores") +
+      ggtitle("Histogram of change scores",
+              subtitle = "Blue vertical reference line is mean, green is median")
+  })
+  output$histChange <- renderPlot(histChange())
   
   ### tab: Jacobson
   jacobson1 <- reactive({
+    req(input$file1)
     fullData() %>%
       select(RespondentID, TherapistID, Gender, Age, YPscore1, YPscore2, YPscaled1toCSC, YPscaled2toCSC) -> tmpTib
     
