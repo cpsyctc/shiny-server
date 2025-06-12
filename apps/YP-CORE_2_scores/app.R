@@ -262,15 +262,22 @@ ui <- fluidPage(
                          p("This is work in progress like everything else in this app.",
                            "This is the todo list for this tab as I see it at this point"),
                          tags$ul(
-                           tags$li("Add buttons to download entire table as a file"),
                            tags$li("And buttons to download selected rows from the interactive datatable"),
-                           tags$li("Probably have to add RCI at some point!")
-                         ),
+                           ),
+                         p(" "),
+                         h2("Download entire data"),
+                         p("These buttons allow you to download the data now with the correct CSC, RCI and RCSC categories for each person's age and gender.  ",
+                           "It also contains the change and rescaled scores used to make the Jacobson plot (see that tab).  Then you can see the data in a ",
+                           "table you can filter or search."),
+                         p(" "),
+                         downloadButton("downloadCSV", "Download as csv"),
+                         downloadButton("downloadXLSX", "Download as Excel xlsx"),
+                         downloadButton("downloadODS", "Download as Libre/OpenOffice ods"),
                          p(" "),
                          h2("Searchable table of the data"),
-                         uiOutput("uploadStatusData"),
+                         p("Now the searchable and filterable data table."),
                          p(" "),
-                         DTOutput("compData"),    
+                         DTOutput("searchableData"),    
                 ),
                 
                 tabPanel("Sociodemographics",
@@ -425,7 +432,8 @@ ui <- fluidPage(
                          p("This is work in progress like everything else in this app.",
                            "This is the todo list for this tab as I see it at this point"),
                          tags$ul(
-                           tags$li("Add options to break down by therapist, age, gender ..."),
+                           tags$li("Add options to colour down by therapist or age instead of gender, or not to colour"),
+                           tags$li("Add option to map n(sessions) on x axis"),
                            tags$li("Buttons to download the plot")
                          ),
                          p(" "),
@@ -480,8 +488,7 @@ ui <- fluidPage(
                          p("This is work in progress like everything else in this app.",
                            "This is the todo list for this tab as I see it at this point"),
                          tags$ul(
-                           tags$li("Probably have to add RCI at some point!"),
-                           tags$li("Add options to break down by age, gender ...?"),
+                           tags$li("Add options to colour by age or gender instead of therapist, or to use single colour?"),
                            tags$li("Will it be useful to people to have more comparative analyses comparing clinicians?")
                          ),
                          p(" "),
@@ -598,7 +605,7 @@ ui <- fluidPage(
                          value = 12,
                          p("App created 22.v.25 by Chris Evans at this point specifically for Oiatillo Temirov for checking his data.",
                            a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/")),
-                         p("Last updated 11.vi.25: added output$uploadStatusXXX for each tab to flag if no data uploaded yet and histograms in scores tab",
+                         p("Last updated 12.vi.25: some aesthetic improvements and download buttons for full data added",
                            "much work still to do!"),
                          p("Licenced under a ",
                            a("Creative Commons, Attribution Licence-ShareAlike",
@@ -866,7 +873,9 @@ server <- function(input, output, session) {
              YPscore2 = round(YPscore2, input$dp),
              Change = round(Change, input$dp),
              YPscore1toCSC = round(YPscore1toCSC, input$dp),
-             YPscore2toCSC = round(YPscore2toCSC, input$dp))
+             YPscore2toCSC = round(YPscore2toCSC, input$dp),
+             YPscaled1toCSC = round(YPscaled1toCSC, input$dp),
+             YPscaled2toCSC = round(YPscaled2toCSC, input$dp),)
   })
   
   tibSummaryStatsWide <- reactive({
@@ -1131,7 +1140,29 @@ server <- function(input, output, session) {
   
   
   ### tab: data
-  output$compData <- DT::renderDataTable(server = FALSE,
+  output$downloadCSV <- downloadHandler(
+    filename = "YP-CORE_data.csv",
+    contentType = "text/csv",
+    content = function(file) {
+      write_csv(fullData(), file = file)
+    })
+  
+  output$downloadXLSX <- downloadHandler(
+    filename = "YP-CORE_data.xlsx",
+    contentType = "text/csv",
+    content = function(file) {
+      writexl::write_xlsx(fullData(), path = file)
+    })
+  
+  output$downloadODS <- downloadHandler(
+    filename = "YP-CORE_data.ods",
+    contentType = "text/csv",
+    content = function(file) {
+      readODS::write_ods(fullData(), path = file)
+    })
+  
+  
+  output$searchableData <- DT::renderDataTable(server = FALSE,
                                          DT::datatable({displayData1()},
                                                        filter = "top",
                                                        extensions = "Buttons",
