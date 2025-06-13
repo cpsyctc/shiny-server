@@ -618,10 +618,10 @@ ui <- fluidPage(
                 
                 tabPanel("Background", 
                          value = 12,
-                         p("App created 22.v.25 by Chris Evans at this point specifically for Oiatillo Temirov for checking his data.",
+                         p("App created 22.v.25 by Chris Evans.",
                            a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/")),
-                         p("Last updated 12.vi.25: some aesthetic improvements and download buttons for full data added",
-                           "much work still to do!"),
+                         p("Last updated 13.vi.25: added plot download button for age histogram: muddling my way forward!",
+                           "Much work still to do!"),
                          p("Licenced under a ",
                            a("Creative Commons, Attribution Licence-ShareAlike",
                              href="http://creativecommons.org/licenses/by-sa/1.0/"),
