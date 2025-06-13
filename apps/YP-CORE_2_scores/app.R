@@ -8,6 +8,7 @@ suppressMessages(library(janitor)) # for tabyl
 suppressMessages(library(flextable)) # for non-interactive tables
 suppressMessages(library(CECPfuns)) # for some utility functions
 suppressMessages(library(plotly)) # for interactivity in the graphics
+suppressMessages(library(shinyDownload))
 
 ### set ggplot defaults
 theme_set(theme_bw())
@@ -312,8 +313,22 @@ ui <- fluidPage(
                          p("Here is a histogram of the ages.  I don't think it's particularly likely ",
                            "that the ages would be equally represented but that is the only plausible ",
                            "reference line for now."),
-                         plotOutput("ageHist"),
-                         p(" "),
+                         div(
+                           class = "panel panel-primary",
+                           div(
+                             class = "panel-heading",
+                             h2("Ages", class = "panel-title")
+                           ),
+                           div(style="height: 620px",
+                             class = "h-75; panel-body",
+                             plotOutput("ageHist")
+                           ),
+                           div(
+                             class = "panel-footer",
+                             downloadGGPlotButtonUI("ageHistDownload", "ageHist"),
+                             p("Avoid PDF: it doesn't format properly but I can't remove the option!")
+                           )
+                         ),
                 ),    
                 
                 tabPanel("Summary statistics by clinician",
@@ -1063,6 +1078,15 @@ server <- function(input, output, session) {
   })
   output$ageHist <- renderPlot(ageHisto(),
                                height = 600)
+  
+  downloadGGPlotButtonServer(
+    id = "ageHistDownload", # <= this should match the ID used in the UI module
+    ggplotObject = ageHisto, # No parentheses here to pass *expression*
+    width = 1500,
+    height = 800
+    # width = input$fileWidth,
+    # height = input$fileHeight
+  )
   
   ### tab: stats by therapist
   summaryStats1longByTher <- reactive({
