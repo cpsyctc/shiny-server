@@ -263,11 +263,13 @@ ui <- fluidPage(
                          p("This is work in progress like everything else in this app.",
                            "This is the todo list for this tab as I see it at this point"),
                          tags$ul(
-                           tags$li("And buttons to download selected rows from the interactive datatable"),
+                           tags$li("What else would you as a user want here?",
+                                   a("Contact me",
+                                     href="https://www.coresystemtrust.org.uk/home/contact-form/")),
                            ),
                          p(" "),
                          h2("Download entire data"),
-                         p("These buttons allow you to download the data now with the correct CSC, RCI and RCSC categories for each person's age and gender.  ",
+                         p("These buttons allow you to download your entire dataset now with the correct CSC, RCI and RCSC categories for each person's age and gender.  ",
                            "It also contains the change and rescaled scores used to make the Jacobson plot (see that tab).  Then you can see the data in a ",
                            "table you can filter or search."),
                          p(" "),
@@ -275,8 +277,11 @@ ui <- fluidPage(
                          downloadButton("downloadXLSX", "Download as Excel xlsx"),
                          downloadButton("downloadODS", "Download as Libre/OpenOffice ods"),
                          p(" "),
+                         p(" "),
                          h2("Searchable table of the data"),
-                         p("Now the searchable and filterable data table."),
+                         p("Now the searchable and filterable data table.  You can download the data you have filtered/searched ",
+                           "using the buttons at the bottom of the table.  If your selection is bigger than the default 50 rows shown ",
+                           "use the length menu '(Show)' to select 'All' and then you can download your entire selection."),
                          p(" "),
                          DTOutput("searchableData"),    
                 ),
@@ -291,11 +296,10 @@ ui <- fluidPage(
                          p("This is work in progress like everything else in this app.",
                            "This is the todo list for this tab as I see it at this point"),
                          tags$ul(
-                           tags$li("Break this up into a series of tables with headings above each"),
-                           tags$li("Rather laboriously (!) add percentages where they make sense"),
-                           tags$li("Use flextable() to make it more digestible."),
-                           tags$li("Add button to download entire data behind the table as a file?"),
-                           tags$li("Probably have to add RCI at some point!")
+                           tags$li("[Technical] Maybe change the plot to a plotly plot?"),
+                           tags$li("What else would you as a user want here?",
+                                   a("Contact me",
+                                     href="https://www.coresystemtrust.org.uk/home/contact-form/")),
                          ),
                          p(" "),
                          h2("The summary stats"),
@@ -347,7 +351,10 @@ ui <- fluidPage(
                            tags$li("Think how it could be made more digestible."),
                            tags$li("Perhaps add percentages but they will only make sense for some of the statistics"),
                            tags$li("Probably have to add RCI at some point!"),
-                           tags$li("Will it be useful to people to have more comparative analyses comparing clinicians?")
+                           tags$li("Will it be useful to people to have more comparative analyses comparing clinicians?"),
+                           tags$li("What else would you as a user want here?",
+                                   a("Contact me",
+                                     href="https://www.coresystemtrust.org.uk/home/contact-form/")),
                          ),
                          p(" "),
                          h2("Summary stats by clinician"),
@@ -374,7 +381,11 @@ ui <- fluidPage(
                            tags$li("Add options to break down by clinician and perhaps by age, gender ...?"),
                            tags$li("Think more about graphing and analyses to extract more from these variables."),
                            tags$li("Will it be useful to people to have more comparative analyses comparing clinicians?"),
-                           tags$li("Start to add analyses that look at change in the light of attendance statistics.")
+                           tags$li("Start to add analyses that look at change in the light of attendance statistics."),
+                           tags$li("[Technical] Maybe change the plot to a plotly plot?"),
+                           tags$li("What else would you as a user want here?",
+                                   a("Contact me",
+                                     href="https://www.coresystemtrust.org.uk/home/contact-form/")),
                          ),
                          p(" "),
                          h2("Summarising attendance data"),
@@ -413,7 +424,11 @@ ui <- fluidPage(
                            "This is the todo list for this tab as I see it at this point"),
                          tags$ul(
                            tags$li("Add analyses of all t1, t2 and change by gender, age ..."),
-                           tags$li("... and therapist?")
+                           tags$li("... and therapist?"),
+                           tags$li("[Technical] Maybe change the plots to plotly plots?"),
+                           tags$li("What else would you as a user want here?",
+                                   a("Contact me",
+                                     href="https://www.coresystemtrust.org.uk/home/contact-form/")),
                          ),
                          p(" "),
                          h2("The YP-CORE scores"),
@@ -449,7 +464,10 @@ ui <- fluidPage(
                          tags$ul(
                            tags$li("Add options to colour down by therapist or age instead of gender, or not to colour"),
                            tags$li("Add option to map n(sessions) on x axis"),
-                           tags$li("Buttons to download the plot")
+                           tags$li("[Technical] add buttons to download the plot or change to ggplotly plot?"),
+                           tags$li("What else would you as a user want here?",
+                                   a("Contact me",
+                                     href="https://www.coresystemtrust.org.uk/home/contact-form/")),
                          ),
                          p(" "),
                          h2("The cat's cradle plot"),
@@ -461,7 +479,12 @@ ui <- fluidPage(
                            "offset somewhat from the individual points, mark the mean baseline and later scores.  ",
                            "The vertical lines through those are the bootstrap 95% confidence intervals."),
                          p(" "),
-                         plotlyOutput('plot1',
+                         p("If you hover over the top of the plot you see the plotly 'modebar' which allows you to save the plot as a jpeg ",
+                           "and to interact with it in various way some of which may be useful to you.  See ",
+                           a("here",
+                           href="https://plotly.com/chart-studio-help/getting-to-know-the-plotly-modebar/"),
+                           " for more on the modebar."),
+                         plotlyOutput('catsCradle1',
                                       height = "100%"),
                 ),    
                 
@@ -480,7 +503,10 @@ ui <- fluidPage(
                            "This is the todo list for this tab as I see it at this point"),
                          tags$ul(
                            tags$li("Add options to break down by therapist, age, gender ..."),
-                           tags$li("Buttons to download the plot")
+                           tags$li("[Technical] add buttons to download the plot or change to ggplotly plot?"),
+                           tags$li("What else would you as a user want here?",
+                                   a("Contact me",
+                                     href="https://www.coresystemtrust.org.uk/home/contact-form/")),
                          ),
                          p(" "),
                          h2("The plot"),
@@ -490,7 +516,12 @@ ui <- fluidPage(
                            "plotted against episode start and finish dates (if given).  If you hover over a point you ",
                            "should be shown the respondent ID, gender and CSC change category."),
                          p(" "),
-                         plotlyOutput('plot2',
+                         p("If you hover over the top of the plot you see the plotly 'modebar' which allows you to save the plot as a jpeg ",
+                           "and to interact with it in various way some of which may be useful to you.  See ",
+                           a("here",
+                             href="https://plotly.com/chart-studio-help/getting-to-know-the-plotly-modebar/"),
+                           " for more on the modebar."),
+                         plotlyOutput('catsCradle2',
                                       height = "100%"),
                 ),  
                 
@@ -504,7 +535,10 @@ ui <- fluidPage(
                            "This is the todo list for this tab as I see it at this point"),
                          tags$ul(
                            tags$li("Add options to colour by age or gender instead of therapist, or to use single colour?"),
-                           tags$li("Will it be useful to people to have more comparative analyses comparing clinicians?")
+                           tags$li("Will it be useful to people to have more comparative analyses comparing clinicians?"),
+                           tags$li("What else would you as a user want here?",
+                                   a("Contact me",
+                                     href="https://www.coresystemtrust.org.uk/home/contact-form/")),
                          ),
                          p(" "),
                          h2("The CSC tabulations"),
@@ -585,12 +619,19 @@ ui <- fluidPage(
                          tags$ul(
                            tags$li("Add options to colour the points by age and therapist instead of gender ..."),
                            tags$li("And perhaps facetting by those variables or to change the plot by those variables."),
-                           tags$li("Add buttons to download the plot.")
+                           tags$li("What else would you as a user want here?",
+                                   a("Contact me",
+                                     href="https://www.coresystemtrust.org.uk/home/contact-form/")),
                          ),
                          p(" "),
                          h2("The plot"),
                          uiOutput("uploadStatusJacobson"),
                          p(" "),
+                         p("If you hover over the top of the plot you see the plotly 'modebar' which allows you to save the plot as a jpeg ",
+                           "and to interact with it in various way some of which may be useful to you.  See ",
+                           a("here",
+                             href="https://plotly.com/chart-studio-help/getting-to-know-the-plotly-modebar/"),
+                           " for more on the modebar."),
                          div(style="width:100%;height:0;padding-top:100%;position:relative;",
                              div(style="position: absolute;
                                       top: 0;
@@ -620,8 +661,9 @@ ui <- fluidPage(
                          value = 12,
                          p("App created 22.v.25 by Chris Evans.",
                            a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/")),
-                         p("Last updated 13.vi.25: added plot download button for age histogram: muddling my way forward!",
-                           "Much work still to do!"),
+                         p("Last updated 14.vi.25: added explanation of plotly modebar for plot downloads, improved todo lists, ",
+                           "added selective download buttons to data tab table."),
+                         p("Much work still to do but getting there!"),
                          p("Licenced under a ",
                            a("Creative Commons, Attribution Licence-ShareAlike",
                              href="http://creativecommons.org/licenses/by-sa/1.0/"),
@@ -1187,30 +1229,31 @@ server <- function(input, output, session) {
   
   
   output$searchableData <- DT::renderDataTable(server = FALSE,
-                                         DT::datatable({displayData1()},
-                                                       filter = "top",
-                                                       extensions = "Buttons",
-                                                       selection = "none",
-                                                       options = list(
-                                                         buttons = list(
-                                                           list(extend = 'csv',   filename =  paste0("scored-", fileStubName())),
-                                                           list(extend = 'excel', filename =  paste0("scored-", fileStubName()))
-                                                         ),
-                                                         ### the important thing is that there is the l to allow for the lengthMenu 
-                                                         ### https://stackoverflow.com/questions/52645959/r-datatables-do-not-display-buttons-and-length-menu-simultaneously
-                                                         # dom = 'Blrtip',
-                                                         dom = "Qlfrtip",
-                                                         searchBuilder = TRUE,
-                                                         autoWidth = TRUE),
-                                                       # fixedColumns = list(leftColumns = 2, rightColumns = 6),
-                                                       # pageLength = 20,
-                                                       # autoWidth = TRUE,
-                                                       # ordering = FALSE,
-                                                       # editable = FALSE,
-                                                       # searching = FALSE),
-                                         )
+                                               DT::datatable({displayData1()},
+                                                             extensions = "Buttons",
+                                                             filter = "top",
+                                                             selection = "none",
+                                                             options = list(
+                                                               lengthMenu = list(c(50, 100, -1), 
+                                                                                 c('50','100', 'All')),
+                                                               ### I was trying to put some space before the download buttons but this
+                                                               ### doesn't do it!
+                                                               # searchPanes = list(
+                                                               #   viewTotal = TRUE,
+                                                               #   i18n = list(
+                                                               #     count = '{total} found',
+                                                               #     countFiltered = '{shown} ({total}   )'
+                                                               #   )
+                                                               # ),
+                                                               buttons = c('copy', 'csv', 'excel'),
+                                                               autoWidth = TRUE,
+                                                               ### the important thing is that there is the l to allow for the lengthMenu 
+                                                               ### https://stackoverflow.com/questions/52645959/r-datatables-do-not-display-buttons-and-length-menu-simultaneously
+                                                               # dom = 'Blrtip',
+                                                               dom = "QlfrtipB")
+                                               )
   )
-  
+
   output$CSCtable1 <- renderUI({
     flexTabulateWithCI(fullData(), CSCcat1) %>%
       htmltools_value()
@@ -1366,7 +1409,7 @@ server <- function(input, output, session) {
              width = lisSessionData$output_pid_width, height = 800)
   })
   
-  output$plot1 <- renderPlotly(
+  output$catsCradle1 <- renderPlotly(
     catsCradle1()
   )
   
@@ -1416,7 +1459,7 @@ server <- function(input, output, session) {
              width = lisSessionData$output_pid_width, height = 800)
   })
   
-  output$plot2 <- renderPlotly(
+  output$catsCradle2 <- renderPlotly(
     catsCradle2()
   )
   
