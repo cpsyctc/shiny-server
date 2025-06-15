@@ -150,7 +150,7 @@ flexTabulateWithCI <- function(tibDat, varName){
 
 
 ### 1. Initialize telemetry with default options (store to a local logfile)
-telemetry <- Telemetry$new(app_name = "CORE-OM_scoring",
+telemetry <- Telemetry$new(app_name = "YP-CORE_2_scores",
                            data_storage = DataStorageSQLite$new(db_path = file.path("../../telemetry.sqlite")))
 
 
