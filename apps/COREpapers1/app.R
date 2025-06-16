@@ -400,10 +400,18 @@ ui <- fluidPage(
                            p(" "),
                            p("Thanks to Keith Newman for the download handler: ",
                              a("shinyDownload", href="https://github.com/keithnewman/shinyDownload/?tab=readme-ov-file")),
+                           p(" "),
+                           h2("Searchable table of the data"),
+                           p("When you have narrowed the list of papers using the panel on the left you can further narrow your ",
+                           "search within the papers showing here using the search field. It searches anywhere in the references."),
+                           p("  "),
+                           p("You can download the data you have filtered ",
+                             "using the buttons at the bottom of the table.  If your selection is bigger than the default 20 rows shown ",
+                             "use the length menu '(Show)' to select 'All' and then you can download your entire selection."),
+                           p(" "),
                            DT::dataTableOutput("papers"),
                            
                   ),
-                  
                   
                   
                   tabPanel("DOIs and URLs",
@@ -493,7 +501,7 @@ ui <- fluidPage(
                            
                            p("App started 10.v.24 by Chris Evans.",
                              a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/")),
-                           p(HTML("Last updated 21.i.25: added searching in paper titles.")),
+                           p(HTML("Last updated 16.vi.25: allowed download of all selected.")),
                            p("Licenced under a ",
                              a("Creative Commons, Attribution Licence-ShareAlike",
                                href="http://creativecommons.org/licenses/by-sa/1.0/"),
@@ -770,17 +778,24 @@ server <- function(input, output, session) {
   output$papers <- DT::renderDataTable(
     DT::datatable({tibPaperRefs()},
                   extensions = "Buttons",
-                  options = list(                                                     
-                    fixedColumns = FALSE,
-                    pageLength = 50,
+                  ### don't want filtering
+                  # filter = "top",
+                  selection = "none",
+                  
+                  options = list(
+                    searching = TRUE,
+                    lengthMenu = list(c(20, 50, 100, -1), 
+                                      c('20', '50','100', 'All')),
+
+                    buttons = c('copy', 'csv', 'excel'),
+                    # layout = list(
+                    #   topStart = 'buttons'
+                    # ),
                     autoWidth = TRUE,
-                    ordering = TRUE,
-                    dom = 'frtip',
-                    editable = FALSE,
-                    searching = TRUE
-                  )
+                    dom = "QlfrtipB")
     )
   )
+
   
   output$papers2 <- DT::renderDataTable(
     DT::datatable({tibPaperDat()},
