@@ -361,7 +361,7 @@ ui <- fluidPage(
                          uiOutput("uploadStatusStatsByClin"),
                          p(" "),
                          tableOutput('summaryStats1longByTher'),
-                ),   
+                ),
                 
                 tabPanel("Attendance",
                          value = 5,
@@ -377,11 +377,9 @@ ui <- fluidPage(
                          p("This is work in progress like everything else in this app.",
                            "This is the todo list for this tab as I see it at this point"),
                          tags$ul(
-                           tags$li("Put statistics into the plot, top right"),
                            tags$li("Add options to break down by clinician and perhaps by age, gender ...?"),
-                           tags$li("Think more about graphing and analyses to extract more from these variables."),
+                           tags$li("Think more about graphs and/or analyses to extract more from these variables."),
                            tags$li("Will it be useful to people to have more comparative analyses comparing clinicians?"),
-                           tags$li("Start to add analyses that look at change in the light of attendance statistics."),
                            tags$li("[Technical] Maybe change the plot to a plotly plot?"),
                            tags$li("What else would you as a user want here?",
                                    a("Contact me",
@@ -641,7 +639,6 @@ ui <- fluidPage(
                                  plotlyOutput("Jacobson1", height="100%")))
                 ),
                 
-                
                 tabPanel("Explanation of the app",
                          value = 11,
                          h2("Explanation"),
@@ -656,13 +653,11 @@ ui <- fluidPage(
                          p(" "),
                 ),
                 
-                
                 tabPanel("Background", 
                          value = 12,
                          p("App created 22.v.25 by Chris Evans.",
                            a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/")),
-                         p("Last updated 14.vi.25: added explanation of plotly modebar for plot downloads, improved todo lists, ",
-                           "added selective download buttons to data tab table."),
+                         p("Last updated 18.vi.25: added simple stats to attendance histogram ",),
                          p("Much work still to do but getting there!"),
                          p("Licenced under a ",
                            a("Creative Commons, Attribution Licence-ShareAlike",
@@ -1533,23 +1528,49 @@ server <- function(input, output, session) {
   attendanceHisto1 <- reactive({
     req(input$file1)
     fullData() %>%
-      filter(!is.na(nSessionsAttended)) %>%
-      summarise(nOK = n(),
-                min = min(nSessionsAttended),
-                mean = mean(nSessionsAttended),
-                median = median(nSessionsAttended),
-                max = max(nSessionsAttended)) -> tmpTibStats
+      # filter(!is.na(nSessionsAttended)) %>%
+      summarise(nTot = n(),
+                nOK = getNOK(nSessionsAttended),
+                min = min(nSessionsAttended, na.rm = TRUE),
+                mean = mean(nSessionsAttended, na.rm = TRUE),
+                median = median(nSessionsAttended, na.rm = TRUE),
+                max = max(nSessionsAttended, na.rm = TRUE)) -> tmpTibStats
     
-    ggplot(data = fullData(),
-           aes(x = nSessionsAttended)) +
-      geom_histogram(fill = "grey",
-                     center = 0) +
+    str_c("Total n = ",
+          tmpTibStats$nTot,
+          ",  n with session count = ",
+          tmpTibStats$nOK,
+          "\nMean = ",
+          round(tmpTibStats$mean, input$dp),
+          ", Median = ",
+          round(tmpTibStats$median, input$dp),
+          "\nMin = ",
+          tmpTibStats$min,
+          ", Max = ",
+          tmpTibStats$max) -> tmpLabel
+    
+    fullData() %>%
+      filter(!is.na(nSessionsAttended)) %>%
+      count(nSessionsAttended) -> tmpTib
+
+    ggplot(data = tmpTib,
+           aes(x = nSessionsAttended,
+               y = n)) +
+      geom_bar(stat = "identity",
+               fill = "grey") +
       geom_vline(xintercept = tmpTibStats$mean,
                  colour = "blue") +
       geom_vline(xintercept = tmpTibStats$median,
                  colour = "green") +
       scale_x_continuous("n(Sessions attended)",
                          breaks = seq(0, tmpTibStats$max)) +
+      annotate("text",
+               x = tmpTibStats$max, 
+               y = max(tmpTib$n),
+               label = tmpLabel,
+               hjust = 1,
+               vjust = 1,
+               size = 10) +
       ggtitle("Histogram of numbers of sessions attended",
               subtitle = "Vertical reference lines: blue = mean, green = median")
   })
