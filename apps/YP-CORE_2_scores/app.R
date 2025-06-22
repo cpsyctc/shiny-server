@@ -25,6 +25,7 @@ vecLookup <- c("Blackshaw PhD (UK & Ireland)",
                "Di Biase et al., 2021 (Italy)")
 
 ### create the internal lookup table
+### RCI and CSC are based on mean scoring
 tribble(~Ref, ~Age,  ~Gender,  ~CSC, ~RCI, ~refAlpha, ~refSD,
         "Blackshaw PhD (UK & Ireland)", 11, "F", 1.432, .892, NA, NA,
         "Blackshaw PhD (UK & Ireland)", 12, "F", 1.337, .911, NA, NA,
@@ -462,7 +463,6 @@ ui <- fluidPage(
                          tags$ul(
                            tags$li("Add options to colour down by therapist or age instead of gender, or not to colour"),
                            tags$li("Add option to map n(sessions) on x axis"),
-                           tags$li("[Technical] add buttons to download the plot or change to ggplotly plot?"),
                            tags$li("What else would you as a user want here?",
                                    a("Contact me",
                                      href="https://www.coresystemtrust.org.uk/home/contact-form/")),
@@ -475,7 +475,10 @@ ui <- fluidPage(
                            "It shows all the complete pairs of scores coloured by gender with connecting lines.",
                            "The dashed horizontal reference line marks the mean baseline score and the black points,",
                            "offset somewhat from the individual points, mark the mean baseline and later scores.  ",
-                           "The vertical lines through those are the bootstrap 95% confidence intervals."),
+                           "The vertical lines through those are the bootstrap 95% confidence intervals (CI).",
+                           "If the vertical CI line to the right, for the second scores does not extend ",
+                           "through the horizontal reference line then the mean change is unlikely to be ",
+                           "down to chance."),
                          p(" "),
                          p("If you hover over the top of the plot you see the plotly 'modebar' which allows you to save the plot as a jpeg ",
                            "and to interact with it in various way some of which may be useful to you.  See ",
@@ -510,7 +513,7 @@ ui <- fluidPage(
                          h2("The plot"),
                          uiOutput("uploadStatusChangeB"),
                          p(" "),
-                         p("This shows all the complete pairs of scores coloured by therapist ID with connecting lines ",
+                         p("This shows all the complete data with scores and dates for both occasions coloured by therapist ID with connecting lines ",
                            "plotted against episode start and finish dates (if given).  If you hover over a point you ",
                            "should be shown the respondent ID, gender and CSC change category."),
                          p(" "),
@@ -523,8 +526,51 @@ ui <- fluidPage(
                                       height = "100%"),
                 ),  
                 
-                tabPanel("RCSC analyses",
+                tabPanel("Change (c)",
                          value = 9,
+                         h2("Explanation"),
+                         p("This tab plots change against sessions attended (if given)"),
+                         p(" "),
+                         p("This is very similar to the previous plots but the x axis is by sessions attended.",
+                           "This gives a picture of whether change relates to sessions attended.  Again you ",
+                           "can identify the points by hovering over them when you will see a 'tooltip'",
+                           "giving you the YP-CORE score, the respondent ID, therapist ID and the category ",
+                           "of the CSC change."),
+                         h2("Todo list"),
+                         p("This is work in progress like everything else in this app.",
+                           "This is the todo list for this tab as I see it at this point"),
+                         tags$ul(
+                           tags$li("Add options to break down by therapist, age, gender ..."),
+                           tags$li("[Technical] add buttons to download the plot or change to ggplotly plot?"),
+                           tags$li("What else would you as a user want here?",
+                                   a("Contact me",
+                                     href="https://www.coresystemtrust.org.uk/home/contact-form/")),
+                         ),
+                         p(" "),
+                         h2("The plot"),
+                         uiOutput("uploadStatusChangeB"),
+                         p(" "),
+                         p("This shows all the data with scores and dates for both occasions.  The wavy curve in blue is the ",
+                           "LOESS smoothed fit mapping change to numbers of sessions attendeed.  The grey envelope around the ",
+                           "curve gives the 95% confidence interval around that."),
+                         p("The individual change scores are in grey and the blue points mark the mean change for each number ",
+                           "of sessions attended.  If you hover over an individual point you ",
+                           "should be shown the respondent ID, gender and CSC change category. "),
+                         p("Points below the -1 mark reliable improvement and points above +1 reliable deterioration.",
+                           "If the dotted mean change line lies inside the grey confidence envelope there is no evidence, ",
+                           "of a systematic relationship between change and numbers of sessions attended."),
+                         p(" "),
+                         p("If you hover at the top of the plot you see the plotly 'modebar' which allows you to save the plot as a jpeg ",
+                           "and to interact with it in various way some of which may be useful to you.  See ",
+                           a("here",
+                             href="https://plotly.com/chart-studio-help/getting-to-know-the-plotly-modebar/"),
+                           " for more on the modebar."),
+                         plotlyOutput('loessPlot1',
+                                      height = "100%"),
+                ),  
+                
+                tabPanel("RCSC analyses",
+                         value = 10,
                          h2("Explanation"),
                          p("This tab gives a simple breakdown of the CSC categories: baseline, final and change counts"),
                          p(" "),
@@ -593,7 +639,7 @@ ui <- fluidPage(
                 ),    
                 
                 tabPanel("Jacobson plot",
-                         value = 10,
+                         value = 11,
                          h2("Explanation"),
                          p("This tab gives a scaled Jacobon plot"),
                          p(" "),
@@ -640,7 +686,7 @@ ui <- fluidPage(
                 ),
                 
                 tabPanel("Explanation of the app",
-                         value = 11,
+                         value = 12,
                          h2("Explanation"),
                          p("This app is definitely work in progress at the moment."),
                          p(" "),
@@ -1456,6 +1502,76 @@ server <- function(input, output, session) {
   
   output$catsCradle2 <- renderPlotly(
     catsCradle2()
+  )
+  
+  ### tab: change(c)
+  loessPlot1 <- reactive({
+    req(input$file1)
+    
+    fullData() %>%
+      print()
+    
+    ### massage the data
+    fullData() %>%
+      ### drop any missing scores
+      filter(!is.na(YPscore1)) %>%
+      filter(!is.na(YPscore2)) %>%
+      filter(!is.na(nSessionsAttended)) %>%
+      filter(!is.na(RCI)) %>%
+      mutate(tmpChange = (YPscore2 - YPscore1),
+             scaledChange = tmpChange / RCI) -> tmpTib
+    
+    tmpTib %>%
+      group_by(nSessionsAttended) %>%
+      summarise(n = n(),
+                mean = mean(scaledChange),
+                min = min(scaledChange),
+                max = max(scaledChange)) %>%
+      ungroup() -> tmpTibStats
+
+    suppressWarnings(ggplot(data = tmpTib,
+                            aes(x = nSessionsAttended, y = scaledChange)) +
+                       geom_smooth(aes(x = nSessionsAttended, y = scaledChange)) +
+                       geom_point(aes(label1 = RespondentID,
+                                      label2 = Gender,
+                                      label3 = YPscore1,
+                                      label4 = YPscore2, 
+                                      label5 = CSC),
+                                  colour = "grey") +
+                       geom_point(data = tmpTibStats,
+                                  inherit.aes = FALSE,
+                                  aes(x = nSessionsAttended,
+                                      y = mean),
+                                  size = 2.5,
+                                  shape = 16,
+                                  colour = "blue") +
+                       geom_linerange(data = tmpTibStats,
+                                      inherit.aes = FALSE,
+                                      aes(x = nSessionsAttended,
+                                          ymin = min, ymax = max),
+                                      linetype = 3,
+                                      colour = "grey") +
+                       geom_hline(yintercept = 0) +
+                       geom_hline(yintercept = mean(tmpTib$scaledChange),
+                                  linetype = 3) +
+                       xlab("Date") +
+                       scale_y_continuous("Change, scaled to the RCI")) +
+      ggtitle("Change scores, scaled to the appropriate RCI",
+              subtitle = str_c("A change equal to the RCI has score 1.",
+                               "Solid horizontal reference line marks no change, ",
+                               "dashed line marks overall mean change."))
+    
+    
+    ggplotly(tooltip = c("label1",
+                         "label2",
+                         "label3",
+                         "label4",
+                         "label5"),
+             width = lisSessionData$output_pid_width, height = 800)
+  })
+  
+  output$loessPlot1 <- renderPlotly(
+    loessPlot1()
   )
   
   
