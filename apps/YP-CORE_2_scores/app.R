@@ -167,6 +167,7 @@ itemsCOREOM <- paste(itemStem, sprintf("%02.0f", 1:34), sep = "")
 
 # Define UI for app ----
 ui <- fluidPage(
+# ui <- fillPage(
   
   use_telemetry(), # 2. Add necessary Javascript to Shiny
   
@@ -297,7 +298,7 @@ ui <- fluidPage(
                          p("This is work in progress like everything else in this app.",
                            "This is the todo list for this tab as I see it at this point"),
                          tags$ul(
-                           tags$li("[Technical] Maybe change the plot to a plotly plot?"),
+                           tags$li("[Technical] Make plot downloadable?"),
                            tags$li("What else would you as a user want here?",
                                    a("Contact me",
                                      href="https://www.coresystemtrust.org.uk/home/contact-form/")),
@@ -351,8 +352,8 @@ ui <- fluidPage(
                            tags$li("Add button to download entire table as a file."),
                            tags$li("Think how it could be made more digestible."),
                            tags$li("Perhaps add percentages but they will only make sense for some of the statistics"),
-                           tags$li("Probably have to add RCI at some point!"),
                            tags$li("Will it be useful to people to have more comparative analyses comparing clinicians?"),
+                           tags$li("Add biplane/forest plots?"),
                            tags$li("What else would you as a user want here?",
                                    a("Contact me",
                                      href="https://www.coresystemtrust.org.uk/home/contact-form/")),
@@ -381,7 +382,7 @@ ui <- fluidPage(
                            tags$li("Add options to break down by clinician and perhaps by age, gender ...?"),
                            tags$li("Think more about graphs and/or analyses to extract more from these variables."),
                            tags$li("Will it be useful to people to have more comparative analyses comparing clinicians?"),
-                           tags$li("[Technical] Maybe change the plot to a plotly plot?"),
+                           tags$li("[Technical] Make plot downloadable?"),
                            tags$li("What else would you as a user want here?",
                                    a("Contact me",
                                      href="https://www.coresystemtrust.org.uk/home/contact-form/")),
@@ -424,7 +425,7 @@ ui <- fluidPage(
                          tags$ul(
                            tags$li("Add analyses of all t1, t2 and change by gender, age ..."),
                            tags$li("... and therapist?"),
-                           tags$li("[Technical] Maybe change the plots to plotly plots?"),
+                           tags$li("[Technical] Make plots downloadable?"),
                            tags$li("What else would you as a user want here?",
                                    a("Contact me",
                                      href="https://www.coresystemtrust.org.uk/home/contact-form/")),
@@ -578,8 +579,6 @@ ui <- fluidPage(
                          p("This is work in progress like everything else in this app.",
                            "This is the todo list for this tab as I see it at this point"),
                          tags$ul(
-                           tags$li("Add options to colour by age or gender instead of therapist, or to use single colour?"),
-                           tags$li("Will it be useful to people to have more comparative analyses comparing clinicians?"),
                            tags$li("What else would you as a user want here?",
                                    a("Contact me",
                                      href="https://www.coresystemtrust.org.uk/home/contact-form/")),
@@ -643,15 +642,22 @@ ui <- fluidPage(
                          h2("Explanation"),
                          p("This tab gives a scaled Jacobon plot"),
                          p(" "),
-                         p("The Jacobson plot plots the 2nd/final score against the first. Points lying on the leading diagonal mark clients ",
-                           "whose last YP-CORE score is exactly the same as their fist score.  Points below the leading diagonal have lower ",
-                           "last scores than their first scores, points above the leading diagonal, <i>vice versa</i>."),
-                         p("The 'tramlines' either side of the leading diagonal mark the RCI for the YP-CORE for that person's age and gender.",
-                           "As the scores have been rescaled here everyone, regardless of age or gender, has tramlines on 1 above or 1 below ",
-                           "the leading diagonal.  Points inside the tramlines mark people whose scores changed but less than the RCI ",
+                         p("The Jacobson plot plots the 2nd/final score against the first. ",
+                           "The scores have been rescaled by subtracting the CSC appropriate to the age and gender of the participant ",
+                           "to ensure that zero is always a score equal to that CSC.  This removes the issue of having to have ",
+                           "multiple different vertical and horizontal reference lines on the plot.  Further, the scores are then ",
+                           "rescaled by dividing them by the appropriate RCI for the gender and age so one set of tramlines for the RCI ",
+                           "can be used."),
+                         p("Points lying on the leading diagonal mark clients ",
+                           "whose last YP-CORE score is exactly the same as their first score.  Points below the leading diagonal have lower ",
+                           "last scores than their first scores, points above the leading diagonal, ",
+                           tags$i("vice versa", .noWS = "after"),
+                           "."),
+                         p("As the 'tramlines' either side of the leading diagonal always mark the RCI for the YP-CORE for that person's age and gender.  ",
+                           "Points inside the tramlines mark people whose scores changed but less than the RCI ",
                            "(or RCC: Reliable Change Criterion), i.e. 'no reliable change'.  Points below the lower tramline come from people ",
                            "whose YP-CORE scores improved more than the RCI and those above the upper tramline deteriorated more than the RCI."),
-                         p("The black vertical and horizontal lines mark the CSC.  Points to the left of the vertical line started below the ",
+                         p("The black vertical and horizontal lines mark the unified CSC.  Points to the left of the vertical line started below the ",
                            "CSC, those to the right started above it.  Similarly, points above the horizontal line finished above the CSC and ",
                            "those below it finished below the CSC"),
                          p("As in previous plots you can identify the points by hovering over them ",
@@ -703,7 +709,8 @@ ui <- fluidPage(
                          value = 12,
                          p("App created 22.v.25 by Chris Evans.",
                            a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/")),
-                         p("Last updated 18.vi.25: added simple stats to attendance histogram ",),
+                         p("Last updated 23.vi.25: improvements to Jacobson plot and many stats ",
+                           "added to 'Summary statistics by clinician'."),
                          p("Much work still to do but getting there!"),
                          p("Licenced under a ",
                            a("Creative Commons, Attribution Licence-ShareAlike",
@@ -911,6 +918,7 @@ server <- function(input, output, session) {
                 by = c("Gender", "Age")) %>%
       mutate(Change = YPscore2 - YPscore1,
              changeMeanScoring = YPmean2 - YPmean1,
+             scaledChange = (YPscore2 - YPscore1) / RCI,
              YPscore1toCSC = YPscore1 - CSC,
              YPscore2toCSC = YPscore2 - CSC,
              YPscaled1toCSC = YPscore1toCSC / RCI,
@@ -1174,13 +1182,12 @@ server <- function(input, output, session) {
   ### tab: stats by therapist
   summaryStats1longByTher <- reactive({
     req(input$file1)
+
     fullData() %>%
       group_by(TherapistID) %>%
       summarise(totalRecords = n(),
                 nClients = n_distinct(RespondentID),
                 nClinicians = n_distinct(TherapistID),
-                # firstDate = min(Start_date, na.rm = TRUE),
-                # lastDate = max(End_date, na.rm = TRUE),
                 nFemale = sum(Gender == "F", na.rm = TRUE),
                 nMale = sum(Gender == "M", na.rm = TRUE),
                 nOther = sum(Gender == "O", na.rm = TRUE),
@@ -1228,11 +1235,40 @@ server <- function(input, output, session) {
                 medianYP2 = median(YPscore2, na.rm = TRUE),
                 maxYP2 = max(YPscore2, na.rm = TRUE),
                 sdYP2 = sd(YPscore2, na.rm = TRUE),
+                ### change
                 minChange = min(Change, na.rm = TRUE),
                 meanChange = mean(Change, na.rm = TRUE),
                 medianChange = median(Change, na.rm = TRUE),
                 maxChange = max(Change, na.rm = TRUE),
-                sdChange = sd(Change, na.rm = TRUE)) %>%
+                sdChange = sd(Change, na.rm = TRUE),
+                ### scaled change
+                minScaledChange = min(scaledChange, na.rm = TRUE),
+                meanScaledChange = mean(scaledChange, na.rm = TRUE),
+                medianScaledChange = median(scaledChange, na.rm = TRUE),
+                maxScaledChange = max(scaledChange, na.rm = TRUE),
+                sdScaledChange = sd(scaledChange, na.rm = TRUE),
+                ### CSC
+                propCSC1high = sum(CSCcat1 == "High", na.rm = TRUE) / getNOK(CSCcat1),
+                propCSC2high = sum(CSCcat2 == "High", na.rm = TRUE) / getNOK(CSCcat1),
+                propCSClowToHigh = sum(CSCchange == "Low to high", na.rm = TRUE) / getNOK(CSCchange),
+                propCSCstayedHigh = sum(CSCchange == "Stayed high", na.rm = TRUE) / getNOK(CSCchange),
+                propCSCstayedLow = sum(CSCchange == "Stayed low", na.rm = TRUE) / getNOK(CSCchange),
+                propCSChighToLow = sum(CSCchange == "Low to high", na.rm = TRUE) / getNOK(CSCchange),
+                ### RCI
+                propRelDet = sum(RelChange == "Reliable deterioration", na.rm = TRUE) / getNOK(RelChange),
+                propNoRelChge = sum(RelChange == "No reliable change", na.rm = TRUE) / getNOK(RelChange),
+                propRelImp = sum(RelChange == "Reliable improvement", na.rm = TRUE) / getNOK(RelChange),
+                ### RCSC
+                propSigLowToHigh = sum(RCSCcat == "Clinically significant AND reliable deterioration", na.rm = TRUE) / getNOK(RCSCcat),
+                propStayHighRelDet = sum(RCSCcat == "Stayed high AND reliable deterioration", na.rm = TRUE) / getNOK(RCSCcat),
+                propStayHighNoRelChge = sum(RCSCcat == "Stayed high, no reliable change", na.rm = TRUE) / getNOK(RCSCcat),
+                propStayHighRelImp = sum(RCSCcat == "Stayed high, reliable improvement", na.rm = TRUE) / getNOK(RCSCcat),
+                propStayLowRelDet = sum(RCSCcat == "Stayed low BUT reliable deterioration", na.rm = TRUE) / getNOK(RCSCcat),
+                propStayLowNoRelChge = sum(RCSCcat == "Stayed low and no reliable change", na.rm = TRUE) / getNOK(RCSCcat),
+                propStayLowRelImp = sum(RCSCcat == "Stayed low AND reliable improvement", na.rm = TRUE) / getNOK(RCSCcat),
+                propLowToHighNoRelChge = sum(RCSCcat == "Clinically significant deterioration but no reliable change", na.rm = TRUE) / getNOK(RCSCcat),
+                propHighToLowNoRelChge = sum(RCSCcat == "Clinically significant improvement but no reliable change", na.rm = TRUE) / getNOK(RCSCcat),
+                propRelAndSigImprove = sum(RCSCcat == "Reliable and clinically significant improvement", na.rm = TRUE) / getNOK(RCSCcat)) %>%
       pivot_longer(cols = -TherapistID, names_to = "Statistic") %>%
       pivot_wider(id_cols = "Statistic", names_from = TherapistID, values_from = "value")
   })
@@ -1507,19 +1543,14 @@ server <- function(input, output, session) {
   ### tab: change(c)
   loessPlot1 <- reactive({
     req(input$file1)
-    
-    fullData() %>%
-      print()
-    
+
     ### massage the data
     fullData() %>%
       ### drop any missing scores
       filter(!is.na(YPscore1)) %>%
       filter(!is.na(YPscore2)) %>%
       filter(!is.na(nSessionsAttended)) %>%
-      filter(!is.na(RCI)) %>%
-      mutate(tmpChange = (YPscore2 - YPscore1),
-             scaledChange = tmpChange / RCI) -> tmpTib
+      filter(!is.na(RCI)) -> tmpTib
     
     tmpTib %>%
       group_by(nSessionsAttended) %>%
@@ -1809,9 +1840,14 @@ server <- function(input, output, session) {
   ### tab: Jacobson
   jacobson1 <- reactive({
     req(input$file1)
-    fullData() %>%
-      select(RespondentID, TherapistID, Gender, Age, YPscore1, YPscore2, YPscaled1toCSC, YPscaled2toCSC) -> tmpTib
     
+    fullData() %>%
+      mutate(Gender = str_trim(Gender),
+             Gender = if_else(is.na(Gender) | Gender == "",
+                              "Not recorded",
+                              Gender)) %>%
+      select(RespondentID, TherapistID, Gender, Age, YPscore1, YPscore2, YPscaled1toCSC, YPscaled2toCSC) -> tmpTib
+
     tmpTib %>%
       summarise(min = min(c(min(YPscaled1toCSC),
                             min(YPscaled2toCSC))),
