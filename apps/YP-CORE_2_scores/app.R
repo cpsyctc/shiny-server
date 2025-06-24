@@ -112,6 +112,7 @@ vecCSCcategoriesOrdered <- c("Clinically significant AND reliable deterioration"
                              "Stayed high AND reliable deterioration",
                              "Clinically significant deterioration but no reliable change",
                              "Stayed high, no reliable change",
+                             "Stayed high, reliable improvement",
                              "Stayed low BUT reliable deterioration",
                              "Stayed low and no reliable change",
                              "Clinically significant improvement but no reliable change",
@@ -709,8 +710,7 @@ ui <- fluidPage(
                          value = 12,
                          p("App created 22.v.25 by Chris Evans.",
                            a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/")),
-                         p("Last updated 23.vi.25: improvements to Jacobson plot and many stats ",
-                           "added to 'Summary statistics by clinician'."),
+                         p("Last updated 24.vi.25: YPwide2.csv extended and RCSC categories corrected."),
                          p("Much work still to do but getting there!"),
                          p("Licenced under a ",
                            a("Creative Commons, Attribution Licence-ShareAlike",
@@ -945,6 +945,7 @@ server <- function(input, output, session) {
       mutate(RCSCcat = case_when(
         CSCchange == "Stayed high" & RelChange == "Reliable deterioration" ~ "Stayed high AND reliable deterioration",
         CSCchange == "Stayed high" & RelChange == "No reliable change" ~ "Stayed high, no reliable change",
+        CSCchange == "Stayed high" & RelChange == "Reliable improvement" ~ "Stayed high, reliable improvement",
         CSCchange == "High to low" & RelChange == "Reliable improvement" ~ "Reliable and clinically significant improvement",
         CSCchange == "High to low" & RelChange == "No reliable change" ~ "Clinically significant improvement but no reliable change",
         CSCchange == "Low to high" & RelChange == "Reliable deterioration" ~ "Clinically significant AND reliable deterioration",
@@ -968,9 +969,10 @@ server <- function(input, output, session) {
   displayData1 <- reactive({
     req(input$file1)
     fullData() %>%
-      select(-c(Ref, CSC, RCI, refAlpha, refSD,
-                YPmean1, YPmean2, YPclin1, YPclin2,
-                changeMeanScoring)) %>%
+      # select(-c(Ref, CSC, RCI, refAlpha, refSD,
+      #           YPmean1, YPmean2, YPclin1, YPclin2,
+      #           changeMeanScoring)) %>%
+      select(-Ref) %>%
       rename(nSessAtt = nSessionsAttended,
              nSessDNA = nSessionsDNAed,
              nSessCanc = nSessionsCancelled,
