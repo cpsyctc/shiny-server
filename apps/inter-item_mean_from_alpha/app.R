@@ -2,10 +2,7 @@
 suppressMessages(library(shiny))
 suppressMessages(library(shinyWidgets))
 suppressMessages(library(tidyverse))
-# suppressMessages(library(CECPfuns))
 suppressMessages(library(shiny.telemetry))
-# suppressMessages(library(shinyDownload)) # from remotes::install_github("keithnewman/shinyDownload")
-# suppressMessages(library(DT))
 
 ### function
 getAvRfromAlphaAndK <- function(a, k) {
@@ -40,12 +37,12 @@ ui <- fluidPage(
       h3("Put your values in here, replacing the existing ones",
          align = "center"),
       numericInput("alpha",
-                   "Cronback alpha value: .1 < rel < 1",
+                   "Cronbach alpha value: .1 < rel < 1",
                    value = .65,
                    min = -.1,
                    max = .999999,
                    width = "100%"),
-      helpText("In theory reliability can be negative but I have assumed you don't want to model that!"),
+      helpText("Reliability can be negative but I have assumed you don't want to model that!"),
       numericInput("k",
                    "k: number of items in existing measure with alpha you put in previous box",
                    value = 10,
@@ -64,17 +61,18 @@ ui <- fluidPage(
       h3("Mean inter-item correlation for that alpha and k", align="center"),
       verbatimTextOutput("res"),
       p("This incredibly basic shiny app uses the equation for a standardised Cronbach alpha",
-        "to get a mean inter-item correlation that would have given that alpha given the k for the measure."),
+        "to get a mean inter-item correlation that would have given that alpha, given k, the number of items in the measure."),
       p(" "),
-      p("The formula is standardised alpha is:"),
+      p("The formula for standardised alpha is:"),
       p(" "),
       withMathJax("$$\\alpha = \\frac{kr}{1 +(k-1)r}$$"),
       p(" "),
-      p("So by rearranging that (boy am I getting rusty at elementary algebra!) the formula to get that r from k and alpha is: "),
+      p("where r is the mean inter-item correlation.So by rearranging that (boy am I getting rusty at elementary algebra!) ",
+      "the formula to get r given k and alpha is: "),
       withMathJax("$$\\frac{1}{(1 + \\frac{k}{\\alpha}-\\alpha)}$$"),
       p("App created by Chris Evans",
         a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/"),
-        "26.vi.25 and licenced under a ",
+        "26.vi.25, updated with cosmetic tweaks 27.vi.25.  Licenced under a ",
         a("Creative Commons, Attribution Licence-ShareAlike",
           href="http://creativecommons.org/licenses/by-sa/1.0/"),
         " Please respect that and put an acknowledgement and link back to here if re-using anything from here."),
