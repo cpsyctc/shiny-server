@@ -252,7 +252,7 @@ ui <- fluidPage(
                          p("This tables shows the data you uploaded plus the coding of that data."),
                          tags$ul(tags$li("At the right of  the table the coding gives you the CSC categories of the YP-CORE scores (if there were any.)"),
                                  tags$li("YPscore1toCSC is the difference between the first YP-SCORE and the CSC for that age and gender."),
-                                 tags$li("YPscore2toCSC is the same for the second YP-SCORE.  These will get used in some plots later, see todo list!"),
+                                 tags$li("YPscore2toCSC is the same for the second YP-SCORE.  These will get used in the scaled Jacobson plot later."),
                                  tags$li("The search box is a very simple inclusive search so if you put '62' in there the table will reduce to showing you ",
                                          "any rows of data that contain '62' anywhere including say a participant ID of 62 or a score of 1.62.  "),
                                  tags$li("The filter boxes at the top of each column allow you to search in that variable.  They will often show you a ",
@@ -276,9 +276,9 @@ ui <- fluidPage(
                            "It also contains the change and rescaled scores used to make the Jacobson plot (see that tab).  Then you can see the data in a ",
                            "table you can filter or search."),
                          p(" "),
-                         downloadButton("downloadCSV", "Download as csv"),
-                         downloadButton("downloadXLSX", "Download as Excel xlsx"),
-                         downloadButton("downloadODS", "Download as Libre/OpenOffice ods"),
+                         downloadButton("downloadAllCSV", "Download as csv"),
+                         downloadButton("downloadAllXLSX", "Download as Excel xlsx"),
+                         downloadButton("downloadAllODS", "Download as Libre/OpenOffice ods"),
                          p(" "),
                          p(" "),
                          h2("Searchable table of the data"),
@@ -299,7 +299,6 @@ ui <- fluidPage(
                          p("This is work in progress like everything else in this app.",
                            "This is the todo list for this tab as I see it at this point"),
                          tags$ul(
-                           tags$li("[Technical] Make plot downloadable?"),
                            tags$li("What else would you as a user want here?",
                                    a("Contact me",
                                      href="https://www.coresystemtrust.org.uk/home/contact-form/")),
@@ -350,12 +349,11 @@ ui <- fluidPage(
                            
                            "This is the todo list for this tab as I see it at this point"),
                          tags$ul(
-                           tags$li("Add button to download entire table as a file."),
                            tags$li("Think how it could be made more digestible."),
                            tags$li("Perhaps add percentages but they will only make sense for some of the statistics"),
                            tags$li("Will it be useful to people to have more comparative analyses comparing clinicians?"),
                            tags$li("Add biplane/forest plots?"),
-                           tags$li("What else would you as a user want here?",
+                           tags$li("What would you as a user want here?",
                                    a("Contact me",
                                      href="https://www.coresystemtrust.org.uk/home/contact-form/")),
                          ),
@@ -364,6 +362,13 @@ ui <- fluidPage(
                          uiOutput("uploadStatusStatsByClin"),
                          p(" "),
                          tableOutput('summaryStats1longByTher'),
+                         p(" "),
+                         downloadButton("downloadClinician1CSV", "Download as csv"),
+                         downloadButton("downloadClinician1XLSX", "Download as Excel xlsx"),
+                         downloadButton("downloadClinician1ODS", "Download as Libre/OpenOffice ods"),
+                         p(" "),
+                         p(" "),
+                         
                 ),
                 
                 tabPanel("Attendance",
@@ -710,8 +715,8 @@ ui <- fluidPage(
                          value = 12,
                          p("App created 22.v.25 by Chris Evans.",
                            a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/")),
-                         p("Last updated 24.vi.25: YPwide2.csv extended and RCSC categories corrected."),
-                         p("Much work still to do but getting there!"),
+                         p("Last updated 27.vi.25: ."),
+                         p("Much work still to do ... but getting there!"),
                          p("Licenced under a ",
                            a("Creative Commons, Attribution Licence-ShareAlike",
                              href="http://creativecommons.org/licenses/by-sa/1.0/"),
@@ -1181,10 +1186,59 @@ server <- function(input, output, session) {
     # height = input$fileHeight
   )
   
+  ### tab: data
+  output$downloadAllCSV <- downloadHandler(
+    filename = "YP-CORE_data.csv",
+    contentType = "text/csv",
+    content = function(file) {
+      write_csv(fullData(), file = file)
+    })
+  
+  output$downloadAllXLSX <- downloadHandler(
+    filename = "YP-CORE_data.xlsx",
+    contentType = "text/csv",
+    content = function(file) {
+      writexl::write_xlsx(fullData(), path = file)
+    })
+  
+  output$downloadAllODS <- downloadHandler(
+    filename = "YP-CORE_data.ods",
+    contentType = "text/csv",
+    content = function(file) {
+      readODS::write_ods(fullData(), path = file)
+    })
+  
+  
+  output$searchableData <- DT::renderDataTable(server = FALSE,
+                                               DT::datatable({displayData1()},
+                                                             extensions = "Buttons",
+                                                             filter = "top",
+                                                             selection = "none",
+                                                             options = list(
+                                                               lengthMenu = list(c(50, 100, -1), 
+                                                                                 c('50','100', 'All')),
+                                                               ### I was trying to put some space before the download buttons but this
+                                                               ### doesn't do it!
+                                                               # searchPanes = list(
+                                                               #   viewTotal = TRUE,
+                                                               #   i18n = list(
+                                                               #     count = '{total} found',
+                                                               #     countFiltered = '{shown} ({total}   )'
+                                                               #   )
+                                                               # ),
+                                                               buttons = c('copy', 'csv', 'excel'),
+                                                               autoWidth = TRUE,
+                                                               ### the important thing is that there is the l to allow for the lengthMenu 
+                                                               ### https://stackoverflow.com/questions/52645959/r-datatables-do-not-display-buttons-and-length-menu-simultaneously
+                                                               # dom = 'Blrtip',
+                                                               dom = "QlfrtipB")
+                                               )
+  )
+
   ### tab: stats by therapist
   summaryStats1longByTher <- reactive({
     req(input$file1)
-
+    
     fullData() %>%
       group_by(TherapistID) %>%
       summarise(totalRecords = n(),
@@ -1283,56 +1337,30 @@ server <- function(input, output, session) {
     fileStubName
   })
   
-  
-  ### tab: data
-  output$downloadCSV <- downloadHandler(
-    filename = "YP-CORE_data.csv",
+  output$downloadClinician1CSV <- downloadHandler(
+    filename = "YP-CORE_clinician_data.csv",
     contentType = "text/csv",
     content = function(file) {
-      write_csv(fullData(), file = file)
+      write_csv(summaryStats1longByTher(), file = file)
     })
   
-  output$downloadXLSX <- downloadHandler(
-    filename = "YP-CORE_data.xlsx",
+  output$downloadClinician1XLSX <- downloadHandler(
+    filename = "YP-CORE_clinician_data.xlsx",
     contentType = "text/csv",
     content = function(file) {
-      writexl::write_xlsx(fullData(), path = file)
+      writexl::write_xlsx(summaryStats1longByTher(), path = file)
     })
   
-  output$downloadODS <- downloadHandler(
-    filename = "YP-CORE_data.ods",
+  output$downloadClinician1ODS <- downloadHandler(
+    filename = "YP-CORE_clinician_data.ods",
     contentType = "text/csv",
     content = function(file) {
-      readODS::write_ods(fullData(), path = file)
+      readODS::write_ods(summaryStats1longByTher(), path = file)
     })
   
   
-  output$searchableData <- DT::renderDataTable(server = FALSE,
-                                               DT::datatable({displayData1()},
-                                                             extensions = "Buttons",
-                                                             filter = "top",
-                                                             selection = "none",
-                                                             options = list(
-                                                               lengthMenu = list(c(50, 100, -1), 
-                                                                                 c('50','100', 'All')),
-                                                               ### I was trying to put some space before the download buttons but this
-                                                               ### doesn't do it!
-                                                               # searchPanes = list(
-                                                               #   viewTotal = TRUE,
-                                                               #   i18n = list(
-                                                               #     count = '{total} found',
-                                                               #     countFiltered = '{shown} ({total}   )'
-                                                               #   )
-                                                               # ),
-                                                               buttons = c('copy', 'csv', 'excel'),
-                                                               autoWidth = TRUE,
-                                                               ### the important thing is that there is the l to allow for the lengthMenu 
-                                                               ### https://stackoverflow.com/questions/52645959/r-datatables-do-not-display-buttons-and-length-menu-simultaneously
-                                                               # dom = 'Blrtip',
-                                                               dom = "QlfrtipB")
-                                               )
-  )
-
+  
+  ### tab:
   output$CSCtable1 <- renderUI({
     flexTabulateWithCI(fullData(), CSCcat1) %>%
       htmltools_value()
