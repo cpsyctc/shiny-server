@@ -412,11 +412,20 @@ ui <- fluidPage(
                          uiOutput("TableAttendanceStats2"),
                          
                          h2("Histogram of session count"),
-                         p("Here is the histogram of the numbers of sessions attended"),
+                         p("Here is the histogram of the numbers of sessions attended.",
+                           "Green vertical reference line marks the median, blue the mean.  ",
+                           "If you hover over the plot, then toward the top edge you should see the plotly options that allow ",
+                           "you to download the plot."),
                          p(" "),
-                         plotOutput('attendanceHistogram1'),
+                         div(style="width:100%;height:0;padding-top:100%;position:relative;",
+                             div(style="position: absolute;
+                                      top: 0;
+                                      left: 0;
+                                      width: 100%;
+                                      height: 100%;",
+                                 plotlyOutput("attendanceHistogram1", height="100%"))),
                          p(" ") ,
-                         
+                 
                 ),    
                 
                 tabPanel("Scores",
@@ -990,9 +999,6 @@ server <- function(input, output, session) {
   displayData1 <- reactive({
     req(input$file1)
     fullData() %>%
-      # select(-c(Ref, CSC, RCI, refAlpha, refSD,
-      #           YPmean1, YPmean2, YPclin1, YPclin2,
-      #           changeMeanScoring)) %>%
       select(-Ref) %>%
       rename(nSessAtt = nSessionsAttended,
              nSessDNA = nSessionsDNAed,
@@ -1758,18 +1764,14 @@ server <- function(input, output, session) {
       scale_x_continuous("n(Sessions attended)",
                          breaks = seq(0, tmpTibStats$max)) +
       annotate("text",
-               x = tmpTibStats$max, 
-               y = max(tmpTib$n),
                label = tmpLabel,
-               hjust = 1,
-               vjust = 1,
-               size = 10) +
-      ggtitle("Histogram of numbers of sessions attended",
-              subtitle = "Vertical reference lines: blue = mean, green = median")
+               x = .9 * max(tmpTib$nSessionsAttended),
+               y = .9 * max(tmpTib$n),
+               hjust = 1)
   })
   
-  output$attendanceHistogram1 <- renderPlot(attendanceHisto1(),
-                                  height = 800)
+  output$attendanceHistogram1 <- renderPlotly(attendanceHisto1())
+                                  # height = 800)
   
   ### tab: scores
   summaryScoresTxt1  <- reactive({
