@@ -412,9 +412,12 @@ ui <- fluidPage(
                          
                          h2("Histogram of session count"),
                          p("Here is the histogram of the numbers of sessions attended.",
-                           "Green vertical reference line marks the median, blue the mean.  ",
-                           "If you hover over the plot, then toward the top edge you should see the plotly options that allow ",
-                           "you to download the plot."),
+                           "Green vertical reference line marks the median, blue the mean."),
+                         p("If you hover over the top of the plot you see the plotly 'modebar' which allows you to save the plot as a jpeg ",
+                           "and to interact with it in various way some of which may be useful to you.  See ",
+                           a("here",
+                             href="https://plotly.com/chart-studio-help/getting-to-know-the-plotly-modebar/"),
+                           " for more on that modebar."),
                          p(" "),
                          div(style="width:100%;height:0;padding-top:100%;position:relative;",
                              div(style="position: absolute;
@@ -439,7 +442,6 @@ ui <- fluidPage(
                          tags$ul(
                            tags$li("Add analyses of all t1, t2 and change by gender, age ..."),
                            tags$li("... and therapist?"),
-                           tags$li("[Technical] Make plots downloadable?"),
                            tags$li("What else would you as a user want here?",
                                    a("Contact me",
                                      href="https://www.coresystemtrust.org.uk/home/contact-form/")),
@@ -452,14 +454,40 @@ ui <- fluidPage(
                          p(" "),
                          uiOutput("scoreStatsTable1"),
                          p(" "),
-                         plotOutput("histScores1",
-                                    height = 600),
+                         p("Here are histograms of the scores and score change with ",
+                           "green vertical reference lines marking the median and blue the mean."),
+                         p("If you hover over the top of the plots you see the plotly 'modebar' which allows you to save the plot as a jpeg ",
+                           "and to interact with it in various way some of which may be useful to you.  See ",
+                           a("here",
+                             href="https://plotly.com/chart-studio-help/getting-to-know-the-plotly-modebar/"),
+                           " for more on that modebar."),
                          p(" "),
-                         plotOutput("histScores2",
-                                    height = 600),
+                         div(style="width:100%;height:0;padding-top:100%;position:relative;",
+                             div(style="position: absolute;
+                                      top: 0;
+                                      left: 0;
+                                      width: 100%;
+                                      height: 100%;",
+                                 plotlyOutput("histScores1", height="100%"))),
                          p(" "),
-                         plotOutput("histChange",
-                                    height = 600),
+                         p(" "),
+                         div(style="width:100%;height:0;padding-top:100%;position:relative;",
+                             div(style="position: absolute;
+                                      top: 0;
+                                      left: 0;
+                                      width: 100%;
+                                      height: 100%;",
+                                 plotlyOutput("histScores2", height="100%"))),
+                         p(" "),
+                         p(" "),
+                         div(style="width:100%;height:0;padding-top:100%;position:relative;",
+                             div(style="position: absolute;
+                                      top: 0;
+                                      left: 0;
+                                      width: 100%;
+                                      height: 100%;",
+                                 plotlyOutput("histChange", height="100%"))),
+                         p(" "),
                 ),   
                 
                 tabPanel("Change (a)",
@@ -739,7 +767,7 @@ ui <- fluidPage(
                          value = 12,
                          p("App created 22.v.25 by Chris Evans.",
                            a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/")),
-                         p("Last updated 28.vi.25: very tedious rewriting to use ggplotly to allow downloading of attendance histogram."),
+                         p("Last updated 29.vi.25: shift score histograms to ggplotly to allow downloads."),
                          p("Much work still to do ... but getting there!"),
                          p("Licenced under a ",
                            a("Creative Commons, Attribution Licence-ShareAlike",
@@ -1770,7 +1798,6 @@ server <- function(input, output, session) {
   })
   
   output$attendanceHistogram1 <- renderPlotly(attendanceHisto1())
-                                  # height = 800)
   
   ### tab: scores
   summaryScoresTxt1  <- reactive({
@@ -1836,11 +1863,10 @@ server <- function(input, output, session) {
                  colour = "green") +
       scale_x_continuous("First YP-CORE scores",
                          breaks = seq(0, 4, .2),
-                         limits = c(0, 4)) +
-      ggtitle("Histogram of first YP-CORE scores",
-              subtitle = "Blue vertical reference line is mean, green is median")
+                         limits = c(0, 4)) 
   })
-  output$histScores1 <- renderPlot(histScores1())
+  
+  output$histScores1 <- renderPlotly(histScores1())
   
   histScores2 <- reactive({
     req(input$file1)
@@ -1858,11 +1884,9 @@ server <- function(input, output, session) {
                  colour = "green") +
       scale_x_continuous("Second YP-CORE scores",
                          breaks = seq(0, 4, .2),
-                         limits = c(0, 4)) +
-      ggtitle("Histogram of second YP-CORE scores",
-              subtitle = "Blue vertical reference line is mean, green is median")
+                         limits = c(0, 4))
   })
-  output$histScores2 <- renderPlot(histScores2())
+  output$histScores2 <- renderPlotly(histScores2())
   
   histChange <- reactive({
     req(input$file1)
@@ -1878,11 +1902,9 @@ server <- function(input, output, session) {
                  colour = "blue") +
       geom_vline(xintercept = tmpTibStats$median,
                  colour = "green") +
-      scale_x_continuous("Change scores") +
-      ggtitle("Histogram of change scores",
-              subtitle = "Blue vertical reference line is mean, green is median")
+      scale_x_continuous("Change scores") 
   })
-  output$histChange <- renderPlot(histChange())
+  output$histChange <- renderPlotly(histChange())
   
   ### tab: Jacobson
   jacobson1 <- reactive({
