@@ -547,7 +547,6 @@ ui <- fluidPage(
                            "This is the todo list for this tab as I see it at this point"),
                          tags$ul(
                            tags$li("Add options to break down by therapist, age, gender ..."),
-                           tags$li("[Technical] add buttons to download the plot or change to ggplotly plot?"),
                            tags$li("What else would you as a user want here?",
                                    a("Contact me",
                                      href="https://www.coresystemtrust.org.uk/home/contact-form/")),
@@ -584,7 +583,6 @@ ui <- fluidPage(
                            "This is the todo list for this tab as I see it at this point"),
                          tags$ul(
                            tags$li("Add options to break down by therapist, age, gender ..."),
-                           tags$li("[Technical] add buttons to download the plot or change to ggplotly plot?"),
                            tags$li("What else would you as a user want here?",
                                    a("Contact me",
                                      href="https://www.coresystemtrust.org.uk/home/contact-form/")),
@@ -600,7 +598,8 @@ ui <- fluidPage(
                            "of sessions attended.  If you hover over an individual point you ",
                            "should be shown the respondent ID, gender and CSC change category. "),
                          p("Points below the -1 mark reliable improvement and points above +1 reliable deterioration.",
-                           "If the dotted mean change line lies inside the grey confidence envelope there is no evidence, ",
+                           "If the dotted horizontal line marks the mean change across all the paired data.  If this ",
+                           "lies inside the grey confidence envelope there is no evidence, ",
                            "of a systematic relationship between change and numbers of sessions attended."),
                          p(" "),
                          p("If you hover at the top of the plot you see the plotly 'modebar' which allows you to save the plot as a jpeg ",
@@ -1665,11 +1664,11 @@ server <- function(input, output, session) {
                        geom_hline(yintercept = mean(tmpTib$scaledChange),
                                   linetype = 3) +
                        xlab("Date") +
-                       scale_y_continuous("Change, scaled to the RCI")) +
-      ggtitle("Change scores, scaled to the appropriate RCI",
-              subtitle = str_c("A change equal to the RCI has score 1.",
-                               "Solid horizontal reference line marks no change, ",
-                               "dashed line marks overall mean change."))
+                       scale_y_continuous("Change, scaled to the RCI")) 
+      # ggtitle("Change scores, scaled to the appropriate RCI",
+      #         subtitle = str_c("A change equal to the RCI has score 1.",
+      #                          "Solid horizontal reference line marks no change, ",
+      #                          "dashed line marks overall mean change."))
     
     
     ggplotly(tooltip = c("label1",
@@ -1940,8 +1939,7 @@ server <- function(input, output, session) {
                   linetype = 3) +
       geom_abline(slope = 1, intercept = -1,
                   linetype = 3) +
-      ggtitle("Jacobson plot of YP-CORE score change") +
-      scale_x_continuous("First YP-CORE score, rescaled",
+     scale_x_continuous("First YP-CORE score, rescaled",
                          limits = c(tmpTibLimits$min, 
                                     tmpTibLimits$max)) +
       scale_y_continuous("Second YP-CORE score, rescaled",
