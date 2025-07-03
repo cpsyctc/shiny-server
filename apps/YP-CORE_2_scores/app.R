@@ -168,7 +168,7 @@ itemsCOREOM <- paste(itemStem, sprintf("%02.0f", 1:34), sep = "")
 
 # Define UI for app ----
 ui <- fluidPage(
-# ui <- fillPage(
+  # ui <- fillPage(
   
   use_telemetry(), # 2. Add necessary Javascript to Shiny
   
@@ -181,6 +181,7 @@ ui <- fluidPage(
   mainPanel(
     tabsetPanel(type = "tabs",
                 
+                ### tab: (1) upload
                 tabPanel("Upload",
                          value = 1,
                          h2("Introduction"),
@@ -246,10 +247,50 @@ ui <- fluidPage(
                                   "other tabs to the right.")
                 ),
                 
-                tabPanel("Data", 
+                ### tab: (2) data checking
+                tabPanel("Data checking", 
                          value = 2,
                          h2("Explanation"),
-                         p("This tables shows the data you uploaded plus the coding of that data."),
+                         p("This tab:"),
+                         tags$ul(tags$li("Shows clear errors in the data"),
+                                 tags$li("Shows warnings about problems in the data"),
+                                 tags$li("Summarises the missing value counts"),
+                                 tags$li("Shows you the data rows with missing data in case you want to fix them")),
+                         p(" "),
+                         h2("This is work in progress!!"),
+                         p("This is work in progress like everything else in this app.",
+                           "This is the todo list for this tab as I see it at this point"),
+                         tags$ul(
+                           tags$li("What else would you as a user want here?",
+                                   a("Contact me",
+                                     href="https://www.coresystemtrust.org.uk/home/contact-form/")),
+                         ),
+                         p(" "),
+                         h2("Errors in the data"),
+                         p(" "),
+                         p("These are impossibilities in your data: out of range values, impossible dates and second date before the first date."),
+                         DTOutput("searchableErrorData"),
+                         
+                         
+                         p(" "),
+                         h2("Missing value counts"),
+                         p(" "),
+                         p("Here are the numbers of missing values in your data."),
+                         p(" "),
+                         uiOutput("missingValueTab"),
+                         
+                         p(" "),
+                         h2("Searchable table of the data"),
+                         p("This shows the rows in the data you uploaded which have missing data.  I hope this will help you check if any of these are unnecessary missing values."),
+                         p(" "),
+                         DTOutput("searchableMissingData"),    
+                ),
+                
+                ### tab: (3) data
+                tabPanel("Data", 
+                         value = 3,
+                         h2("Explanation"),
+                         p("This table shows the data you uploaded plus the coding of that data."),
                          tags$ul(tags$li("At the right of  the table the coding gives you the CSC categories of the YP-CORE scores (if there were any.)"),
                                  tags$li("YPscore1toCSC is the difference between the first YP-SCORE and the CSC for that age and gender."),
                                  tags$li("YPscore2toCSC is the same for the second YP-SCORE.  These will get used in the scaled Jacobson plot later."),
@@ -269,7 +310,7 @@ ui <- fluidPage(
                            tags$li("What else would you as a user want here?",
                                    a("Contact me",
                                      href="https://www.coresystemtrust.org.uk/home/contact-form/")),
-                           ),
+                         ),
                          p(" "),
                          h2("Download entire data"),
                          p("These buttons allow you to download your entire dataset now with the correct CSC, RCI and RCSC categories for each person's age and gender.  ",
@@ -289,8 +330,9 @@ ui <- fluidPage(
                          DTOutput("searchableData"),    
                 ),
                 
+                ### tab: (4) sociodemographics
                 tabPanel("Sociodemographics",
-                         value = 3,
+                         value = 4,
                          h2("Explanation"),
                          p("This is pretty indigestible but it gives all the summary statistics for all the variables across all clinicians.",
                            "I think the naming of the statistics is pretty self-explanatory if not particularly easy on the eye."),
@@ -326,8 +368,8 @@ ui <- fluidPage(
                              h2("Ages", class = "panel-title")
                            ),
                            div(style="height: 620px",
-                             class = "h-75; panel-body",
-                             plotOutput("ageHist")
+                               class = "h-75; panel-body",
+                               plotOutput("ageHist")
                            ),
                            div(
                              class = "panel-footer",
@@ -337,8 +379,9 @@ ui <- fluidPage(
                          ),
                 ),    
                 
+                ### tab: (5) Summary statistics by clinician
                 tabPanel("Summary statistics by clinician",
-                         value = 4,
+                         value = 5,
                          h2("Explanation"),
                          p("As with the 'Summary statistics' tab this is pretty indigestible and gives all the same summary statistics ",
                            "for all the variables across all clinicians.",
@@ -371,15 +414,16 @@ ui <- fluidPage(
                          
                 ),
                 
+                ### tab: (6) attendance
                 tabPanel("Attendance",
-                         value = 5,
+                         value = 6,
                          h2("Explanation"),
                          p("This tab gives the statistics about attendance.  These are often undervalued and people focus ",
-                         "largely on the scores and score changes.  This is a pity as it's hard to learn from scores if we ",
-                         "completely ignore attendance.  However, it is undoubtedly the case that understanding score changes ",
-                         "taking patterns of attendance and possible markers of ambivalence/conflict about change in the ",
-                         "attendance data is complicated.  I hope to add more analyses later that may help bring score change ",
-                         "and attendance information together but this is a start!"),
+                           "largely on the scores and score changes.  This is a pity as it's hard to learn from scores if we ",
+                           "completely ignore attendance.  However, it is undoubtedly the case that understanding score changes ",
+                           "taking patterns of attendance and possible markers of ambivalence/conflict about change in the ",
+                           "attendance data is complicated.  I hope to add more analyses later that may help bring score change ",
+                           "and attendance information together but this is a start!"),
                          p(" "),
                          h2("Todo list"),
                          p("This is work in progress like everything else in this app.",
@@ -427,11 +471,12 @@ ui <- fluidPage(
                                       height: 100%;",
                                  plotlyOutput("attendanceHistogram1", height="100%"))),
                          p(" ") ,
-                 
+                         
                 ),    
                 
+                ### tab: (7) scores
                 tabPanel("Scores",
-                         value = 6,
+                         value = 7,
                          h2("Explanation"),
                          p("This tab gives descriptive statistics about the scores"),
                          p(" "),
@@ -490,8 +535,10 @@ ui <- fluidPage(
                          p(" "),
                 ),   
                 
+                
+                ### tab: (8) change (a)
                 tabPanel("Change (a)",
-                         value = 7,
+                         value = 8,
                          h2("Explanation"),
                          p("This tab gives a cat's cradle plot of the data"),
                          p(" "),
@@ -526,14 +573,15 @@ ui <- fluidPage(
                          p("If you hover over the top of the plot you see the plotly 'modebar' which allows you to save the plot as a jpeg ",
                            "and to interact with it in various way some of which may be useful to you.  See ",
                            a("here",
-                           href="https://plotly.com/chart-studio-help/getting-to-know-the-plotly-modebar/"),
+                             href="https://plotly.com/chart-studio-help/getting-to-know-the-plotly-modebar/"),
                            " for more on the modebar."),
                          plotlyOutput('catsCradle1',
                                       height = "100%"),
                 ),    
                 
+                ### tab: (9) change (b)
                 tabPanel("Change (b)",
-                         value = 8,
+                         value = 9,
                          h2("Explanation"),
                          p("This tab gives a cat's cradle plot against dates (if given)"),
                          p(" "),
@@ -568,8 +616,9 @@ ui <- fluidPage(
                                       height = "100%"),
                 ),  
                 
+                ### tab: (10) change (c)
                 tabPanel("Change (c)",
-                         value = 9,
+                         value = 10,
                          h2("Explanation"),
                          p("This tab plots change against sessions attended (if given)"),
                          p(" "),
@@ -611,8 +660,9 @@ ui <- fluidPage(
                                       height = "100%"),
                 ),  
                 
+                ### tab: (11) RCSC
                 tabPanel("RCSC analyses",
-                         value = 10,
+                         value = 11,
                          h2("Explanation"),
                          p("This tab gives a simple breakdown of the CSC categories: baseline, final and change counts"),
                          p(" "),
@@ -678,8 +728,9 @@ ui <- fluidPage(
                          p(" "),
                 ),    
                 
+                ### tab: (12) Jacobson
                 tabPanel("Jacobson plot",
-                         value = 11,
+                         value = 12,
                          h2("Explanation"),
                          p("This tab gives a scaled Jacobon plot"),
                          p(" "),
@@ -732,8 +783,9 @@ ui <- fluidPage(
                                  plotlyOutput("Jacobson1", height="100%")))
                 ),
                 
+                ### tab: (13) explanation
                 tabPanel("Explanation of the app",
-                         value = 12,
+                         value = 13,
                          h2("Explanation"),
                          p("This app was developed to accompany upcoming papers out of Emily Blackshaw's huge ",
                            "PhD work on the YP-CORE which gave us updated and more precise referential YP-CORE data ",
@@ -762,11 +814,12 @@ ui <- fluidPage(
                          p(" "),
                 ),
                 
+                ### tab: (14) background
                 tabPanel("Background", 
-                         value = 12,
+                         value = 14,
                          p("App created 22.v.25 by Chris Evans.",
                            a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/")),
-                         p("Last updated 29.vi.25: shift score histograms to ggplotly to allow downloads."),
+                         p("Last updated 30.vi.25: coverted remaining change plots to use ggplotly for downloading ability."),
                          p("Much work still to do ... but getting there!"),
                          p("Licenced under a ",
                            a("Creative Commons, Attribution Licence-ShareAlike",
@@ -857,7 +910,7 @@ server <- function(input, output, session) {
   output$uploadStatusRCSC <- renderUI(uploadPlease())
   output$uploadStatusJacobson <- renderUI(uploadPlease())
   
-  ### tab: sociodemographics
+  ### tab: (4) sociodemographics
   output$lookupTable1 <- renderUI({
     req(input$file1)
     showLookup() %>%
@@ -866,13 +919,15 @@ server <- function(input, output, session) {
       htmltools_value()
   })
   
-  
+  ### create the main data file: fullData()
   fullData <- reactive({
-    # req(input$file1)
+    req(input$file1)
     ### work out file format 
+    ### assumes that people have stayed with sensible file extensions
     str_replace(fileSelected(), "^(.)*?(\\.)(.*$)", "\\3") %>%
       str_to_lower() -> fileType
-    ### read in the data
+    
+    ### now read in the data
     if(fileType == "csv") {
       suppressMessages(read.csv(file = fileSelected())) %>%
         as_tibble() -> dataInput
@@ -909,13 +964,78 @@ server <- function(input, output, session) {
                                                           col_types = lisColTypes))) -> dataInput
     }
     
+    ### check initial column names are as expected
     validate(need(colnames(dataInput) == vecColNames,
                   "Your data don't seem to have the correct column names.  Sorry, aborting!"))
-
+    
+    
+    ### OK, now you appear to have usable data, work on it!
     dataInput %>%
       as_tibble() %>%
       ### cleaning 
-      ### sort out of range values
+      ### trim character variables
+      mutate(across(where(is.character), ~ str_trim(.x))) %>%
+      
+      ### error detection: dates
+      mutate(errDate1 = as.numeric(Start_date != "" & is.na(as.Date(Start_date, format = "%Y-%m-%d"))),
+             errDate2 = as.numeric(End_date != "" & is.na(as.Date(End_date, format = "%Y-%m-%d"))),
+             errDateOrder = if_else(errDate1 == 0 & errDate2 == 0 & 
+                                      !is.na(Start_date) & !is.na(End_date) &
+                                      as.numeric(as.Date(Start_date, format = "%Y-%m-%d") > as.Date(End_date, format = "%Y-%m-%d")),
+                                    1,
+                                    0),
+             errMesgDate = case_when(
+               errDate1 == 1 & errDate2 ==0 ~ "Impossible start date",
+               errDate1 == 0 & errDate2 ==1 ~ "Impossible end date",
+               errDate1 == 1 & errDate2 ==1 ~ "Start and end dates impossible")) %>%
+      
+      ### OK, now massage dates to dates!
+      mutate(Start_date = as.Date(Start_date, format = "%Y-%m-%d"),
+             End_date = as.Date(End_date, format = "%Y-%m-%d")) %>%
+      
+      ### errors in scores
+      mutate(errScore1 = if_else(!is.na(YPmean1) & (YPmean1 < 0 | YPmean1 > 4),
+                                 1,
+                                 0),
+             errMesgScore1 = if_else(!is.na(YPmean1) & (YPmean1 < 0 | YPmean1 > 4),
+                                     "YPmean1 out of range",
+                                     ""),
+             errScore2 = if_else(!is.na(YPmean2) & (YPmean2 < 0 | YPmean2 > 4),
+                                 1,
+                                 0),
+             errMesgScore2 = if_else(!is.na(YPmean2) & (YPmean2 < 0 | YPmean2 > 4),
+                                     "YPmean2 out of range",
+                                     ""),
+             errScore1 = if_else(!is.na(YPclin1) & (YPclin1 < 0 | YPclin1 > 4),
+                                 1,
+                                 0),
+             errMesgScore1 = if_else(!is.na(YPclin1) & (YPclin1 < 0 | YPclin1 > 4),
+                                     "YPclin1 out of range",
+                                     ""),
+             errScore2 = if_else(!is.na(YPclin2) & (YPclin2 < 0 | YPclin2 > 4),
+                                 1,
+                                 0),
+             errMesgScore2 = if_else(!is.na(YPclin2) & (YPclin2 < 0 | YPclin2 > 4),
+                                     "YPclin2 out of range",
+                                     ""),
+             errScore1 = if_else((!is.na(YPmean1) & !is.na(YPclin1)) &
+                                   abs(10 * YPmean1 - YPclin1) > .00001,
+                                 1,
+                                 0),
+             errScore2 = if_else((!is.na(YPmean2) & !is.na(YPclin2)) &
+                                   abs(10 * YPmean2 - YPclin2) > .00001,
+                                 1,
+                                 0),
+             errMesgScore1 = if_else((!is.na(YPmean1) & !is.na(YPclin1)) &
+                                       abs(10 * YPmean1 - YPclin1) > .00001,
+                                     "Mean and clin scores given for first score but incompatible values",
+                                     ""),
+             errMesgScore2 = if_else((!is.na(YPmean2) & !is.na(YPclin2)) &
+                                       abs(10 * YPmean2 - YPclin2) > .00001,
+                                     "Mean and clin scores given for second score but incompatible values",
+                                     "")) %>%
+      
+      ### recode out of range values to missing
       mutate(YPmean1 = if_else(YPmean1 < 0 | YPmean1 > 4,
                                NA_real_,
                                YPmean1),
@@ -928,6 +1048,7 @@ server <- function(input, output, session) {
              YPclin2 = if_else(YPclin2 < 0 | YPclin2 > 40,
                                NA_real_,
                                YPclin2)) %>%
+      
       ### get the corresponding scorings where we can
       mutate(YPmean1 = if_else(is.na(YPmean1) & !is.na(YPclin1),
                                YPclin1 / 10,
@@ -941,23 +1062,29 @@ server <- function(input, output, session) {
              YPclin2 = if_else(is.na(YPclin2) & !is.na(YPmean2),
                                YPmean2 * 10,
                                YPclin2)) %>%
+      
       ### simplify gender
       mutate(Gender = str_to_upper(str_sub(Gender, 1, 1)),
              Gender = if_else(is.na(Gender),
                               "",
                               Gender)) %>%
+      
       ### deal with out of range ages
       mutate(Age = if_else(Age < 11 | Age > 25,
                            NA_integer_,
                            Age)) %>%
-      ### massage dates
-      mutate(Start_date = as.Date(Start_date, format = "%Y-%m-%d"),
-             End_date = as.Date(End_date, format = "%Y-%m-%d")) %>%
-      ### massage variables we need as factors
+      
+      ### massage variables we need to have as factors
       mutate(RespondentID = ordered(RespondentID),
              TherapistID = ordered(TherapistID),
              Gender = ordered(Gender)) -> dataInput
     
+    dataInput %>%
+      select(Comment, starts_with("err"), ends_with("date")) %>%
+      tail() %>%
+      print() # @@@
+    
+    ### create variables YPscore1 and YPscore2 using the scoring the user requested
     if (input$Scoring == "Item mean (range 0-4)") {
       dataInput %>%
         mutate(YPscore1 = YPmean1,
@@ -967,6 +1094,28 @@ server <- function(input, output, session) {
         mutate(YPscore1 = YPclin1,
                YPscore2 = YPclin2) -> dataInput
     }
+    
+    ### create missing value counts
+    dataInput %>%
+    mutate(missRespID = as.numeric(is.na(RespondentID)),
+           missTherID = as.numeric(is.na(TherapistID)),
+           missGender = as.numeric(Gender == ""),
+           missAge = as.numeric(is.na(Age)),
+           missYP1 = as.numeric(is.na(YPscore1)),
+           missYP2 = as.numeric(is.na(YPscore2)),
+           missStartDate = as.numeric(is.na(Start_date)),
+           missEndDate = as.numeric(is.na(End_date)),
+           missSessAtt = as.numeric(is.na(nSessionsAttended)),
+           missSessDNA = as.numeric(is.na(nSessionsDNAed)),
+           missSessCanc = as.numeric(is.na(nSessionsCancelled)),
+           missSessLate = as.numeric(is.na(nSessionsLate))) -> dataInput
+    
+    dataInput %>%
+      rowwise() %>%
+      mutate(nMissVals = sum(c_across(starts_with("miss"))),
+             nErrVals = sum(c_across(c(errDate1, errDate2, errDateOrder, errScore1, errScore2)),
+                            na.rm = TRUE)) %>%
+      ungroup() -> dataInput
     
     ### get CSC categories per row using matching age & gender
     dataInput %>%
@@ -1013,19 +1162,34 @@ server <- function(input, output, session) {
     
   })
   
-  
   ### get the data in long format
   longDat <- reactive({
     req(input$file1)
     fullData() %>%
-      pivot_longer(cols = starts_with("YPscore"), names_to = "WhichScore", values_to = "Score") 
+      select(starts_with("err")) %>%
+      select(where(is.numeric)) %>%
+      pivot_longer(cols = everything()) %>%
+      group_by(name) %>%
+      count(value) %>%
+      print()
     
+    fullData() %>%
+      select(starts_with("errMesg")) %>%
+      pivot_longer(cols = everything()) %>%
+      group_by(name) %>%
+      count(value) %>%
+      print()
+    
+    fullData() %>%
+      pivot_longer(cols = starts_with("YPscore"), names_to = "WhichScore", values_to = "Score") 
   })
   
+
   displayData1 <- reactive({
     req(input$file1)
     fullData() %>%
       select(-Ref) %>%
+      ### shorten some variable names
       rename(nSessAtt = nSessionsAttended,
              nSessDNA = nSessionsDNAed,
              nSessCanc = nSessionsCancelled,
@@ -1053,7 +1217,7 @@ server <- function(input, output, session) {
                 maxAge = max(Age, na.rm = TRUE),
                 meanAge = mean(Age, na.rm = TRUE),
                 sdAge = sd(Age, na.rm = TRUE),
-                nMissingAge = getNNA(Age),
+                nMissAge = getNNA(Age),
                 nAge11 = sum(Age == 11, na.rm = TRUE),
                 nAge12 = sum(Age == 12, na.rm = TRUE),
                 nAge13 = sum(Age == 13, na.rm = TRUE),
@@ -1128,7 +1292,104 @@ server <- function(input, output, session) {
   output$summaryStatsText1 <- renderText(summaryStatsText1())
   
   
-  ### tab: sociodemographics
+  ### tab: (2) data checking
+  errorDataTab <- reactive({
+    fullData() %>%
+      filter(nErrVals > 0) %>%
+      select(RespondentID : YPclin2, starts_with("nSessions"), starts_with("err"), nErrVals)
+  })
+  output$searchableErrorData <- DT::renderDataTable(server = FALSE,
+                                                      DT::datatable({errorDataTab()},
+                                                                    extensions = "Buttons",
+                                                                    filter = "top",
+                                                                    selection = "none",
+                                                                    options = list(
+                                                                      lengthMenu = list(c(50, 100, -1), 
+                                                                                        c('50','100', 'All')),
+                                                                      ### I was trying to put some space before the download buttons but this
+                                                                      ### doesn't do it!
+                                                                      # searchPanes = list(
+                                                                      #   viewTotal = TRUE,
+                                                                      #   i18n = list(
+                                                                      #     count = '{total} found',
+                                                                      #     countFiltered = '{shown} ({total}   )'
+                                                                      #   )
+                                                                      # ),
+                                                                      buttons = c('copy', 'csv', 'excel'),
+                                                                      autoWidth = TRUE,
+                                                                      ### the important thing is that there is the l to allow for the lengthMenu 
+                                                                      ### https://stackoverflow.com/questions/52645959/r-datatables-do-not-display-buttons-and-length-menu-simultaneously
+                                                                      # dom = 'Blrtip',
+                                                                      dom = "QlfrtipB")
+                                                      )
+  )
+  
+  
+  missingValueTab <- reactive({
+    req(input$file1)
+    fullData() %>%
+      select(starts_with("miss")) %>%
+      pivot_longer(cols = everything(),
+                   names_to = "variable") %>%
+      mutate(variable = str_remove(variable, fixed("miss")),
+             variable = ordered(variable,
+                                levels = c("RespID",
+                                           "TherID",
+                                           "Gender",
+                                           "Age",
+                                           "YP1",
+                                           "YP2",
+                                           "StartDate",
+                                           "EndDate",
+                                           "SessAtt",
+                                           "SessDNA",
+                                           "SessCanc",
+                                           "SessLate"))) %>%
+      group_by(variable) %>%
+      summarise(n = n(),
+                nMissing = sum(value),
+                percMissing = round(100 * nMissing / n, 1),
+                percMissing = str_c(percMissing, "%")) %>%
+      flextable() %>%
+      autofit() %>%
+      htmltools_value()
+  })
+  output$missingValueTab <- renderUI(missingValueTab())
+  
+  missingDataTab <- reactive({
+    fullData() %>%
+      filter(nMissVals > 0) %>%
+      select(RespondentID : YPclin2, starts_with("nSessions"), nMissVals)
+  })
+
+  output$searchableMissingData <- DT::renderDataTable(server = FALSE,
+                                               DT::datatable({missingDataTab()},
+                                                             extensions = "Buttons",
+                                                             filter = "top",
+                                                             selection = "none",
+                                                             options = list(
+                                                               lengthMenu = list(c(50, 100, -1), 
+                                                                                 c('50','100', 'All')),
+                                                               ### I was trying to put some space before the download buttons but this
+                                                               ### doesn't do it!
+                                                               # searchPanes = list(
+                                                               #   viewTotal = TRUE,
+                                                               #   i18n = list(
+                                                               #     count = '{total} found',
+                                                               #     countFiltered = '{shown} ({total}   )'
+                                                               #   )
+                                                               # ),
+                                                               buttons = c('copy', 'csv', 'excel'),
+                                                               autoWidth = TRUE,
+                                                               ### the important thing is that there is the l to allow for the lengthMenu 
+                                                               ### https://stackoverflow.com/questions/52645959/r-datatables-do-not-display-buttons-and-length-menu-simultaneously
+                                                               # dom = 'Blrtip',
+                                                               dom = "QlfrtipB")
+                                               )
+  )
+  
+  
+  ### tab: (4) sociodemographics
   genderStatsText1 <- reactive({
     req(input$file1)
     fullData() %>%
@@ -1234,7 +1495,7 @@ server <- function(input, output, session) {
     # height = input$fileHeight
   )
   
-  ### tab: data
+  ### tab: (3) data
   output$downloadAllCSV <- downloadHandler(
     filename = "YP-CORE_data.csv",
     contentType = "text/csv",
@@ -1282,8 +1543,8 @@ server <- function(input, output, session) {
                                                                dom = "QlfrtipB")
                                                )
   )
-
-  ### tab: stats by therapist
+  
+  ### tab: (5) Summary statistics by clinician
   summaryStats1longByTher <- reactive({
     req(input$file1)
     
@@ -1300,7 +1561,7 @@ server <- function(input, output, session) {
                 maxAge = max(Age, na.rm = TRUE),
                 meanAge = mean(Age, na.rm = TRUE),
                 sdAge = sd(Age, na.rm = TRUE),
-                nMissingAge = getNNA(Age),
+                nMissAge = getNNA(Age),
                 nAge11 = sum(Age == 11, na.rm = TRUE),
                 nAge12 = sum(Age == 12, na.rm = TRUE),
                 nAge13 = sum(Age == 13, na.rm = TRUE),
@@ -1407,8 +1668,7 @@ server <- function(input, output, session) {
     })
   
   
-  
-  ### tab:
+  ### tab: (11) RCSC
   output$CSCtable1 <- renderUI({
     flexTabulateWithCI(fullData(), CSCcat1) %>%
       htmltools_value()
@@ -1496,6 +1756,7 @@ server <- function(input, output, session) {
   
   output$summaryStats1longByTher <- renderTable(summaryStats1longByTher())
   
+  ### tab: (8) change (a)
   catsCradle1 <- reactive({
     req(input$file1)
     ### massage the data
@@ -1520,8 +1781,8 @@ server <- function(input, output, session) {
     tmpTib %>%
       group_by(WhichScore) %>%
       summarise(mean = list(suppressMessages(getBootCImean(Score,
-                                          nLT20err = FALSE,
-                                          verbose = FALSE)))) %>%
+                                                           nLT20err = FALSE,
+                                                           verbose = FALSE)))) %>%
       unnest_wider(mean) %>%
       ungroup() %>%
       mutate(x = if_else(WhichScore == 1,
@@ -1568,6 +1829,8 @@ server <- function(input, output, session) {
     catsCradle1()
   )
   
+  
+  ### tab: (9) change (b)
   catsCradle2 <- reactive({
     req(input$file1)
     ### massage the data
@@ -1618,10 +1881,12 @@ server <- function(input, output, session) {
     catsCradle2()
   )
   
-  ### tab: change(c)
+  
+  
+  ### tab: (10) change (c)
   loessPlot1 <- reactive({
     req(input$file1)
-
+    
     ### massage the data
     fullData() %>%
       ### drop any missing scores
@@ -1637,7 +1902,7 @@ server <- function(input, output, session) {
                 min = min(scaledChange),
                 max = max(scaledChange)) %>%
       ungroup() -> tmpTibStats
-
+    
     suppressWarnings(ggplot(data = tmpTib,
                             aes(x = nSessionsAttended, y = scaledChange)) +
                        geom_smooth(aes(x = nSessionsAttended, y = scaledChange)) +
@@ -1665,10 +1930,10 @@ server <- function(input, output, session) {
                                   linetype = 3) +
                        xlab("Date") +
                        scale_y_continuous("Change, scaled to the RCI")) 
-      # ggtitle("Change scores, scaled to the appropriate RCI",
-      #         subtitle = str_c("A change equal to the RCI has score 1.",
-      #                          "Solid horizontal reference line marks no change, ",
-      #                          "dashed line marks overall mean change."))
+    # ggtitle("Change scores, scaled to the appropriate RCI",
+    #         subtitle = str_c("A change equal to the RCI has score 1.",
+    #                          "Solid horizontal reference line marks no change, ",
+    #                          "dashed line marks overall mean change."))
     
     
     ggplotly(tooltip = c("label1",
@@ -1684,7 +1949,7 @@ server <- function(input, output, session) {
   )
   
   
-  ### tab: attendance
+  ### tab: (6) attendance
   attendanceDataCounts <- reactive({
     req(input$file1)
     fullData() %>%
@@ -1777,7 +2042,7 @@ server <- function(input, output, session) {
     fullData() %>%
       filter(!is.na(nSessionsAttended)) %>%
       count(nSessionsAttended) -> tmpTib
-
+    
     ggplot(data = tmpTib,
            aes(x = nSessionsAttended,
                y = n)) +
@@ -1798,7 +2063,7 @@ server <- function(input, output, session) {
   
   output$attendanceHistogram1 <- renderPlotly(attendanceHisto1())
   
-  ### tab: scores
+  ### tab: (7) scores
   summaryScoresTxt1  <- reactive({
     req(input$file1)
     str_c("Across your ",
@@ -1833,11 +2098,11 @@ server <- function(input, output, session) {
                                    "Change"))) %>%
       group_by(Score) %>%
       reframe(nOK = getNOK(value),
-                min = min(value, na.rm = TRUE),
-                CI = list(suppressMessages(getBootCImean(value))),
-                median = median(value, na.rm = TRUE),
-                max = max(value, na.rm = TRUE),
-                sd = sd(value, na.rm = TRUE)) %>%
+              min = min(value, na.rm = TRUE),
+              CI = list(suppressMessages(getBootCImean(value))),
+              median = median(value, na.rm = TRUE),
+              max = max(value, na.rm = TRUE),
+              sd = sd(value, na.rm = TRUE)) %>%
       unnest_wider(CI) %>%
       flextable() %>%
       colformat_double(digits = input$dp) %>%
@@ -1905,7 +2170,7 @@ server <- function(input, output, session) {
   })
   output$histChange <- renderPlotly(histChange())
   
-  ### tab: Jacobson
+  ### tab: (12) Jacobson
   jacobson1 <- reactive({
     req(input$file1)
     
@@ -1915,7 +2180,7 @@ server <- function(input, output, session) {
                               "Not recorded",
                               Gender)) %>%
       select(RespondentID, TherapistID, Gender, Age, YPscore1, YPscore2, YPscaled1toCSC, YPscaled2toCSC) -> tmpTib
-
+    
     tmpTib %>%
       summarise(min = min(c(min(YPscaled1toCSC),
                             min(YPscaled2toCSC))),
@@ -1939,7 +2204,7 @@ server <- function(input, output, session) {
                   linetype = 3) +
       geom_abline(slope = 1, intercept = -1,
                   linetype = 3) +
-     scale_x_continuous("First YP-CORE score, rescaled",
+      scale_x_continuous("First YP-CORE score, rescaled",
                          limits = c(tmpTibLimits$min, 
                                     tmpTibLimits$max)) +
       scale_y_continuous("Second YP-CORE score, rescaled",
