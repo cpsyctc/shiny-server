@@ -95,10 +95,10 @@ vecColTypes <- c("RespondentID" = "text",
                  "TherapistID" = "text",
                  "Gender" = "text",
                  "Age" = "numeric",
-                 "YPmean1" = "numeric",
-                 "YPmean2" = "numeric",
-                 "YPclin1" = "numeric",
-                 "YPclin2" = "numeric",
+                 "YPmean1" = "text",
+                 "YPmean2" = "text",
+                 "YPclin1" = "text",
+                 "YPclin2" = "text",
                  "Comment" = "text",
                  "Start_date" = "text",
                  "End_date" = "text",
@@ -107,6 +107,23 @@ vecColTypes <- c("RespondentID" = "text",
                  "nSessionsCancelled" = "numeric",
                  "nSessionsLate" = "numeric",
                  "nWeeks" = "numeric")
+
+vecColClasses <- c("RespondentID" = "character", 
+                   "TherapistID" = "character",
+                   "Gender" = "character",
+                   "Age" = "numeric",
+                   "YPmean1" = "character",
+                   "YPmean2" = "character",
+                   "YPclin1" = "character",
+                   "YPclin2" = "character",
+                   "Comment" = "character",
+                   "Start_date" = "character",
+                   "End_date" = "character",
+                   "nSessionsAttended" = "numeric",
+                   "nSessionsDNAed" = "numeric",
+                   "nSessionsCancelled" = "numeric",
+                   "nSessionsLate" = "numeric",
+                   "nWeeks" = "numeric")
 
 vecCSCcategoriesOrdered <- c("Clinically significant AND reliable deterioration",
                              "Stayed high AND reliable deterioration",
@@ -211,9 +228,8 @@ ui <- fluidPage(
                          p(" "),
                          p("First upload your data in one of those formats, the analyses then appear in the tabs after this one."),
                          p(" "),
-                         h2("This is work in progress!!"),
-                         p("This is work in progress like everything else in this app.",
-                           "Each tab has a todo list for what's to come for that tab and the explanation tab has a general todo list."),
+                         h2("I can go on for ever improving this app but I think it's ready for use now."),
+                         p("Each tab has a todo list with some ideas I have about what might be added or changed and the explanation tab has a general todo list."),
                          
                          p(" "),
                          h2("Upload data"),
@@ -257,9 +273,8 @@ ui <- fluidPage(
                                  tags$li("Summarises the missing value counts"),
                                  tags$li("Shows you the data rows with missing data in case you want to fix them")),
                          p(" "),
-                         h2("This is work in progress!!"),
-                         p("This is work in progress like everything else in this app.",
-                           "This is the todo list for this tab as I see it at this point"),
+                         h2("I can go on for ever improving this app but I think it's ready for use now."),
+                         p("This is the todo list for this tab as I see it at this point"),
                          tags$ul(
                            tags$li("What else would you as a user want here?",
                                    a("Contact me",
@@ -268,7 +283,10 @@ ui <- fluidPage(
                          p(" "),
                          h2("Errors in the data"),
                          p(" "),
-                         p("These are impossibilities in your data: out of range values, impossible dates and second date before the first date."),
+                         p("These are impossibilities in your data: out of range values, impossible dates and second date before the first date.  ",
+                           "This will default to show  you the rows with errors in sets of 50.  To see all the entries with errors, ",
+                           "use the 'Show ... entries' selection before the table and select 'All'. You will then see all the entries with errors ",
+                           "and you will be able to download or copy to the clipboard that entire table using the buttons below the table."),
                          DTOutput("searchableErrorData"),
                          
                          
@@ -280,8 +298,13 @@ ui <- fluidPage(
                          uiOutput("missingValueTab"),
                          
                          p(" "),
-                         h2("Searchable table of the data"),
-                         p("This shows the rows in the data you uploaded which have missing data.  I hope this will help you check if any of these are unnecessary missing values."),
+                         h2("Searchable table showing missing data"),
+                         p("This shows the rows in the data you uploaded which have missing data.  I hope this will help you check if any of these ",
+                         "are unnecessary missing values.  ",
+                         "As for the table of frankly impossible entries above, this defaults to show  you the rows with errors in sets of 50.  ",
+                         "To see all the entries with errors, use the 'Show ... entries' selection before the table and select 'All'. ",
+                         "You will then see all the entries with errors and you will be able to download or copy to the clipboard that entire ",
+                         "table using the buttons below the table."),
                          p(" "),
                          DTOutput("searchableMissingData"),    
                 ),
@@ -303,11 +326,10 @@ ui <- fluidPage(
                                  tags$li("The filtering is a Boolean AND which is to say that you will get to see the rows that fulfil all the constraints you input.")
                          ),
                          p(" "),
-                         h2("This is work in progress!!"),
-                         p("This is work in progress like everything else in this app.",
-                           "This is the todo list for this tab as I see it at this point"),
+                         h2("I can go on for ever improving this app but I think it's ready for use now."),
+                         p("This is the todo list for this tab as I see it at this point"),
                          tags$ul(
-                           tags$li("What else would you as a user want here?",
+                           tags$li("What would you as a user want here?",
                                    a("Contact me",
                                      href="https://www.coresystemtrust.org.uk/home/contact-form/")),
                          ),
@@ -338,10 +360,9 @@ ui <- fluidPage(
                            "I think the naming of the statistics is pretty self-explanatory if not particularly easy on the eye."),
                          p(" "),
                          h2("Todo list"),
-                         p("This is work in progress like everything else in this app.",
-                           "This is the todo list for this tab as I see it at this point"),
+                         p("This is the todo list for this tab as I see it at this point"),
                          tags$ul(
-                           tags$li("What else would you as a user want here?",
+                           tags$li("What would you as a user want here?",
                                    a("Contact me",
                                      href="https://www.coresystemtrust.org.uk/home/contact-form/")),
                          ),
@@ -388,11 +409,9 @@ ui <- fluidPage(
                            "I think the naming of the statistics is pretty self-explanatory if not particularly easy on the eye."),
                          p(" "),
                          h2("Todo list"),
-                         p("This is work in progress. Until such time as this is no longer true (when?!), this is work in progress like everything else in this app.",
-                           
-                           "This is the todo list for this tab as I see it at this point"),
+                         p("This is the todo list for this tab as I see it at this point"),
                          tags$ul(
-                           tags$li("Think how it could be made more digestible."),
+                           tags$li("Think how I can make it more digestible!"),
                            tags$li("Perhaps add percentages but they will only make sense for some of the statistics"),
                            tags$li("Will it be useful to people to have more comparative analyses comparing clinicians?"),
                            tags$li("Add biplane/forest plots?"),
@@ -426,8 +445,7 @@ ui <- fluidPage(
                            "and attendance information together but this is a start!"),
                          p(" "),
                          h2("Todo list"),
-                         p("This is work in progress like everything else in this app.",
-                           "This is the todo list for this tab as I see it at this point"),
+                         p("This is the todo list for this tab as I see it at this point"),
                          tags$ul(
                            tags$li("Add options to break down by clinician and perhaps by age, gender ...?"),
                            tags$li("Think more about graphs and/or analyses to extract more from these variables."),
@@ -482,8 +500,7 @@ ui <- fluidPage(
                          p(" "),
                          p("Very much work in progress."),
                          h2("Todo list"),
-                         p("This is work in progress like everything else in this app.",
-                           "This is the todo list for this tab as I see it at this point"),
+                         p("This is the todo list for this tab as I see it at this point"),
                          tags$ul(
                            tags$li("Add analyses of all t1, t2 and change by gender, age ..."),
                            tags$li("... and therapist?"),
@@ -548,8 +565,7 @@ ui <- fluidPage(
                            "giving you the YP-CORE score, the respondent ID, therapist ID and the category ",
                            "of the CSC change."),
                          h2("Todo list"),
-                         p("This is work in progress like everything else in this app.",
-                           "This is the todo list for this tab as I see it at this point"),
+                         p("This is the todo list for this tab as I see it at this point"),
                          tags$ul(
                            tags$li("Add options to colour down by therapist or age instead of gender, or not to colour"),
                            tags$li("Add option to map n(sessions) on x axis"),
@@ -591,8 +607,7 @@ ui <- fluidPage(
                            "giving you the YP-CORE score, the respondent ID, therapist ID and the category ",
                            "of the CSC change."),
                          h2("Todo list"),
-                         p("This is work in progress like everything else in this app.",
-                           "This is the todo list for this tab as I see it at this point"),
+                         p("This is the todo list for this tab as I see it at this point"),
                          tags$ul(
                            tags$li("Add options to break down by therapist, age, gender ..."),
                            tags$li("What else would you as a user want here?",
@@ -628,8 +643,7 @@ ui <- fluidPage(
                            "giving you the YP-CORE score, the respondent ID, therapist ID and the category ",
                            "of the CSC change."),
                          h2("Todo list"),
-                         p("This is work in progress like everything else in this app.",
-                           "This is the todo list for this tab as I see it at this point"),
+                         p("This is the todo list for this tab as I see it at this point"),
                          tags$ul(
                            tags$li("Add options to break down by therapist, age, gender ..."),
                            tags$li("What else would you as a user want here?",
@@ -667,10 +681,9 @@ ui <- fluidPage(
                          p("This tab gives a simple breakdown of the CSC categories: baseline, final and change counts"),
                          p(" "),
                          h2("Todo list"),
-                         p("This is work in progress like everything else in this app.",
-                           "This is the todo list for this tab as I see it at this point"),
+                         p("This is the todo list for this tab as I see it at this point"),
                          tags$ul(
-                           tags$li("What else would you as a user want here?",
+                           tags$li("What would you as a user want here?",
                                    a("Contact me",
                                      href="https://www.coresystemtrust.org.uk/home/contact-form/")),
                          ),
@@ -756,8 +769,7 @@ ui <- fluidPage(
                            "when you will see a 'tooltip'",
                            "giving you the person's gender, age, first and last YP-CORE scores (not rescaled), the respondent ID and therapist ID."),
                          h2("Todo list"),
-                         p("This is work in progress like everything else in this app.",
-                           "This is the todo list for this tab as I see it at this point"),
+                         p("This is the todo list for this tab as I see it at this point"),
                          tags$ul(
                            tags$li("Add options to colour the points by age and therapist instead of gender ..."),
                            tags$li("And perhaps facetting by those variables or to change the plot by those variables."),
@@ -819,7 +831,7 @@ ui <- fluidPage(
                          value = 14,
                          p("App created 22.v.25 by Chris Evans.",
                            a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/")),
-                         p("Last updated 30.vi.25: coverted remaining change plots to use ggplotly for downloading ability."),
+                         p("Last updated 5.vii.25: finally fixed the error trapping and changed status from work in progress to released for use."),
                          p("Much work still to do ... but getting there!"),
                          p("Licenced under a ",
                            a("Creative Commons, Attribution Licence-ShareAlike",
@@ -929,7 +941,8 @@ server <- function(input, output, session) {
     
     ### now read in the data
     if(fileType == "csv") {
-      suppressMessages(read.csv(file = fileSelected())) %>%
+      suppressMessages(read.csv(file = fileSelected(),
+                                colClasses = vecColClasses)) %>%
         as_tibble() -> dataInput
     }
     if(fileType == "rda") {
@@ -947,10 +960,10 @@ server <- function(input, output, session) {
                           "TherapistID" = "c",
                           "Gender" = "c",
                           "Age" = "i",
-                          "YPmean1" = "d",
-                          "YPmean2" = "d",
-                          "YPclin1" = "d",
-                          "YPclin2" = "d",
+                          "YPmean1" = "c",
+                          "YPmean2" = "c",
+                          "YPclin1" = "c",
+                          "YPclin2" = "c",
                           "Comment" = "c",
                           "Start_date" = "c",
                           "End_date" = "c",
@@ -967,15 +980,15 @@ server <- function(input, output, session) {
     ### check initial column names are as expected
     validate(need(colnames(dataInput) == vecColNames,
                   "Your data don't seem to have the correct column names.  Sorry, aborting!"))
-    
-    
+
     ### OK, now you appear to have usable data, work on it!
     dataInput %>%
       as_tibble() %>%
       ### cleaning 
       ### trim character variables
-      mutate(across(where(is.character), ~ str_trim(.x))) %>%
-      
+      mutate(across(where(is.character), ~ str_trim(.x))) -> dataInput
+    
+    dataInput %>%
       ### error detection: dates
       mutate(errDate1 = as.numeric(Start_date != "" & is.na(as.Date(Start_date, format = "%Y-%m-%d"))),
              errDate2 = as.numeric(End_date != "" & is.na(as.Date(End_date, format = "%Y-%m-%d"))),
@@ -989,66 +1002,77 @@ server <- function(input, output, session) {
                errDate1 == 0 & errDate2 ==1 ~ "Impossible end date",
                errDate1 == 1 & errDate2 ==1 ~ "Start and end dates impossible")) %>%
       
-      ### OK, now massage dates to dates!
+      ### OK, now massage dates from character to dates!
       mutate(Start_date = as.Date(Start_date, format = "%Y-%m-%d"),
              End_date = as.Date(End_date, format = "%Y-%m-%d")) %>%
       
       ### errors in scores
-      mutate(errScore1 = if_else(!is.na(YPmean1) & (YPmean1 < 0 | YPmean1 > 4),
+      mutate(YPmeanTxt1 = YPmean1, # get original character inputs
+             YPmeanTxt2 = YPmean2,
+             YPclinTxt1 = YPclin1,
+             YPclinTxt2 = YPclin2,
+             ### convert to numeric
+             YPmean1 = as.numeric(YPmean1),
+             YPmean2 = as.numeric(YPmean2),
+             YPclin1 = as.numeric(YPclin1),
+             YPclin2 = as.numeric(YPclin2),
+             ### convert out of range values to missing
+             YPmean1 = if_else(YPmean1 > 4 | YPmean1 < 0,
+                               NA_real_,
+                               YPmean1),
+             YPmean2 = if_else(YPmean2 > 4 | YPmean2 < 0,
+                               NA_real_,
+                               YPmean2),
+             YPclin1 = if_else(YPclin1 > 40 | YPclin1 < 0,
+                               NA_real_,
+                               YPclin1),
+             YPclin2 = if_else(YPclin1 > 40 | YPclin2 < 0,
+                               NA_real_,
+                               YPclin2)) %>%
+      ### now create the score error flags
+      mutate(errScore1 = if_else(YPmeanTxt1 != "" & is.na(YPmean1),
                                  1,
                                  0),
-             errMesgScore1 = if_else(!is.na(YPmean1) & (YPmean1 < 0 | YPmean1 > 4),
-                                     "YPmean1 out of range",
+             errMesg = if_else(YPmeanTxt1 != "" & errScore1 == 1,
+                                     "Impossible entry for YPmean1",
                                      ""),
-             errScore2 = if_else(!is.na(YPmean2) & (YPmean2 < 0 | YPmean2 > 4),
+             errScore1 = if_else(YPclinTxt1 != "" & is.na(YPclin1),
+                                 1,
+                                 errScore1),
+             errMesg = if_else(YPclinTxt1 != "" & errScore1 == 1,
+                                     "Impossible entry for YPclin1",
+                               errMesg),
+             errScore2 = if_else(YPmeanTxt2 != "" & is.na(YPmean2),
                                  1,
                                  0),
-             errMesgScore2 = if_else(!is.na(YPmean2) & (YPmean2 < 0 | YPmean2 > 4),
-                                     "YPmean2 out of range",
-                                     ""),
-             errScore1 = if_else(!is.na(YPclin1) & (YPclin1 < 0 | YPclin1 > 4),
+             errMesg = if_else(YPmeanTxt2 != "" & errScore2 == 1,
+                                     "Impossible entry for YPmean2",
+                               errMesg),
+             errScore2 = if_else(YPclinTxt2 != "" & is.na(YPclin2),
                                  1,
-                                 0),
-             errMesgScore1 = if_else(!is.na(YPclin1) & (YPclin1 < 0 | YPclin1 > 4),
-                                     "YPclin1 out of range",
-                                     ""),
-             errScore2 = if_else(!is.na(YPclin2) & (YPclin2 < 0 | YPclin2 > 4),
-                                 1,
-                                 0),
-             errMesgScore2 = if_else(!is.na(YPclin2) & (YPclin2 < 0 | YPclin2 > 4),
-                                     "YPclin2 out of range",
-                                     ""),
+                                 errScore2),
+             errMesg = if_else(YPclinTxt2 != "" & errScore2 == 1,
+                                     "Impossible entry for YPclin2",
+                               errMesg),
+             ### and now both scores entered but not compatible
              errScore1 = if_else((!is.na(YPmean1) & !is.na(YPclin1)) &
                                    abs(10 * YPmean1 - YPclin1) > .00001,
                                  1,
-                                 0),
+                                 errScore1),
              errScore2 = if_else((!is.na(YPmean2) & !is.na(YPclin2)) &
                                    abs(10 * YPmean2 - YPclin2) > .00001,
                                  1,
-                                 0),
-             errMesgScore1 = if_else((!is.na(YPmean1) & !is.na(YPclin1)) &
-                                       abs(10 * YPmean1 - YPclin1) > .00001,
-                                     "Mean and clin scores given for first score but incompatible values",
-                                     ""),
-             errMesgScore2 = if_else((!is.na(YPmean2) & !is.na(YPclin2)) &
-                                       abs(10 * YPmean2 - YPclin2) > .00001,
-                                     "Mean and clin scores given for second score but incompatible values",
-                                     "")) %>%
-      
-      ### recode out of range values to missing
-      mutate(YPmean1 = if_else(YPmean1 < 0 | YPmean1 > 4,
-                               NA_real_,
-                               YPmean1),
-             YPmean2 = if_else(YPmean2 < 0 | YPmean2 > 4,
-                               NA_real_,
-                               YPmean2),
-             YPclin1 = if_else(YPclin1 < 0 | YPclin1 > 40,
-                               NA_real_,
-                               YPclin1),
-             YPclin2 = if_else(YPclin2 < 0 | YPclin2 > 40,
-                               NA_real_,
-                               YPclin2)) %>%
-      
+                                 errScore2),
+             errMesg = if_else((!is.na(YPmean2) & !is.na(YPclin2)) &
+                                 abs(10 * YPmean2 - YPclin2) > .00001,
+                               "Mean and clin scores given for second score but incompatible values",
+                               errMesg)) -> dataInput 
+    
+    dataInput %>%
+      select(Comment, starts_with("YPmean"), starts_with("YPclin"), starts_with("errS"), errMesg) %>%
+      print()
+    
+    dataInput %>%
       ### get the corresponding scorings where we can
       mutate(YPmean1 = if_else(is.na(YPmean1) & !is.na(YPclin1),
                                YPclin1 / 10,
@@ -1079,11 +1103,6 @@ server <- function(input, output, session) {
              TherapistID = ordered(TherapistID),
              Gender = ordered(Gender)) -> dataInput
     
-    dataInput %>%
-      select(Comment, starts_with("err"), ends_with("date")) %>%
-      tail() %>%
-      print() # @@@
-    
     ### create variables YPscore1 and YPscore2 using the scoring the user requested
     if (input$Scoring == "Item mean (range 0-4)") {
       dataInput %>%
@@ -1097,18 +1116,18 @@ server <- function(input, output, session) {
     
     ### create missing value counts
     dataInput %>%
-    mutate(missRespID = as.numeric(is.na(RespondentID)),
-           missTherID = as.numeric(is.na(TherapistID)),
-           missGender = as.numeric(Gender == ""),
-           missAge = as.numeric(is.na(Age)),
-           missYP1 = as.numeric(is.na(YPscore1)),
-           missYP2 = as.numeric(is.na(YPscore2)),
-           missStartDate = as.numeric(is.na(Start_date)),
-           missEndDate = as.numeric(is.na(End_date)),
-           missSessAtt = as.numeric(is.na(nSessionsAttended)),
-           missSessDNA = as.numeric(is.na(nSessionsDNAed)),
-           missSessCanc = as.numeric(is.na(nSessionsCancelled)),
-           missSessLate = as.numeric(is.na(nSessionsLate))) -> dataInput
+      mutate(missRespID = as.numeric(is.na(RespondentID)),
+             missTherID = as.numeric(is.na(TherapistID)),
+             missGender = as.numeric(Gender == ""),
+             missAge = as.numeric(is.na(Age)),
+             missYP1 = as.numeric(is.na(YPscore1)),
+             missYP2 = as.numeric(is.na(YPscore2)),
+             missStartDate = as.numeric(is.na(Start_date)),
+             missEndDate = as.numeric(is.na(End_date)),
+             missSessAtt = as.numeric(is.na(nSessionsAttended)),
+             missSessDNA = as.numeric(is.na(nSessionsDNAed)),
+             missSessCanc = as.numeric(is.na(nSessionsCancelled)),
+             missSessLate = as.numeric(is.na(nSessionsLate))) -> dataInput
     
     dataInput %>%
       rowwise() %>%
@@ -1184,7 +1203,7 @@ server <- function(input, output, session) {
       pivot_longer(cols = starts_with("YPscore"), names_to = "WhichScore", values_to = "Score") 
   })
   
-
+  
   displayData1 <- reactive({
     req(input$file1)
     fullData() %>%
@@ -1296,32 +1315,25 @@ server <- function(input, output, session) {
   errorDataTab <- reactive({
     fullData() %>%
       filter(nErrVals > 0) %>%
-      select(RespondentID : YPclin2, starts_with("nSessions"), starts_with("err"), nErrVals)
+      # select(RespondentID : YPclin2, starts_with("nSessions"), starts_with("err"), nErrVals)
+      select(RespondentID, TherapistID, YPmeanTxt1, YPmeanTxt2, YPclinTxt1, YPclinTxt2, Start_date, End_date,
+             starts_with("err"))
   })
   output$searchableErrorData <- DT::renderDataTable(server = FALSE,
-                                                      DT::datatable({errorDataTab()},
-                                                                    extensions = "Buttons",
-                                                                    filter = "top",
-                                                                    selection = "none",
-                                                                    options = list(
-                                                                      lengthMenu = list(c(50, 100, -1), 
-                                                                                        c('50','100', 'All')),
-                                                                      ### I was trying to put some space before the download buttons but this
-                                                                      ### doesn't do it!
-                                                                      # searchPanes = list(
-                                                                      #   viewTotal = TRUE,
-                                                                      #   i18n = list(
-                                                                      #     count = '{total} found',
-                                                                      #     countFiltered = '{shown} ({total}   )'
-                                                                      #   )
-                                                                      # ),
-                                                                      buttons = c('copy', 'csv', 'excel'),
-                                                                      autoWidth = TRUE,
-                                                                      ### the important thing is that there is the l to allow for the lengthMenu 
-                                                                      ### https://stackoverflow.com/questions/52645959/r-datatables-do-not-display-buttons-and-length-menu-simultaneously
-                                                                      # dom = 'Blrtip',
-                                                                      dom = "QlfrtipB")
-                                                      )
+                                                    DT::datatable({errorDataTab()},
+                                                                  extensions = "Buttons",
+                                                                  filter = "top",
+                                                                  selection = "none",
+                                                                  options = list(
+                                                                    lengthMenu = list(c(50, 100, -1), 
+                                                                                      c('50','100', 'All')),
+                                                                    buttons = c('copy', 'csv', 'excel'),
+                                                                    autoWidth = TRUE,
+                                                                    ### the important thing is that there is the l to allow for the lengthMenu 
+                                                                    ### https://stackoverflow.com/questions/52645959/r-datatables-do-not-display-buttons-and-length-menu-simultaneously
+                                                                    # dom = 'Blrtip',
+                                                                    dom = "QlfrtipB")
+                                                    )
   )
   
   
@@ -1361,31 +1373,31 @@ server <- function(input, output, session) {
       filter(nMissVals > 0) %>%
       select(RespondentID : YPclin2, starts_with("nSessions"), nMissVals)
   })
-
+  
   output$searchableMissingData <- DT::renderDataTable(server = FALSE,
-                                               DT::datatable({missingDataTab()},
-                                                             extensions = "Buttons",
-                                                             filter = "top",
-                                                             selection = "none",
-                                                             options = list(
-                                                               lengthMenu = list(c(50, 100, -1), 
-                                                                                 c('50','100', 'All')),
-                                                               ### I was trying to put some space before the download buttons but this
-                                                               ### doesn't do it!
-                                                               # searchPanes = list(
-                                                               #   viewTotal = TRUE,
-                                                               #   i18n = list(
-                                                               #     count = '{total} found',
-                                                               #     countFiltered = '{shown} ({total}   )'
-                                                               #   )
-                                                               # ),
-                                                               buttons = c('copy', 'csv', 'excel'),
-                                                               autoWidth = TRUE,
-                                                               ### the important thing is that there is the l to allow for the lengthMenu 
-                                                               ### https://stackoverflow.com/questions/52645959/r-datatables-do-not-display-buttons-and-length-menu-simultaneously
-                                                               # dom = 'Blrtip',
-                                                               dom = "QlfrtipB")
-                                               )
+                                                      DT::datatable({missingDataTab()},
+                                                                    extensions = "Buttons",
+                                                                    filter = "top",
+                                                                    selection = "none",
+                                                                    options = list(
+                                                                      lengthMenu = list(c(50, 100, -1), 
+                                                                                        c('50','100', 'All')),
+                                                                      ### I was trying to put some space before the download buttons but this
+                                                                      ### doesn't do it!
+                                                                      # searchPanes = list(
+                                                                      #   viewTotal = TRUE,
+                                                                      #   i18n = list(
+                                                                      #     count = '{total} found',
+                                                                      #     countFiltered = '{shown} ({total}   )'
+                                                                      #   )
+                                                                      # ),
+                                                                      buttons = c('copy', 'csv', 'excel'),
+                                                                      autoWidth = TRUE,
+                                                                      ### the important thing is that there is the l to allow for the lengthMenu 
+                                                                      ### https://stackoverflow.com/questions/52645959/r-datatables-do-not-display-buttons-and-length-menu-simultaneously
+                                                                      # dom = 'Blrtip',
+                                                                      dom = "QlfrtipB")
+                                                      )
   )
   
   
