@@ -947,8 +947,8 @@ server <- function(input, output, session) {
     }
     if(fileType == "rda") {
       suppressMessages(load(file = fileSelected()))
-      tibYPwide2 -> dataInput
-      rm(tibYPwide2)
+      # tibYPwide2 -> dataInput
+      # rm(tibYPwide2)
     }
     if(fileType == "xlsx") {
       suppressMessages(readxl::read_xlsx(path = fileSelected(),
@@ -1067,11 +1067,6 @@ server <- function(input, output, session) {
                                  abs(10 * YPmean2 - YPclin2) > .00001,
                                "Mean and clin scores given for second score but incompatible values",
                                errMesg)) -> dataInput 
-    
-    dataInput %>%
-      select(Comment, starts_with("YPmean"), starts_with("YPclin"), starts_with("errS"), errMesg) %>%
-      print()
-    
     dataInput %>%
       ### get the corresponding scorings where we can
       mutate(YPmean1 = if_else(is.na(YPmean1) & !is.na(YPclin1),
@@ -1559,8 +1554,11 @@ server <- function(input, output, session) {
   ### tab: (5) Summary statistics by clinician
   summaryStats1longByTher <- reactive({
     req(input$file1)
-    
+
     fullData() %>%
+      mutate(TherapistID = if_else(is.na(TherapistID) | TherapistID == "",
+                                   "No clinician ID given",
+                                   TherapistID)) %>%
       group_by(TherapistID) %>%
       summarise(totalRecords = n(),
                 nClients = n_distinct(RespondentID),
@@ -1647,7 +1645,7 @@ server <- function(input, output, session) {
                 propHighToLowNoRelChge = sum(RCSCcat == "Clinically significant improvement but no reliable change", na.rm = TRUE) / getNOK(RCSCcat),
                 propRelAndSigImprove = sum(RCSCcat == "Reliable and clinically significant improvement", na.rm = TRUE) / getNOK(RCSCcat)) %>%
       pivot_longer(cols = -TherapistID, names_to = "Statistic") %>%
-      pivot_wider(id_cols = "Statistic", names_from = TherapistID, values_from = "value")
+      pivot_wider(id_cols = "Statistic", names_from = TherapistID, values_from = "value") 
   })
   
   fileStubName <- reactive({
