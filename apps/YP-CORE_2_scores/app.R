@@ -831,8 +831,8 @@ ui <- fluidPage(
                          value = 14,
                          p("App created 22.v.25 by Chris Evans.",
                            a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/")),
-                         p("Last updated 5.vii.25: finally fixed the error trapping and changed status from work in progress to released for use."),
-                         p("Much work still to do ... but getting there!"),
+                         p("Last updated 6.vii.25: tweaked reading of ods files to use new ods file."),
+                         p("Some work still possible, including xlsx file use ... but pretty much usable now!"),
                          p("Licenced under a ",
                            a("Creative Commons, Attribution Licence-ShareAlike",
                              href="http://creativecommons.org/licenses/by-sa/1.0/"),
@@ -947,8 +947,6 @@ server <- function(input, output, session) {
     }
     if(fileType == "rda") {
       suppressMessages(load(file = fileSelected()))
-      # tibYPwide2 -> dataInput
-      # rm(tibYPwide2)
     }
     if(fileType == "xlsx") {
       suppressMessages(readxl::read_xlsx(path = fileSelected(),
@@ -974,7 +972,10 @@ server <- function(input, output, session) {
                           "nWeeks" = "i")
       
       suppressMessages(suppressWarnings(readODS::read_ods(path = fileSelected(),
-                                                          col_types = lisColTypes))) -> dataInput
+                                                          sheet = 2,
+                                                          col_types = lisColTypes))) %>%
+        mutate(Start_date = as.Date(Start_date, format = "%d/%m/%Y"),
+               End_date = as.Date(End_date, format = "%d/%m/%Y")) -> dataInput
     }
     
     ### check initial column names are as expected
@@ -1179,20 +1180,6 @@ server <- function(input, output, session) {
   ### get the data in long format
   longDat <- reactive({
     req(input$file1)
-    fullData() %>%
-      select(starts_with("err")) %>%
-      select(where(is.numeric)) %>%
-      pivot_longer(cols = everything()) %>%
-      group_by(name) %>%
-      count(value) %>%
-      print()
-    
-    fullData() %>%
-      select(starts_with("errMesg")) %>%
-      pivot_longer(cols = everything()) %>%
-      group_by(name) %>%
-      count(value) %>%
-      print()
     
     fullData() %>%
       pivot_longer(cols = starts_with("YPscore"), names_to = "WhichScore", values_to = "Score") 
@@ -1843,6 +1830,7 @@ server <- function(input, output, session) {
   ### tab: (9) change (b)
   catsCradle2 <- reactive({
     req(input$file1)
+
     ### massage the data
     fullData() %>%
       select(-Age) %>%
