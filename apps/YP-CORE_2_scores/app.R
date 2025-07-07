@@ -954,8 +954,6 @@ server <- function(input, output, session) {
                                          col_types = vecColTypes)) %>%
         mutate(Start_date = as.Date(Start_date),
                End_date = as.Date(End_date)) -> dataInput
-      
-      print(dataInput)
     }
     if(fileType == "ods") {
       ### col_types of the input file
@@ -1835,10 +1833,6 @@ server <- function(input, output, session) {
   ### tab: (9) change (b)
   catsCradle2 <- reactive({
     req(input$file1)
-    
-    fullData() %>%
-      select(ends_with("_date")) %>%
-      print()
 
     ### massage the data
     fullData() %>%
