@@ -100,8 +100,8 @@ vecColTypes <- c("RespondentID" = "text",
                  "YPclin1" = "text",
                  "YPclin2" = "text",
                  "Comment" = "text",
-                 "Start_date" = "text",
-                 "End_date" = "text",
+                 "Start_date" = "date",
+                 "End_date" = "date",
                  "nSessionsAttended" = "numeric",
                  "nSessionsDNAed" = "numeric",
                  "nSessionsCancelled" = "numeric",
@@ -831,7 +831,7 @@ ui <- fluidPage(
                          value = 14,
                          p("App created 22.v.25 by Chris Evans.",
                            a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/")),
-                         p("Last updated 6.vii.25: tweaked reading of ods files to use new ods file."),
+                         p("Last updated 7.vii.25: tweaked reading of xlsx files to use new xlsx file."),
                          p("Some work still possible, including xlsx file use ... but pretty much usable now!"),
                          p("Licenced under a ",
                            a("Creative Commons, Attribution Licence-ShareAlike",
@@ -950,7 +950,12 @@ server <- function(input, output, session) {
     }
     if(fileType == "xlsx") {
       suppressMessages(readxl::read_xlsx(path = fileSelected(),
-                                         col_types = vecColTypes)) -> dataInput
+                                         sheet = 2,
+                                         col_types = vecColTypes)) %>%
+        mutate(Start_date = as.Date(Start_date),
+               End_date = as.Date(End_date)) -> dataInput
+      
+      print(dataInput)
     }
     if(fileType == "ods") {
       ### col_types of the input file
@@ -1298,7 +1303,7 @@ server <- function(input, output, session) {
     fullData() %>%
       filter(nErrVals > 0) %>%
       # select(RespondentID : YPclin2, starts_with("nSessions"), starts_with("err"), nErrVals)
-      select(RespondentID, TherapistID, YPmeanTxt1, YPmeanTxt2, YPclinTxt1, YPclinTxt2, Start_date, End_date,
+      select(RespondentID, TherapistID, YPmean1, YPmean2, YPclin1, YPclin2, Start_date, End_date,
              starts_with("err"))
   })
   output$searchableErrorData <- DT::renderDataTable(server = FALSE,
@@ -1830,6 +1835,10 @@ server <- function(input, output, session) {
   ### tab: (9) change (b)
   catsCradle2 <- reactive({
     req(input$file1)
+    
+    fullData() %>%
+      select(ends_with("_date")) %>%
+      print()
 
     ### massage the data
     fullData() %>%
