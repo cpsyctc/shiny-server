@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+  <html lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+    <title>How to use this YP-CORE_2_scores shiny app</title>
+    
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+      <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+          <link rel="manifest" href="/site.webmanifest">
+            <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+              <meta name="msapplication-TileColor" content="#da532c">
+                <meta name="theme-color" content="#ffffff">
+                  
+                  <style type="text/css">
+                    body, html {
+                      font-family: Helvetica, Arial, sans-serif;
+                      background-color: #F5F5F5;
+                        color: #114;
+                        margin: 0;
+                      padding: 0;
+                    }
+                  a {
+                    text-decoration: none;
+                  }
+                  a:hover {
+                    text-decoration: underline;
+                  }
+                  #titleBar {
+                  height: 80px;
+                  background-color: #3475b4;
+                    overflow: hidden;
+                  border-bottom: 1px solid #3475b3;
+                  -moz-box-shadow:    0px 0px 10px 3px #BBC;
+                  -webkit-box-shadow: 0px 0px 10px 3px #BBC;
+                  box-shadow:         0px 0px 10px 3px #BBC;
+                  }
+#titleBar #container {
+margin-top: 14px;
+}
+#titleBar h1 {
+margin: 0 auto .5em auto;
+padding: .2em;
+color: #EEE;
+  text-align: center;
+}
+#intro {
+background-color: #DDD;
+  margin: 1em 1em 0 1em;
+padding: .75em;
+text-align: center;
+border: 1px solid #CCC;
+font-size: 18px;
+}
+#intro p {
+margin: .3em 0 .3em 0;
+}
+#outer-content {
+max-width: 910px;
+margin-left: auto;
+margin-right: auto;
+}
+#content {
+margin: 1em auto 1em auto;
+float: left;
+}
+#main{
+margin-left: 35px;
+margin-right: 35px;
+float: left;
+line-height: 24px;
+}
+
+#shiny{
+float: left;
+width: 305px;
+margin-left: -330px;
+padding-left: 20px;
+border-left: 1px solid #AAA;
+}
+#shiny iframe {
+margin-top: 30px;
+}
+.caption{
+  font-size: 13px;
+}
+code {
+  background-color: #E5E5E5;
+    border: 1px solid #AAA;
+  -webkit-border-radius: 3px;
+  -khtml-border-radius: 3px; 
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  padding: 0 .5em 0 .5em;
+}
+</style>
+  </head>
+  <body>
+  <div id="titleBar">
+  <div id="container">
+  <h1>How to use this app</h1>
+  </div>
+  </div>
+  <div id = "main">
+    <h1>Inputting data to analyse and some basic settings</h1>
+    When you open this app you will be seeing something like this.
+    <hr>
+    <img src="./Screenshot_001.png">
+    <hr>
+    Obviously, the URL won't be '127.0.0.1:4295' and what you see will depend on the browser that you are using 
+    and will look fairly different on a 'phone or even a tablet.  The text may also have changed a bit by the 
+    time you are using the app, even that list of tabs: 'Upload', 'Data checking' ... may have changed. </p>
+    <p>
+      However, the basic layout will be something like that.</p>
+      <p>The first thing you need to do is to give the app some data to process.  Start by pulling down 
+      one of the files shown here:
+    <hr>
+    <img src="./Screenshot_002.png">
+    <hr>
+      Then, to get used to the app, don't change the data in the file, just upload it into the app.
+      You do that using that section of the page saying 'Upload data' and offering you a file selection
+      input marked 'Browse...'</p>, here:
+    <hr>
+    <img src="./Screenshot_003.png">
+    <hr>
+      You can pull a file, ideally starting with the one you just downloaded with its artificial data.
+      Here you can see that I've done that, uploading YPwide2.csv
+    <hr>
+    <img src="./Screenshot_004.png">
+    <hr>
+    You can also see there that the app is showing you the default referential data.
+    <hr>
+    <img src="./Screenshot_005.png">
+    <hr>
+    If you want one of other available referential data you can just select the one you want at any point
+    by coming back to this home tab ('Upload') and changing your selection.</p>
+    <p>The last options on this home tab are at the bottom of the tab and shown here.</p>
+    <hr>
+    <img src="./Screenshot_006.png">
+    <hr>
+    The first relates to the fact that, regrettably, there are two ways of scoring some of the CORE measures:
+    <ul>
+      <li>'Mean' scoring'
+      which uses the mean of the item scores allowing prorating of up to 10% missing items 
+      (i.e. across nine YP-CORE items if one is missing, but not prorating if more items are missing and ...</li>
+      <li>'Clinical' scoring which is the mean score multiplied by 10.</li>
+    </ul>
+    If you look at the data in one of those example spreadsheets you will see that you can enter data using
+    either scoring or even a mixture of the two.  This radio button selection just affects which system the 
+    app uses in what it returns.</p>
+    <p>The second input control here sets the number of decimal points that the app will use for most of 
+    the analyses it provides.  Two is usually sensible but you can change this at any point, i.e. you may 
+    be looking at analyses in one of other tabs and you can come back to this tab and reset what you want here.</p>
+    <h1>Moving on to get analyses out of the app</h1>
+    Now we have data in and have chosen those basic settings we can get the app to do some work.  This is all 
+    done in separate tabs:
+    <hr>
+    <img src="./Screenshot_007.png">
+    <hr>
+    There are three 'odd' tabs.  We have just been through the home/upload tab.  The other two that <i>aren't</i>
+    about analyses are those last two: 'Explanation of the app', and 'Background'. The first of those is what it
+    says but not a full how to guide like this and the second covers the copyright/copyleft status of all my
+    apps and the history of the app. </p>
+    <p>So that brings us to the nuts and bolts of the app.  Currently the tabs are as shown there, others 
+      may have been added to the app by the time you are reading this as I hope they'll be pretty self-explanatory.
+      The second tab, 'Data checking' is what it says and with the next tab, 'Data' it is not really about
+      analyses but about the data itself.</p>
+    <p>Here is the top of the 'Data checking' tab:</p>
+    <hr>
+    <img src="./Screenshot_008.png">
+    <hr>
+    <p>I have framed an area that is present in all the tabs except the 'home/upload' tab: an update/status/suggestions block.
+    Do feel free to suggest improvements and to report errors or problems.  I don't promise that I will implement all suggestions
+    but I will consider each one. Equally, I can't promise to be able to solve any and all problems people encounter though I 
+    will do my best and I will most certainly try to correct any reported errors. This has grown into a pretty huge app with 
+    over two thosand lines in the main app and definitely still growing.  I am not a gifted programmer so I am sure frank 
+    errors will emerge.  Please report them!</p>
+    <p>This next block selects rows in the uploaded data that seem to have errors.</p>
+    <hr>
+    <img src="./Screenshot_009.png">
+    <hr>
+    <p>That screenshot has arrows marking three key parts of this, an interactive 'DT/DataTable'.</p>
+    <ul>
+      <li>The first is very self-explanatory as it just controls how many lines of data that appear to contain errors are show
+    in the table.  The 'all' option is important if you want to download this table.  More on that below.</li>
+      <li>The second is also self-explanatory: you can search across all the fields in the table.  I think that's only 
+    likely to be useful to find a particular client by ID.</li>
+      <li>The last points to the first of the filters at the head of each column.  These enable you to filter to rows 
+      where the value for that column matches what you put in that box.  There's a box for each column as you see.
+      So to filter to all rows with errors in the first YP-CORE score, put '1' in the column errScore1.  The column
+      'errMesg' should give you a message about the error.</li>
+    </ul>
+    </div>
+</html>
