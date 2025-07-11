@@ -15,8 +15,9 @@
                     body, html {
                       font-family: Helvetica, Arial, sans-serif;
                       background-color: #F5F5F5;
-                        color: #114;
-                        margin: 0;
+                      color: #114;
+                      margin: 5;
+                      padding-left: 10px;
                       padding: 0;
                     }
                   a {
@@ -25,8 +26,25 @@
                   a:hover {
                     text-decoration: underline;
                   }
+                  h2 {
+                    text-align: center;
+                    text-decoration: underline;
+                    font-size: 300%;
+                    background-color: #FFFF99;
+                    padding-top: 30px;
+                    padding-bottom: 30px;
+                  }
+                  h3 {
+                    text-align: center;
+                    text-decoration: underline;
+                    font-size: 300%;
+                    padding-top: 30px;
+                    padding-bottom: 30px;
+                    background-color: #FFFF99;
+                  }
                   #titleBar {
                   height: 80px;
+                  font-size: larger;
                   background-color: #3475b4;
                     overflow: hidden;
                   border-bottom: 1px solid #3475b3;
@@ -34,6 +52,10 @@
                   -webkit-box-shadow: 0px 0px 10px 3px #BBC;
                   box-shadow:         0px 0px 10px 3px #BBC;
                   }
+                  #contents {
+                    background-color: #FFFF99;
+                  }
+                  
 #titleBar #container {
 margin-top: 14px;
 }
@@ -92,6 +114,7 @@ code {
   border-radius: 3px;
   padding: 0 .5em 0 .5em;
 }
+
 </style>
   </head>
   <body>
@@ -100,8 +123,39 @@ code {
   <h1>How to use this app</h1>
   </div>
   </div>
-  <div id = "main">
-    <h1>Inputting data to analyse and some basic settings</h1>
+  <hr>
+  <div id="contents">
+    <h2>Contents</h1>
+    <ul>
+      <li><a href="#inputting">Inputting data to analyse and some basic settings: the home/upload tab</a></li>
+      <li><a href="#odd-tabs">The 'odd' tabs</a></li>
+    <ul>
+      <li><a href="#checking">Data error checking and warnings: the 'Data checking' tab</a></li>
+      <li><a href="#data-tab">The 'Data' tab: to export your data with age/gender categories</a></li>
+      <li>'Explanation of this app': this tab has some simple explantory content about the app and is self-explanatory</li>
+      <li>'Background': this tab gives the copyright (copyleft) status of the app and some other background including
+      a line or two about the latest update with its date.</li>
+    </ul>
+      <li><a href="#the-analytic-tabs">The tabs that give you analyses of the data</a></li>
+      <ul>
+        <li><a href="#sociodemographics">Sociodemographics</a></li>
+        <li><a href="#by-clinician">Summary statistics by clinician</a></li>
+        <li><a href="#attendance">Attendance</a></li>
+        <li><a href="#scores">Scores</a></li>
+        <li><a href="#change-a">Change (a)</a></li>
+        <li><a href="#change-b">Change (b)</a></li>
+        <li><a href="#change-c">Change (c)</a></li>
+        <li><a href="#rcsc">RCSC analyses</a></li>
+        <li><a href="#jacobson">Jacobson plot</a></li>
+      </ul>
+      <li><a href="#history">History of this document with short clarification of latest update and its date.</a>
+    </li>
+    </ul>
+    <p><br>     </p>
+    </div>
+    <hr>
+    <div id = "main">
+    <h3 id="inputting">Inputting data to analyse and some basic settings</h2>
     When you open this app you will be seeing something like this.
     <hr>
     <img src="./Screenshot_001.png">
@@ -118,7 +172,7 @@ code {
     <hr>
       Then, to get used to the app, don't change the data in the file, just upload it into the app.
       You do that using that section of the page saying 'Upload data' and offering you a file selection
-      input marked 'Browse...'</p>, here:
+      input marked 'Browse...', here:
     <hr>
     <img src="./Screenshot_003.png">
     <hr>
@@ -150,13 +204,14 @@ code {
     <p>The second input control here sets the number of decimal points that the app will use for most of 
     the analyses it provides.  Two is usually sensible but you can change this at any point, i.e. you may 
     be looking at analyses in one of other tabs and you can come back to this tab and reset what you want here.</p>
-    <h1>Moving on to get analyses out of the app</h1>
+    <h3>The other tabs</h3>
     Now we have data in and have chosen those basic settings we can get the app to do some work.  This is all 
     done in separate tabs:
     <hr>
     <img src="./Screenshot_007.png">
     <hr>
-    There are three 'odd' tabs.  We have just been through the home/upload tab.  The other two that <i>aren't</i>
+    <h3 id="odd-tabs">The odd tabs</h3>
+    There are three 'odd' tabs, i.e. ones that don't do any analyses or manipulation of the data.  We have just been through the home/upload tab.  The other two that <i>aren't</i>
     about analyses are those last two: 'Explanation of the app', and 'Background'. The first of those is what it
     says but not a full how to guide like this and the second covers the copyright/copyleft status of all my
     apps and the history of the app. </p>
@@ -164,6 +219,8 @@ code {
       may have been added to the app by the time you are reading this as I hope they'll be pretty self-explanatory.
       The second tab, 'Data checking' is what it says and with the next tab, 'Data' it is not really about
       analyses but about the data itself.</p>
+      
+    <h3 id="checking">The data checking tab</h3>  
     <p>Here is the top of the 'Data checking' tab:</p>
     <hr>
     <img src="./Screenshot_008.png">
@@ -174,6 +231,7 @@ code {
     will do my best and I will most certainly try to correct any reported errors. This has grown into a pretty huge app with 
     over two thosand lines in the main app and definitely still growing.  I am not a gifted programmer so I am sure frank 
     errors will emerge.  Please report them!</p>
+    
     <p>This next block selects rows in the uploaded data that seem to have errors.</p>
     <hr>
     <img src="./Screenshot_009.png">
@@ -189,5 +247,92 @@ code {
       So to filter to all rows with errors in the first YP-CORE score, put '1' in the column errScore1.  The column
       'errMesg' should give you a message about the error.</li>
     </ul>
+    <h3 id="data-tab">The 'Data' tab: to export your data with age/gender categories</h3>
+    <p>This tab allows you to export or copy either all your data with the added variables created by the app.  It uses 
+    a searchable and filterable 'DataTable' table to allow you find or filter out a subset of your total
+    dataset that you might want to download.</p>
+    <p>The tab starts like this.</p>
+    <hr>
+    <img src="./Screenshot_010.png">
+    <hr>
+    <ul>
+      <li>The 'Explanation' block tells you about filtering and searching</li>
+      <li>The 'Download entire data' block does exactly what it says!  Then you have ...</li>
+      <li>... the 'Searchable table of the data' again does exactly what it says allowing you
+      to look at specific rows in your data and, if you want, copy or export them.  This next 
+      screen grab shows that I have selected data for therapist '3' where the gender of 
+      client is female ('F') and the age was between 11 and 14.</li>
+    </ul>
+    <hr>
+    <img src="./Screenshot_011.png">
+    <hr>
+    
+    
+    <h3 id="sociodemographics">Sociodemographics</h3>
+    At the time of writing this document this tab gives a simple tabulation of the gender breakdown 
+    in your data, a similar table of ages and then a histogram plot of the ages.  This looks like this.
+    <hr>
+    <img src="./Screenshot_012.png">
+    <hr>
+    As you can see there, you can download the histogram in various formats (but the pdf export is
+    broken and beyond my skills to hack into the download functions and fix that so don't use it).
+    
+    <h3 id="by-clinician">Summary statistics by clinician</h3>
+    <p>This tab does what it says!  I have reservations about it but I do believe that collaborations
+    between clinicians, or services in which a number of clinicians work with clients and record
+    change data <i>should</i> want to look at differences in a spirit of curiosity and collaboration.</p>
+    <p>This next screen grab shows my to do list with some questions to you, the end users.  Do 
+    come back to me with the link there if you have suggestions.</p>
+    <p>Then it shows the top of a long table that summarises many things from the data, breaking things
+    down by clinician.<br>
+    the table is downloadable.</p>
+    <hr>
+    <img src="./Screenshot_013.png">
+    <hr>
+    
+    <h3 id="attendance">Attendance</h3>
+    This tab gives some breakdown of the attendance information in your data as shown in this screen grab.
+    <hr>
+    <img src="./Screenshot_014.png">
+    <hr>
+    <p>That is followed by histogram of the numbers of sessions attended as shown here.</p>
+    <hr>
+    <img src="./Screenshot_015.png">
+    <hr>
+    <p>Unlike the earlier histogram of ages, this is a <i></i>plotly/ggplotly</i> plot.  Plotly plots, 
+    which I create with an     R package called ggplotly, have a 'modebar' at the top that appears if 
+    you hover your cursor over the plot.  In this screen grab I have marked the text that alerts you 
+    to this, with it's hyperlink to 
+    <a href="https://plotly.com/chart-studio-help/getting-to-know-the-plotly-modebar/">https://plotly.com/chart-studio-help/getting-to-know-the-plotly-modebar/</a>
+    where you can find all you might want to know about this modebar (and probably much more than you
+    need!)  I have linked that to the modebar itself and, as I had my cursor hovering over the 'download'
+    icon when I took the screen grab, you can see the tooltip explaining the little icon.</p>
+    <p>Unlike the histogram of ages, created with a more basic bit of R, this can only be downloaded 
+    as a png file but it does seem to work reliably.</p>
+    <h3 id="scores">Scores</h3>
+    
+    <h3 id="change-a">Change (a)</h3>
+    
+    <h3 id="change-b">Change (b)</h3>
+    
+    <h3 id="change-c">Change (c)</h3>
+    
+    <h3 id="rcsc">RCSC analyses</h3>
+    
+    Those analyses lead into this next tab: the Jacobson plot.
+    
+    <h3 id="jacobson">Jacobson</h3>
+    
+    
+    <h3 id="history">History of this document</h3>
+    <ul>
+      <li>Created 9.vii.25</li>
+      <li>Last updated 11.vii.25.  Some, still clunky, improvement of the aesthetics.  Contents 
+      section added and headings added for all the headings (mostly pointing to tabs in the app).  
+      So far I have only done these sections down to the attendance one.  I have also added this 
+      history section.</li>
+    </ul>
+    
+    
     </div>
 </html>
