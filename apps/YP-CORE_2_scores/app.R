@@ -205,7 +205,7 @@ ui <- fluidPage(
                          p(" "),
                          p("If you haven't used this app before then I recommend that you read this short ",
                            a("howto document",
-                             href = "howto.html"),
+                             href = "./www/howto.html"),
                            " before going further.  "),
                          p("This app takes YP-CORE data in rows each with one or two scores.  These will typically be one row per ",
                            "client, usually baseline and last session completions.  ",
@@ -840,7 +840,7 @@ ui <- fluidPage(
                            a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/")),
                          p("Last updated 11.vii.25: much work on the ", 
                            a("howto.html file.",
-                             href="https://shiny.psyctc.org/apps/YP-CORE_2_scores/howto.html")),
+                             href="./www/howto.html")),
                          p("Some work still possible but I think the app is usable now!"),
                          p("Licenced under a ",
                            a("Creative Commons, Attribution Licence-ShareAlike",
@@ -943,6 +943,7 @@ server <- function(input, output, session) {
   ### create the main data file: fullData()
   fullData <- reactive({
     req(input$file1)
+    print(getwd())
     ### work out file format 
     ### assumes that people have stayed with sensible file extensions
     str_replace(fileSelected(), "^(.)*?(\\.)(.*$)", "\\3") %>%
