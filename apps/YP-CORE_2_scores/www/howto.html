@@ -17,8 +17,11 @@
                       background-color: #F5F5F5;
                       color: #114;
                       margin: 5;
-                      padding-left: 10px;
+                      padding-left: 20px;
                       padding: 0;
+                    }
+                    p {
+                      padding-left: 20px;
                     }
                   a {
                     text-decoration: none;
@@ -148,6 +151,11 @@ code {
         <li><a href="#rcsc">RCSC analyses</a></li>
         <li><a href="#jacobson">Jacobson plot</a></li>
       </ul>
+      <li>Other issues</li>
+        <ul>
+          <li><a href="#warranty">Warranty</a></li>
+          <li><a href="#confidentiality">Confidentiality</a></li>
+        </ul>
       <li><a href="#history">History of this document with short clarification of latest update and its date.</a>
     </li>
     </ul>
@@ -308,29 +316,189 @@ code {
     need!)  I have linked that to the modebar itself and, as I had my cursor hovering over the 'download'
     icon when I took the screen grab, you can see the tooltip explaining the little icon.</p>
     <p>Unlike the histogram of ages, created with a more basic bit of R, this can only be downloaded 
-    as a png file but it does seem to work reliably.</p>
+    as a png file but it does seem to work reliably and using plotly gives other advantages shown 
+    in some later plots.</p>
+    
     <h3 id="scores">Scores</h3>
+    <p>This tab starts with a small table with the very simple descriptive statistics of the scores 
+    as shown this next screen grab.</p>
+    
+    <hr>
+    <img src="./Screenshot_016.png">
+    <hr>
+    
+    <p>As you can see there, this is another plotly graph and I have shown one of the other options
+    in the plotly modebar: the zoom.  After that histogram of the initial scores you have similar 
+    histograms for the final scores and for the change between the two scores.  That leads nicely
+    to the next tab, actually to the first of a series of tabs about the change data (only where you
+    had two scores of course!)</p>
     
     <h3 id="change-a">Change (a)</h3>
+    <p>I think this next screen grab says most of what can be said about this tab including showing
+    one of the great strengths of plotly: it enables me to provide information about individual
+    points, i.e. about the clients who gave the scores.  You can see one box with that sort of 
+    information in the bottom left.  To get this, you just hover your cursor near the point that 
+    interests you.</p>
+    
+    <hr>
+    <img src="./Screenshot_017.png">
+    <hr>
+    
+    <p>The term 'cat's cradle plot'
+    is one that Jo-anne and I used in our 
+    <a href="https://www.psyctc.org/psyctc/book/",
+    target="_blank">'OMbook'</a>.  (Full title: Outcome Measures and Evaluation in Counselling and Psychotherapy.)
+    That makes this a sensible point to observe that the OMbook is good reading if you are starting out in
+    this whole arena of 'Routine Outcome/Change Measurement'.  Yes, we get royalties every time someone buys
+    the book but that's never going to get us to minimum wage for the work (!!) and it isn't why I plug 
+    it here!</p>
     
     <h3 id="change-b">Change (b)</h3>
     
+    This gives a variant on the cat's cradle plot in which the start and end dates are used to show the 
+    individual clients' durations of interventions against time on the x axis and their score change 
+    on the y axis.  I hope this may give a useful sense of the work the clinicians are doing.  As with 
+    the last plot, you can hover over points to get a bit more information about them.  The one in the 
+    screen grab has ID 124, gave gender as female and her YP-CORE score dropped from 1.4 to .2 which in
+    CSC terms is staying below the cutting point so 'stayed low'.
+    <hr>
+    <img src="./Screenshot_018.png">
+    <hr>
+
     <h3 id="change-c">Change (c)</h3>
+    
+    <p>This tab gives a rather different analysis of the change scores.  Here the tooltip is giving
+    the ID, gender, both YP-CORE scores and saying that the CSC for this gender and age was 1.432
+    so this (artificial) person has deteriorated severel on the YP-CORE from a low score, well below
+    the CSC cutting point to just above it.</p>
+    
+    <hr>
+    <img src="./Screenshot_019.png">
+    <hr>
+    
+    <p>I hope the explanation in the screen grab there, above the plot, is clear enough.  Do please 
+    <a href="https://www.psyctc.org/psyctc/contact-me/", target="_blank">contact me</a> 
+    if it's not clear and let's see if I can improve the explanation.</p>
+    
+    <p>One thing may be confusing in the plot as you may see a tooltip like this:</p>
+    
+    <hr>
+    <img src="./Screenshot_020.png">
+    <hr>
+    
+    <p>That is giving the values of the 95% confidence interval around the loess smoothed 
+    regression line, i.e. the values of the points at the top and bottom of that grey envelope
+    around the blue curve.  Here, for two sessions attended the interval is from -.06 to 1.
+    Remember that those are rescaled change scores, not actual change as this allows us to 
+    compare the trajectories of change against the number of sessions attended taking the 
+    issues of (binary) gender and age out of the issue.</p>
+    
+    <p>the feels like a sensible cue for another small plug to some of my other 
+    work that may help.  I have created an 
+    <a href="https://www.psyctc.org/psyctc/book/glossary/", target="_blank">online glossary</a>
+    of terms used in and around therapy research. That was created to go with the
+    <a href="https://www.psyctc.org/psyctc/book/",
+    target="_blank">'OMbook'</a> but has gone well beyond the words we used there and is now 
+    (July 2025) up to 395 entries!  Do have a look there if you are seeing words or terms 
+    that aren't familiar to you and if they are not there, 
+    <a href="https://www.psyctc.org/psyctc/contact-me/", target="_blank">contact me</a>
+    and I will see if I can write something useful about them for the glossary.</p>
+    
     
     <h3 id="rcsc">RCSC analyses</h3>
     
-    Those analyses lead into this next tab: the Jacobson plot.
+    <p>This tab gives a series of tables giving the breakdown of the scores in terms of the 
+    Reliable and Clinically Significant (RCSC) paradigm.  Here is the introductory text and
+    the first set of tables.</p>
+    
+    <hr>
+    <img src="./Screenshot_021.png">
+    <hr>
+    
+    <p>And then these tables.</p>
+    
+    <hr>
+    <img src="./Screenshot_022.png">
+    <hr>
+    
+    <p>You can see that most of these tables have a final column named 'CI'.  These are the 
+    95% confidence intervals around the observed percentage for the row.  They are a very 
+    important way for us to avoid having excessive confidence that percentages from even 
+    quite good dataset sizes such as <i>n</i> = 119 for that first table of the CSC 
+    categories of the initial YP-CORE scores.  That value of 68.9% looks pretty precise
+    but the CI is telling us that the precision of estimation is that the value in the 
+    long run, assuming that other things didn't change, might lie anywhere between 60.1% and 
+    76.5%.  (For a more formal but, I hope, still readable explanation of confidence intervals 
+    see <a href="https://www.psyctc.org/psyctc/glossary2/confidence-intervals-cis/",
+    target="_blank")> this glossary entry</a>.)
+    
+    <p>Those analyses lead into this next tab: the Jacobson plot.</p>
     
     <h3 id="jacobson">Jacobson</h3>
     
+    <p>This is the Jacobson plot which is rooted in that RCSC breakdown of change.  The big 
+    advantage of the plot over those tables is that you can see the RCSC categories but the 
+    plot puts the scores back into visibility so we are not just categorising.</p>
+    
+    <hr>
+    <img src="./Screenshot_023.png">
+    <hr>
+    
+    <p>Here's the explanation from the app.  As usual, do
+    <a href="https://www.psyctc.org/psyctc/contact-me/", target="_blank">contact me</a> 
+    if it's not clear and let me see if I can improve that explanation.</p>
+    
+    <hr>
+    <img src="./Screenshot_023.png">
+    <hr>
+    
+    <h3 id="warranty">Warranty</h3>
+    <p>I have done my best to make this app give accurate analyses and have built in some checks
+    on the data and have looked at the outputs from various input data to see if I can see 
+    mistakes.  However, I am a self-taught and not naturally skilled programmer so, as with all
+    software I use, the app comes with no warranty at all.  So always look at its outputs 
+    critically and thoughtfully.  If you see something that doesn't look right and can share the
+    data that produced that output, do please 
+    <a href="https://www.psyctc.org/psyctc/contact-me/", target="_blank">contact me</a> and I will try to 
+    understand the issue and, if I can and have the time, will try to fix it.</p>
+    
+    <h3 id="confidentiality">Confidentiality</h3>
+    <p>(See also 'warranty' above!)</p>
+    <p>This app is pretty well protected behind the way that the ISP I use
+    <a href="https://www.mythic-beasts.com/", target="_blank">Mythic Beasts</a>.
+    That is some considerable protection against the app being hacked and it
+    has the byproduct that I never see the IP addresses from which users come
+    to the app, which has its down sides but does protect your identity (but 
+    I always welcome feedback from anyone who uses the app so do 
+    <a href="https://www.psyctc.org/psyctc/contact-me/", target="_blank">contact me</a>
+    if you have any feedback.)</p>
+    <p>The only information I store about use of the app are the start and 
+    end times of one access which can never identify anyone.  Any data you
+    upload is only stored in a temporary file area on the server which is
+    deleted when your access finishes.</p>
+    <p>I can see that for some users, particularly moderate sized services
+    which may not be able to afford a more comprehensive solution this app
+    may not be usable as it may take too long to upload all your data and
+    process it.  The upload time issue at least would be solved if I 
+    rewrote the app to all identification of users and allowed registered
+    users to store their data on the server and update it efficiently.
+    However, that would create all sorts of data protection issues that
+    I don't have the resources to handle so I won't be doing it. 
+    However, like all my code, the source is open source so if anyone
+    wants to use it and add that sort of functionality they would be
+    welcome as long as they obey the MIT licence.  
+    <a href="https://github.com/cpsyctc/shiny-server/?tab=MIT-1-ov-file",
+    target="_blank">See here</a> for the licence and all the code.</p>
     
     <h3 id="history">History of this document</h3>
     <ul>
       <li>Created 9.vii.25</li>
-      <li>Last updated 11.vii.25.  Some, still clunky, improvement of the aesthetics.  Contents 
+      <li>11.vii.25.  Some, still clunky, improvement of the aesthetics.  Contents 
       section added and headings added for all the headings (mostly pointing to tabs in the app).  
       So far I have only done these sections down to the attendance one.  I have also added this 
       history section.</li>
+      <li>Last updated 12.vii.25. Finally, I have all the tabs in here and two general sections:
+      'Warranty' and 'Confidentiality'.</li>
     </ul>
     
     

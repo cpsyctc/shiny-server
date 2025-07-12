@@ -842,7 +842,8 @@ ui <- fluidPage(
                          p("Last updated 12.vii.25: more work on the ", 
                            a("howto document",
                              target = "_blank",
-                             href = "howto.html")),
+                             href = "howto.html"),
+                         "and some tweaks to the 'Change (c)' tab."),
                          p("Some work still possible but I think the app is usable now!"),
                          p("Licenced under a ",
                            a("Creative Commons, Attribution Licence-ShareAlike",
@@ -945,7 +946,7 @@ server <- function(input, output, session) {
   ### create the main data file: fullData()
   fullData <- reactive({
     req(input$file1)
-    print(getwd())
+
     ### work out file format 
     ### assumes that people have stayed with sensible file extensions
     str_replace(fileSelected(), "^(.)*?(\\.)(.*$)", "\\3") %>%
@@ -1941,20 +1942,15 @@ server <- function(input, output, session) {
                        geom_hline(yintercept = 0) +
                        geom_hline(yintercept = mean(tmpTib$scaledChange),
                                   linetype = 3) +
-                       xlab("Date") +
+                       xlab("n(sessions attended)") +
                        scale_y_continuous("Change, scaled to the RCI")) 
-    # ggtitle("Change scores, scaled to the appropriate RCI",
-    #         subtitle = str_c("A change equal to the RCI has score 1.",
-    #                          "Solid horizontal reference line marks no change, ",
-    #                          "dashed line marks overall mean change."))
-    
-    
-    ggplotly(tooltip = c("label1",
-                         "label2",
-                         "label3",
-                         "label4",
-                         "label5"),
-             width = lisSessionData$output_pid_width, height = 800)
+
+    suppressMessages(ggplotly(tooltip = c("label1",
+                                          "label2",
+                                          "label3",
+                                          "label4",
+                                          "label5"),
+                              width = lisSessionData$output_pid_width, height = 800))
   })
   
   output$loessPlot1 <- renderPlotly(
