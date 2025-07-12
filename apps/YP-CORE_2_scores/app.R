@@ -205,7 +205,8 @@ ui <- fluidPage(
                          p(" "),
                          p("If you haven't used this app before then I recommend that you read this short ",
                            a("howto document",
-                             href = "./www/howto.html"),
+                             target = "_blank",
+                             href = "howto.html"),
                            " before going further.  "),
                          p("This app takes YP-CORE data in rows each with one or two scores.  These will typically be one row per ",
                            "client, usually baseline and last session completions.  ",
@@ -306,11 +307,11 @@ ui <- fluidPage(
                          p(" "),
                          h2("Searchable table showing missing data"),
                          p("This shows the rows in the data you uploaded which have missing data.  I hope this will help you check if any of these ",
-                         "are unnecessary missing values.  ",
-                         "As for the table of frankly impossible entries above, this defaults to show  you the rows with errors in sets of 50.  ",
-                         "To see all the entries with errors, use the 'Show ... entries' selection before the table and select 'All'. ",
-                         "You will then see all the entries with errors and you will be able to download or copy to the clipboard that entire ",
-                         "table using the buttons below the table."),
+                           "are unnecessary missing values.  ",
+                           "As for the table of frankly impossible entries above, this defaults to show  you the rows with errors in sets of 50.  ",
+                           "To see all the entries with errors, use the 'Show ... entries' selection before the table and select 'All'. ",
+                           "You will then see all the entries with errors and you will be able to download or copy to the clipboard that entire ",
+                           "table using the buttons below the table."),
                          p(" "),
                          DTOutput("searchableMissingData"),    
                 ),
@@ -838,16 +839,17 @@ ui <- fluidPage(
                          value = 14,
                          p("App created 22.v.25 by Chris Evans.",
                            a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/")),
-                         p("Last updated 11.vii.25: much work on the ", 
-                           a("howto.html file.",
-                             href="./www/howto.html")),
+                         p("Last updated 12.vii.25: more work on the ", 
+                           a("howto document",
+                             target = "_blank",
+                             href = "howto.html")),
                          p("Some work still possible but I think the app is usable now!"),
                          p("Licenced under a ",
                            a("Creative Commons, Attribution Licence-ShareAlike",
                              href="http://creativecommons.org/licenses/by-sa/1.0/"),
                            " Please respect that and put an acknowledgement and link back to here if re-using anything from here."),
-                         includeHTML("https://shiny.psyctc.org/boilerplate.html")),
-                
+                         includeHTML("https://shiny.psyctc.org/boilerplate.html"),
+                ),
                 id = "tabSelected"),
   )
 )
@@ -994,7 +996,7 @@ server <- function(input, output, session) {
     ### check initial column names are as expected
     validate(need(colnames(dataInput) == vecColNames,
                   "Your data don't seem to have the correct column names.  Sorry, aborting!"))
-
+    
     ### OK, now you appear to have usable data, work on it!
     dataInput %>%
       as_tibble() %>%
@@ -1048,25 +1050,25 @@ server <- function(input, output, session) {
                                  1,
                                  0),
              errMesg = if_else(YPmeanTxt1 != "" & errScore1 == 1,
-                                     "Impossible entry for YPmean1",
-                                     ""),
+                               "Impossible entry for YPmean1",
+                               ""),
              errScore1 = if_else(YPclinTxt1 != "" & is.na(YPclin1),
                                  1,
                                  errScore1),
              errMesg = if_else(YPclinTxt1 != "" & errScore1 == 1,
-                                     "Impossible entry for YPclin1",
+                               "Impossible entry for YPclin1",
                                errMesg),
              errScore2 = if_else(YPmeanTxt2 != "" & is.na(YPmean2),
                                  1,
                                  0),
              errMesg = if_else(YPmeanTxt2 != "" & errScore2 == 1,
-                                     "Impossible entry for YPmean2",
+                               "Impossible entry for YPmean2",
                                errMesg),
              errScore2 = if_else(YPclinTxt2 != "" & is.na(YPclin2),
                                  1,
                                  errScore2),
              errMesg = if_else(YPclinTxt2 != "" & errScore2 == 1,
-                                     "Impossible entry for YPclin2",
+                               "Impossible entry for YPclin2",
                                errMesg),
              ### and now both scores entered but not compatible
              errScore1 = if_else((!is.na(YPmean1) & !is.na(YPclin1)) &
@@ -1554,7 +1556,7 @@ server <- function(input, output, session) {
   ### tab: (5) Summary statistics by clinician
   summaryStats1longByTher <- reactive({
     req(input$file1)
-
+    
     fullData() %>%
       mutate(TherapistID = if_else(is.na(TherapistID) | TherapistID == "",
                                    "No clinician ID given",
@@ -1843,7 +1845,7 @@ server <- function(input, output, session) {
   ### tab: (9) change (b)
   catsCradle2 <- reactive({
     req(input$file1)
-
+    
     ### massage the data
     fullData() %>%
       select(-Age) %>%
