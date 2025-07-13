@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+  <html lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+    <title>How to use this YP-CORE_2_scores shiny app</title>
+    
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+      <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+          <link rel="manifest" href="/site.webmanifest">
+            <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+              <meta name="msapplication-TileColor" content="#da532c">
+                <meta name="theme-color" content="#ffffff">
+                  
+                  <style type="text/css">
+                    body, html {
+                      font-family: Helvetica, Arial, sans-serif;
+                      background-color: #F5F5F5;
+                      color: #114;
+                      margin: 5;
+                      padding-left: 20px;
+                      padding: 0;
+                    }
+                    p {
+                      padding-left: 20px;
+                    }
+                  a {
+                    text-decoration: none;
+                  }
+                  a:hover {
+                    text-decoration: underline;
+                  }
+                  h2 {
+                    text-align: center;
+                    text-decoration: underline;
+                    font-size: 300%;
+                    background-color: #FFFF99;
+                    padding-top: 30px;
+                    padding-bottom: 30px;
+                  }
+                  h3 {
+                    text-align: center;
+                    text-decoration: underline;
+                    font-size: 300%;
+                    padding-top: 30px;
+                    padding-bottom: 30px;
+                    background-color: #FFFF99;
+                  }
+                  #titleBar {
+                  height: 80px;
+                  font-size: larger;
+                  background-color: #3475b4;
+                    overflow: hidden;
+                  border-bottom: 1px solid #3475b3;
+                  -moz-box-shadow:    0px 0px 10px 3px #BBC;
+                  -webkit-box-shadow: 0px 0px 10px 3px #BBC;
+                  box-shadow:         0px 0px 10px 3px #BBC;
+                  }
+                  #contents {
+                    background-color: #FFFF99;
+                  }
+                  
+#titleBar #container {
+margin-top: 14px;
+}
+#titleBar h1 {
+margin: 0 auto .5em auto;
+padding: .2em;
+color: #EEE;
+  text-align: center;
+}
+#intro {
+background-color: #DDD;
+  margin: 1em 1em 0 1em;
+padding: .75em;
+text-align: center;
+border: 1px solid #CCC;
+font-size: 18px;
+}
+#intro p {
+margin: .3em 0 .3em 0;
+}
+#outer-content {
+max-width: 910px;
+margin-left: auto;
+margin-right: auto;
+}
+#content {
+margin: 1em auto 1em auto;
+float: left;
+}
+#main{
+margin-left: 35px;
+margin-right: 35px;
+float: left;
+line-height: 24px;
+}
+
+#shiny{
+float: left;
+width: 305px;
+margin-left: -330px;
+padding-left: 20px;
+border-left: 1px solid #AAA;
+}
+#shiny iframe {
+margin-top: 30px;
+}
+.caption{
+  font-size: 13px;
+}
+code {
+  background-color: #E5E5E5;
+    border: 1px solid #AAA;
+  -webkit-border-radius: 3px;
+  -khtml-border-radius: 3px; 
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  padding: 0 .5em 0 .5em;
+}
+
+</style>
+  </head>
+  <body>
+  <div id="titleBar">
+  <div id="container">
+  <h1>How to use this app</h1>
+  </div>
+  </div>
+  <hr>
+  <div id="contents">
+    <h2>Contents</h1>
+    <ul>
+      <li><a href="#inputting">Inputting data to analyse and some basic settings: the home/upload tab</a></li>
+      <li><a href="#odd-tabs">The 'odd' tabs</a></li>
+    <ul>
+      <li><a href="#checking">Data error checking and warnings: the 'Data checking' tab</a></li>
+      <li><a href="#data-tab">The 'Data' tab: to export your data with age/gender categories</a></li>
+      <li>'Explanation of this app': this tab has some simple explantory content about the app and is self-explanatory</li>
+      <li>'Background': this tab gives the copyright (copyleft) status of the app and some other background including
+      a line or two about the latest update with its date.</li>
+    </ul>
+      <li><a href="#the-analytic-tabs">The tabs that give you analyses of the data</a></li>
+      <ul>
+        <li><a href="#sociodemographics">Sociodemographics</a></li>
+        <li><a href="#by-clinician">Summary statistics by clinician</a></li>
+        <li><a href="#attendance">Attendance</a></li>
+        <li><a href="#scores">Scores</a></li>
+        <li><a href="#change-a">Change (a)</a></li>
+        <li><a href="#change-b">Change (b)</a></li>
+        <li><a href="#change-c">Change (c)</a></li>
+        <li><a href="#rcsc">RCSC analyses</a></li>
+        <li><a href="#jacobson">Jacobson plot</a></li>
+      </ul>
+      <li>Other issues</li>
+        <ul>
+          <li><a href="#warranty">Warranty</a></li>
+          <li><a href="#confidentiality">Confidentiality</a></li>
+        </ul>
+      <li><a href="#history">History of this document with short clarification of latest update and its date.</a>
+    </li>
+    </ul>
+    <p><br>     </p>
+    </div>
+    <hr>
+    <div id = "main">
+    <h3 id="inputting">Inputting data to analyse and some basic settings</h2>
+    When you open this app you will be seeing something like this.
+    <hr>
+    <img src="./Screenshot_001.png">
+    <hr>
+    Obviously, the URL won't be '127.0.0.1:4295' and what you see will depend on the browser that you are using 
+    and will look fairly different on a 'phone or even a tablet.  The text may also have changed a bit by the 
+    time you are using the app, even that list of tabs: 'Upload', 'Data checking' ... may have changed. </p>
+    <p>
+      However, the basic layout will be something like that.</p>
+      <p>The first thing you need to do is to give the app some data to process.  Start by pulling down 
+      one of the files shown here:
+    <hr>
+    <img src="./Screenshot_002.png">
+    <hr>
+      Then, to get used to the app, don't change the data in the file, just upload it into the app.
+      You do that using that section of the page saying 'Upload data' and offering you a file selection
+      input marked 'Browse...', here:
+    <hr>
+    <img src="./Screenshot_003.png">
+    <hr>
+      You can pull a file, ideally starting with the one you just downloaded with its artificial data.
+      Here you can see that I've done that, uploading YPwide2.csv
+    <hr>
+    <img src="./Screenshot_004.png">
+    <hr>
+    You can also see there that the app is showing you the default referential data.
+    <hr>
+    <img src="./Screenshot_005.png">
+    <hr>
+    If you want one of other available referential data you can just select the one you want at any point
+    by coming back to this home tab ('Upload') and changing your selection.</p>
+    <p>The last options on this home tab are at the bottom of the tab and shown here.</p>
+    <hr>
+    <img src="./Screenshot_006.png">
+    <hr>
+    The first relates to the fact that, regrettably, there are two ways of scoring some of the CORE measures:
+    <ul>
+      <li>'Mean' scoring'
+      which uses the mean of the item scores allowing prorating of up to 10% missing items 
+      (i.e. across nine YP-CORE items if one is missing, but not prorating if more items are missing and ...</li>
+      <li>'Clinical' scoring which is the mean score multiplied by 10.</li>
+    </ul>
+    If you look at the data in one of those example spreadsheets you will see that you can enter data using
+    either scoring or even a mixture of the two.  This radio button selection just affects which system the 
+    app uses in what it returns.</p>
+    <p>The second input control here sets the number of decimal points that the app will use for most of 
+    the analyses it provides.  Two is usually sensible but you can change this at any point, i.e. you may 
+    be looking at analyses in one of other tabs and you can come back to this tab and reset what you want here.</p>
+    <h3>The other tabs</h3>
+    Now we have data in and have chosen those basic settings we can get the app to do some work.  This is all 
+    done in separate tabs:
+    <hr>
+    <img src="./Screenshot_007.png">
+    <hr>
+    <h3 id="odd-tabs">The odd tabs</h3>
+    There are three 'odd' tabs, i.e. ones that don't do any analyses or manipulation of the data.  We have just been through the home/upload tab.  The other two that <i>aren't</i>
+    about analyses are those last two: 'Explanation of the app', and 'Background'. The first of those is what it
+    says but not a full how to guide like this and the second covers the copyright/copyleft status of all my
+    apps and the history of the app. </p>
+    <p>So that brings us to the nuts and bolts of the app.  Currently the tabs are as shown there, others 
+      may have been added to the app by the time you are reading this as I hope they'll be pretty self-explanatory.
+      The second tab, 'Data checking' is what it says and with the next tab, 'Data' it is not really about
+      analyses but about the data itself.</p>
+      
+    <h3 id="checking">The data checking tab</h3>  
+    <p>Here is the top of the 'Data checking' tab:</p>
+    <hr>
+    <img src="./Screenshot_008.png">
+    <hr>
+    <p>I have framed an area that is present in all the tabs except the 'home/upload' tab: an update/status/suggestions block.
+    Do feel free to suggest improvements and to report errors or problems.  I don't promise that I will implement all suggestions
+    but I will consider each one. Equally, I can't promise to be able to solve any and all problems people encounter though I 
+    will do my best and I will most certainly try to correct any reported errors. This has grown into a pretty huge app with 
+    over two thosand lines in the main app and definitely still growing.  I am not a gifted programmer so I am sure frank 
+    errors will emerge.  Please report them!</p>
+    
+    <p>This next block selects rows in the uploaded data that seem to have errors.</p>
+    <hr>
+    <img src="./Screenshot_009.png">
+    <hr>
+    <p>That screenshot has arrows marking three key parts of this, an interactive 'DT/DataTable'.</p>
+    <ul>
+      <li>The first is very self-explanatory as it just controls how many lines of data that appear to contain errors are show
+    in the table.  The 'all' option is important if you want to download this table.  More on that below.</li>
+      <li>The second is also self-explanatory: you can search across all the fields in the table.  I think that's only 
+    likely to be useful to find a particular client by ID.</li>
+      <li>The last points to the first of the filters at the head of each column.  These enable you to filter to rows 
+      where the value for that column matches what you put in that box.  There's a box for each column as you see.
+      So to filter to all rows with errors in the first YP-CORE score, put '1' in the column errScore1.  The column
+      'errMesg' should give you a message about the error.</li>
+    </ul>
+    <h3 id="data-tab">The 'Data' tab: to export your data with age/gender categories</h3>
+    <p>This tab allows you to export or copy either all your data with the added variables created by the app.  It uses 
+    a searchable and filterable 'DataTable' table to allow you find or filter out a subset of your total
+    dataset that you might want to download.</p>
+    <p>The tab starts like this.</p>
+    <hr>
+    <img src="./Screenshot_010.png">
+    <hr>
+    <ul>
+      <li>The 'Explanation' block tells you about filtering and searching</li>
+      <li>The 'Download entire data' block does exactly what it says!  Then you have ...</li>
+      <li>... the 'Searchable table of the data' again does exactly what it says allowing you
+      to look at specific rows in your data and, if you want, copy or export them.  This next 
+      screen grab shows that I have selected data for therapist '3' where the gender of 
+      client is female ('F') and the age was between 11 and 14.</li>
+    </ul>
+    <hr>
+    <img src="./Screenshot_011.png">
+    <hr>
+    
+    
+    <h3 id="sociodemographics">Sociodemographics</h3>
+    At the time of writing this document this tab gives a simple tabulation of the gender breakdown 
+    in your data, a similar table of ages and then a histogram plot of the ages.  This looks like this.
+    <hr>
+    <img src="./Screenshot_012.png">
+    <hr>
+    As you can see there, you can download the histogram in various formats (but the pdf export is
+    broken and beyond my skills to hack into the download functions and fix that so don't use it).
+    
+    <h3 id="by-clinician">Summary statistics by clinician</h3>
+    <p>This tab does what it says!  I have reservations about it but I do believe that collaborations
+    between clinicians, or services in which a number of clinicians work with clients and record
+    change data <i>should</i> want to look at differences in a spirit of curiosity and collaboration.</p>
+    <p>This next screen grab shows my to do list with some questions to you, the end users.  Do 
+    come back to me with the link there if you have suggestions.</p>
+    <p>Then it shows the top of a long table that summarises many things from the data, breaking things
+    down by clinician.<br>
+    the table is downloadable.</p>
+    <hr>
+    <img src="./Screenshot_013.png">
+    <hr>
+    
+    <h3 id="attendance">Attendance</h3>
+    This tab gives some breakdown of the attendance information in your data as shown in this screen grab.
+    <hr>
+    <img src="./Screenshot_014.png">
+    <hr>
+    <p>That is followed by histogram of the numbers of sessions attended as shown here.</p>
+    <hr>
+    <img src="./Screenshot_015.png">
+    <hr>
+    <p>Unlike the earlier histogram of ages, this is a <i></i>plotly/ggplotly</i> plot.  Plotly plots, 
+    which I create with an     R package called ggplotly, have a 'modebar' at the top that appears if 
+    you hover your cursor over the plot.  In this screen grab I have marked the text that alerts you 
+    to this, with it's hyperlink to 
+    <a href="https://plotly.com/chart-studio-help/getting-to-know-the-plotly-modebar/">https://plotly.com/chart-studio-help/getting-to-know-the-plotly-modebar/</a>
+    where you can find all you might want to know about this modebar (and probably much more than you
+    need!)  I have linked that to the modebar itself and, as I had my cursor hovering over the 'download'
+    icon when I took the screen grab, you can see the tooltip explaining the little icon.</p>
+    <p>Unlike the histogram of ages, created with a more basic bit of R, this can only be downloaded 
+    as a png file but it does seem to work reliably and using plotly gives other advantages shown 
+    in some later plots.</p>
+    
+    <h3 id="scores">Scores</h3>
+    <p>This tab starts with a small table with the very simple descriptive statistics of the scores 
+    as shown this next screen grab.</p>
+    
+    <hr>
+    <img src="./Screenshot_016.png">
+    <hr>
+    
+    <p>As you can see there, this is another plotly graph and I have shown one of the other options
+    in the plotly modebar: the zoom.  After that histogram of the initial scores you have similar 
+    histograms for the final scores and for the change between the two scores.  That leads nicely
+    to the next tab, actually to the first of a series of tabs about the change data (only where you
+    had two scores of course!)</p>
+    
+    <h3 id="change-a">Change (a)</h3>
+    <p>I think this next screen grab says most of what can be said about this tab including showing
+    one of the great strengths of plotly: it enables me to provide information about individual
+    points, i.e. about the clients who gave the scores.  You can see one box with that sort of 
+    information in the bottom left.  To get this, you just hover your cursor near the point that 
+    interests you.</p>
+    
+    <hr>
+    <img src="./Screenshot_017.png">
+    <hr>
+    
+    <p>The term 'cat's cradle plot'
+    is one that Jo-anne and I used in our 
+    <a href="https://www.psyctc.org/psyctc/book/",
+    target="_blank">'OMbook'</a>.  (Full title: Outcome Measures and Evaluation in Counselling and Psychotherapy.)
+    That makes this a sensible point to observe that the OMbook is good reading if you are starting out in
+    this whole arena of 'Routine Outcome/Change Measurement'.  Yes, we get royalties every time someone buys
+    the book but that's never going to get us to minimum wage for the work (!!) and it isn't why I plug 
+    it here!</p>
+    
+    <h3 id="change-b">Change (b)</h3>
+    
+    This gives a variant on the cat's cradle plot in which the start and end dates are used to show the 
+    individual clients' durations of interventions against time on the x axis and their score change 
+    on the y axis.  I hope this may give a useful sense of the work the clinicians are doing.  As with 
+    the last plot, you can hover over points to get a bit more information about them.  The one in the 
+    screen grab has ID 124, gave gender as female and her YP-CORE score dropped from 1.4 to .2 which in
+    CSC terms is staying below the cutting point so 'stayed low'.
+    <hr>
+    <img src="./Screenshot_018.png">
+    <hr>
+
+    <h3 id="change-c">Change (c)</h3>
+    
+    <p>This tab gives a rather different analysis of the change scores.  Here the tooltip is giving
+    the ID, gender, both YP-CORE scores and saying that the CSC for this gender and age was 1.432
+    so this (artificial) person has deteriorated severel on the YP-CORE from a low score, well below
+    the CSC cutting point to just above it.</p>
+    
+    <hr>
+    <img src="./Screenshot_019.png">
+    <hr>
+    
+    <p>I hope the explanation in the screen grab there, above the plot, is clear enough.  Do please 
+    <a href="https://www.psyctc.org/psyctc/contact-me/", target="_blank">contact me</a> 
+    if it's not clear and let's see if I can improve the explanation.</p>
+    
+    <p>One thing may be confusing in the plot as you may see a tooltip like this:</p>
+    
+    <hr>
+    <img src="./Screenshot_020.png">
+    <hr>
+    
+    <p>That is giving the values of the 95% confidence interval around the loess smoothed 
+    regression line, i.e. the values of the points at the top and bottom of that grey envelope
+    around the blue curve.  Here, for two sessions attended the interval is from -.06 to 1.
+    Remember that those are rescaled change scores, not actual change as this allows us to 
+    compare the trajectories of change against the number of sessions attended taking the 
+    issues of (binary) gender and age out of the issue.</p>
+    
+    <p>the feels like a sensible cue for another small plug to some of my other 
+    work that may help.  I have created an 
+    <a href="https://www.psyctc.org/psyctc/book/glossary/", target="_blank">online glossary</a>
+    of terms used in and around therapy research. That was created to go with the
+    <a href="https://www.psyctc.org/psyctc/book/",
+    target="_blank">'OMbook'</a> but has gone well beyond the words we used there and is now 
+    (July 2025) up to 395 entries!  Do have a look there if you are seeing words or terms 
+    that aren't familiar to you and if they are not there, 
+    <a href="https://www.psyctc.org/psyctc/contact-me/", target="_blank">contact me</a>
+    and I will see if I can write something useful about them for the glossary.</p>
+    
+    
+    <h3 id="rcsc">RCSC analyses</h3>
+    
+    <p>This tab gives a series of tables giving the breakdown of the scores in terms of the 
+    Reliable and Clinically Significant (RCSC) paradigm.  Here is the introductory text and
+    the first set of tables.</p>
+    
+    <hr>
+    <img src="./Screenshot_021.png">
+    <hr>
+    
+    <p>And then these tables.</p>
+    
+    <hr>
+    <img src="./Screenshot_022.png">
+    <hr>
+    
+    <p>You can see that most of these tables have a final column named 'CI'.  These are the 
+    95% confidence intervals around the observed percentage for the row.  They are a very 
+    important way for us to avoid having excessive confidence that percentages from even 
+    quite good dataset sizes such as <i>n</i> = 119 for that first table of the CSC 
+    categories of the initial YP-CORE scores.  That value of 68.9% looks pretty precise
+    but the CI is telling us that the precision of estimation is that the value in the 
+    long run, assuming that other things didn't change, might lie anywhere between 60.1% and 
+    76.5%.  (For a more formal but, I hope, still readable explanation of confidence intervals 
+    see <a href="https://www.psyctc.org/psyctc/glossary2/confidence-intervals-cis/",
+    target="_blank")> this glossary entry</a>.)
+    
+    <p>Those analyses lead into this next tab: the Jacobson plot.</p>
+    
+    <h3 id="jacobson">Jacobson</h3>
+    
+    <p>This is the Jacobson plot which is rooted in that RCSC breakdown of change.  The big 
+    advantage of the plot over those tables is that you can see the RCSC categories but the 
+    plot puts the scores back into visibility so we are not just categorising.</p>
+    
+    <hr>
+    <img src="./Screenshot_023.png">
+    <hr>
+    
+    <p>Here's the explanation from the app.  As usual, do
+    <a href="https://www.psyctc.org/psyctc/contact-me/", target="_blank">contact me</a> 
+    if it's not clear and let me see if I can improve that explanation.</p>
+    
+    <hr>
+    <img src="./Screenshot_023.png">
+    <hr>
+    
+    <h3 id="warranty">Warranty</h3>
+    <p>I have done my best to make this app give accurate analyses and have built in some checks
+    on the data and have looked at the outputs from various input data to see if I can see 
+    mistakes.  However, I am a self-taught and not naturally skilled programmer so, as with all
+    software I use, the app comes with no warranty at all.  So always look at its outputs 
+    critically and thoughtfully.  If you see something that doesn't look right and can share the
+    data that produced that output, do please 
+    <a href="https://www.psyctc.org/psyctc/contact-me/", target="_blank">contact me</a> and I will try to 
+    understand the issue and, if I can and have the time, will try to fix it.</p>
+    
+    <h3 id="confidentiality">Confidentiality</h3>
+    <p>(See also 'warranty' above!)</p>
+    <p>This app is pretty well protected behind the way that the ISP I use
+    <a href="https://www.mythic-beasts.com/", target="_blank">Mythic Beasts</a>.
+    That is some considerable protection against the app being hacked and it
+    has the byproduct that I never see the IP addresses from which users come
+    to the app, which has its down sides but does protect your identity (but 
+    I always welcome feedback from anyone who uses the app so do 
+    <a href="https://www.psyctc.org/psyctc/contact-me/", target="_blank">contact me</a>
+    if you have any feedback.)</p>
+    <p>The only information I store about use of the app are the start and 
+    end times of one access which can never identify anyone.  Any data you
+    upload is only stored in a temporary file area on the server which is
+    deleted when your access finishes.</p>
+    <p>I can see that for some users, particularly moderate sized services
+    which may not be able to afford a more comprehensive solution this app
+    may not be usable as it may take too long to upload all your data and
+    process it.  The upload time issue at least would be solved if I 
+    rewrote the app to all identification of users and allowed registered
+    users to store their data on the server and update it efficiently.
+    However, that would create all sorts of data protection issues that
+    I don't have the resources to handle so I won't be doing it. 
+    However, like all my code, the source is open source so if anyone
+    wants to use it and add that sort of functionality they would be
+    welcome as long as they obey the MIT licence.  
+    <a href="https://github.com/cpsyctc/shiny-server/?tab=MIT-1-ov-file",
+    target="_blank">See here</a> for the licence and all the code.</p>
+    
+    <h3 id="history">History of this document</h3>
+    <ul>
+      <li>Created 9.vii.25</li>
+      <li>11.vii.25.  Some, still clunky, improvement of the aesthetics.  Contents 
+      section added and headings added for all the headings (mostly pointing to tabs in the app).  
+      So far I have only done these sections down to the attendance one.  I have also added this 
+      history section.</li>
+      <li>Last updated 12.vii.25. Finally, I have all the tabs in here and two general sections:
+      'Warranty' and 'Confidentiality'.</li>
+    </ul>
+    
+    
+    </div>
+</html>
