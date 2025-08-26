@@ -22,11 +22,11 @@ vecScoring <- c("Item mean (range 0-4)",
                 "Clinical (10x item mean, range 0-40)")
 vecLookup <- c("Evans et al., 2002 (UK)", # @@@
                "Connell et al., 2007 (UK)", 
-               "Feixas et al., 2016 (Spain)")
+               "Feixas et al., 2016 (Spain);")
 
 ### create the internal lookup table
 ### RCI and CSC are based on mean scoring # @@@
-tribble(~Ref, ~Gender,  ~CSC, ~RCI, ~refAlpha, ~refSD,
+tribble(~RefScore, ~Gender,  ~CSC, ~RCI, ~refAlpha, ~refSD,
         "Evans et al., 2002 (UK); CORE-OM (all items)",   "M", 1.19, 0.51, NA, NA,
         "Evans et al., 2002 (UK); CORE-OM (WB)",          "M", 1.37, 1.33, NA, NA,
         "Evans et al., 2002 (UK); CORE-OM (Problems)",    "M", 1.44, 0.85, NA, NA,
@@ -41,18 +41,18 @@ tribble(~Ref, ~Gender,  ~CSC, ~RCI, ~refAlpha, ~refSD,
         "Evans et al., 2002 (UK); CORE-OM (Non-risk)",    "F", 1.50, 0.55, NA, NA,
         "Connell et al., 2007 (UK); CORE-OM (all items)", "M", 1.00, NA, NA, NA,
         "Connell et al., 2007 (UK); CORE-OM (all items)", "F", 1.00, NA, NA, NA,
-        "Feixas et al., 2016 (Spain) (all items)",        "M", 1.06, NA, NA, NA,
-        "Feixas et al., 2016 (Spain) (WB)",               "M", 1.46, NA, NA, NA,
-        "Feixas et al., 2016 (Spain) (Problems)",         "M", 1.33, NA, NA, NA,
-        "Feixas et al., 2016 (Spain) (Functioning)",      "M", 1.06, NA, NA, NA,
-        "Feixas et al., 2016 (Spain) (Risk)",             "M", 0.24, NA, NA, NA,
-        "Feixas et al., 2016 (Spain) (Non-risk)",         "M", 1.24, NA, NA, NA,
-        "Feixas et al., 2016 (Spain) (all items)",        "F", 1.13, NA, NA, NA,
-        "Feixas et al., 2016 (Spain) (WB)",               "F", 1.82, NA, NA, NA,
-        "Feixas et al., 2016 (Spain) (Problems)",         "F", 1.43, NA, NA, NA,
-        "Feixas et al., 2016 (Spain) (Functioning)",      "F", 1.07, NA, NA, NA,
-        "Feixas et al., 2016 (Spain) (Risk)",             "F", 0.21, NA, NA, NA,
-        "Feixas et al., 2016 (Spain) (Non-risk)",         "F", 1.13, NA, NA, NA,
+        "Feixas et al., 2016 (Spain); (all items)",        "M", 1.06, NA, NA, NA,
+        "Feixas et al., 2016 (Spain); (WB)",               "M", 1.46, NA, NA, NA,
+        "Feixas et al., 2016 (Spain); (Problems)",         "M", 1.33, NA, NA, NA,
+        "Feixas et al., 2016 (Spain); (Functioning)",      "M", 1.06, NA, NA, NA,
+        "Feixas et al., 2016 (Spain); (Risk)",             "M", 0.24, NA, NA, NA,
+        "Feixas et al., 2016 (Spain); (Non-risk)",         "M", 1.24, NA, NA, NA,
+        "Feixas et al., 2016 (Spain); (all items)",        "F", 1.13, NA, NA, NA,
+        "Feixas et al., 2016 (Spain); (WB)",               "F", 1.82, NA, NA, NA,
+        "Feixas et al., 2016 (Spain); (Problems)",         "F", 1.43, NA, NA, NA,
+        "Feixas et al., 2016 (Spain); (Functioning)",      "F", 1.07, NA, NA, NA,
+        "Feixas et al., 2016 (Spain); (Risk)",             "F", 0.21, NA, NA, NA,
+        "Feixas et al., 2016 (Spain); (Non-risk)",         "F", 1.13, NA, NA, NA,
         "Palmieri et al., 2009; CORE-OM (all items)",     "M", 1.09, 0.52, NA, NA,
         "Palmieri et al., 2009; CORE-OM (WB)",            "M", 1.40, 1.45, NA, NA,
         "Palmieri et al., 2009; CORE-OM (Problems)",      "M", 1.30, 0.85, NA, NA,
@@ -64,7 +64,15 @@ tribble(~Ref, ~Gender,  ~CSC, ~RCI, ~refAlpha, ~refSD,
         "Palmieri et al., 2009; CORE-OM (Problems)",      "F", 1.43, 0.85, NA, NA,
         "Palmieri et al., 2009; CORE-OM (Functioning)",   "F", 1.30, 0.89, NA, NA,
         "Palmieri et al., 2009; CORE-OM (Risk)",          "F", 0.22, 0.83, NA, NA,
-        "Palmieri et al., 2009; CORE-OM (Non-risk)",      "F", 1.42, 0.60, NA, NA,) -> tibLookup
+        "Palmieri et al., 2009; CORE-OM (Non-risk)",      "F", 1.42, 0.60, NA, NA) %>%
+  mutate(Ref = str_replace(RefScore, "(.*);(.*)", "\\1"),
+         measure = str_replace(RefScore, "(.*);(.*)", "\\2"),
+         measure = str_trim(measure)) -> tibLookup
+
+tibLookup %>% 
+  select(Ref) %>%
+  distinct() %>%
+  pull() -> vecLookup
 
 # CORE-10
 # CORE-SF/A
@@ -892,9 +900,8 @@ server <- function(input, output, session) {
     }
     
     tmpTibLookup %>%
-      select(-ordAge) %>%
-      select(Ref, Age, Gender, everything()) %>%
-      arrange(Age, Gender) %>%
+      select(Ref, Gender, everything()) %>%
+      arrange(Ref, Gender) %>%
       flextable() %>%
       autofit()
   })
@@ -1089,10 +1096,40 @@ server <- function(input, output, session) {
                               "",
                               Gender)) %>%
       
+      ### turn ages to age at most recent birthday, i.e. floor(age)!
+      mutate(Age = floor(Age)) %>%
       ### deal with out of range ages
-      mutate(Age = if_else(Age < 11 | Age > 25,
+      mutate(Age = if_else(Age < 10 | Age > 114,
                            NA_integer_,
-                           Age)) %>%
+                           Age),
+             ### create age groups
+             AgeGp = case_when(
+               is.na(Age) ~ "Age missing",
+               Age < 18 ~ as.character(Age),
+               Age == 18 ~ "18",
+               Age == 19 ~ "19",
+               Age >= 20 & Age < 25 ~ "20-24",
+               Age > 24 & Age < 30 ~ "25-29",
+               Age >= 30 & Age < 40 ~ "30-39",
+               Age >= 40 & Age < 50 ~ "40-49",
+               Age >= 50 & Age < 60 ~ "50-49",
+               Age >= 60 & Age < 70 ~ "60-49",
+               Age >= 70 & Age < 80 ~ "70-49",
+               Age >= 80 ~ "80 and over"
+             ),
+             UKAgeGp = case_when(
+               is.na(Age) ~ NA_character_,
+               Age >= 10 & Age < 15 ~ "as.character(Age)",
+               Age %in% 15:17 ~ "15-17",
+               Age >= 18 & Age < 25 ~ "19-24",
+               Age >= 25 & Age < 30 ~ "25-29",
+               Age >= 30 & Age < 40 ~ "30-39",
+               Age >= 40 & Age < 50 ~ "40-49",
+               Age >= 50 & Age < 60 ~ "50-49",
+               Age >= 60 & Age < 70 ~ "60-49",
+               Age >= 70 & Age < 80 ~ "70-49",
+               Age >= 80 ~ "80 and over"
+             )) %>%
       
       ### massage variables we need to have as factors
       mutate(RespondentID = ordered(RespondentID),
@@ -1132,10 +1169,16 @@ server <- function(input, output, session) {
                             na.rm = TRUE)) %>%
       ungroup() -> dataInput
     
+    print(colnames(dataInput))
+    print(colnames(tibLookup2()))
+    
     ### get CSC categories per row using matching age & gender
+    ### you have to do this twice, once for each score
+    by1 <- join_by(Gender, measure1 == RefScore)
+    
     dataInput %>%
       left_join(tibLookup2(),
-                by = c("Gender", "Age")) %>%
+                by = by1) %>%
       mutate(Change = score2 - score1,
              changeMeanScoring = mean2 - mean1,
              scaledChange = (score2 - score1) / RCI,
@@ -1217,16 +1260,9 @@ server <- function(input, output, session) {
                 minAge = min(Age, na.rm = TRUE),
                 maxAge = max(Age, na.rm = TRUE),
                 meanAge = mean(Age, na.rm = TRUE),
+                medianAge = median(Age, na.rm = TRUE),
                 sdAge = sd(Age, na.rm = TRUE),
                 nMissAge = getNNA(Age),
-                nAge11 = sum(Age == 11, na.rm = TRUE),
-                nAge12 = sum(Age == 12, na.rm = TRUE),
-                nAge13 = sum(Age == 13, na.rm = TRUE),
-                nAge14 = sum(Age == 14, na.rm = TRUE),
-                nAge15 = sum(Age == 15, na.rm = TRUE),
-                nAge16 = sum(Age == 16, na.rm = TRUE),
-                nAge17 = sum(Age == 17, na.rm = TRUE),
-                nAge18 = sum(Age == 18, na.rm = TRUE),
                 ### sessions
                 minNsessionsAtt = min(nSessionsAttended, na.rm = TRUE),
                 maxNsessionsAtt = max(nSessionsAttended, na.rm = TRUE),
@@ -1407,7 +1443,7 @@ server <- function(input, output, session) {
           round(mean(fullData()$Age, na.rm = TRUE), input$dp),
           ", median ",
           round(median(fullData()$Age, na.rm = TRUE), input$dp),
-          " and, for what's worth here, SD ",
+          " and, for what's worth, SD ",
           round(sd(fullData()$Age, na.rm = TRUE), input$dp),
           ".  Here is the table of ages.")
   })
@@ -1415,67 +1451,48 @@ server <- function(input, output, session) {
   
   tableAges <- reactive({
     req(input$file1)
-    summaryStats1long() %>%
-      filter(str_sub(Statistic, 1, 4) == "nAge") %>%
-      rename(n = value) %>%
-      mutate(nUsable = sum(n)) %>%
-      rowwise() %>%
-      mutate(CI = list(Hmisc::binconf(n, nUsable)[1, ])) %>%
-      ungroup() %>%
-      unnest_wider(CI) %>%
-      mutate(across(PointEst : Upper, ~ .x * 100),
-             across(PointEst : Upper, ~ round(.x, input$dp))) %>%
-      rename(Perc = PointEst,
-             LCL = Lower,
-             UCL = Upper) %>%
-      mutate(Perc = str_c(Perc, "%"),
-             CI = str_c(LCL,
-                        " to ",
-                        UCL,
-                        "%")) %>%
-      select(-c(LCL, UCL)) %>%
+    fullData() %>%
+      mutate(AgeGp = if_else(AgeGp == "Age missing",
+                             NA_character_,
+                             AgeGp)) %>%
+      tabyl(AgeGp) %>%
+      mutate(percent = str_c(percent = round(100 * percent, 1), "%"),
+             valid_percent = str_c(valid_percent = round(100 * valid_percent, 1), "%")) %>%
       flextable() %>%
       autofit() %>%
-      align(j = 4 :5,
-            align = "right") %>%
+      align(j = 3:4,
+            align = "right") %>% 
+      colformat_char(j = "AgeGp",
+                     na_str = "Age missing") %>%
       htmltools_value()
   })
   output$ageTable <- renderUI(tableAges())
   
   ageHisto <- reactive({
     req(input$file1)
-    summaryStats1long() %>%
-      filter(str_sub(Statistic, 1, 4) == "nAge") %>%
-      rename(Age = Statistic,
-             n = value) %>%
-      mutate(Age = as.numeric(str_remove(Age, fixed("nAge"))),
-             nUsable = sum(n)) %>%
-      rowwise() %>%
-      mutate(CI = list(Hmisc::binconf(n, nUsable)[1, ])) %>%
-      ungroup() %>%
-      unnest_wider(CI) %>%
-      mutate(across(PointEst : Upper, ~ .x * nUsable)) %>%
-      rename(Perc = PointEst,
-             LCL = Lower,
-             UCL = Upper) -> tmpTib
     
-    tmpTib %>%
-      reframe(meanN = nUsable / n()) %>%
-      select(meanN) %>%
-      pull() -> tmpValMeanN
+    fullData() %>%
+      filter(!is.na(Age)) %>%
+      summarise(nOK = n(),
+                min = min(Age),
+                mean = list(getBootCImean(Age)),
+                median = median(Age),
+                max = max(Age),
+                SD = sd(Age)) -> tibAgeStats
     
-    ggplot(data = tmpTib,
-           aes(x = Age,
-               y = n)) +
-      geom_point() +
-      geom_bar(stat = "identity",
-               fill = "grey") +
-      geom_linerange(aes(ymin = LCL, ymax = UCL)) +
-      geom_hline(yintercept = tmpValMeanN,
-                 linetype = 3) +
-      ggtitle("Barchart of ages",
-              subtitle = str_c("Horizontal reference line is mean n had ages been equally frequent",
-                               "\nVertical reference lines are binomial 95% CIs for observed n values."))
+    print(tibAgeStats)
+
+    ggplot(data = fullData(),
+           aes(x = AgeGp)) +
+      geom_bar() 
+      # geom_bar(stat = "identity",
+      #          fill = "grey") +
+      # geom_linerange(aes(ymin = LCL, ymax = UCL)) +
+      # geom_hline(yintercept = tmpValMeanN,
+      #            linetype = 3) +
+      # ggtitle("Barchart of ages",
+      #         subtitle = str_c("Horizontal reference line is mean n had ages been equally frequent",
+      #                          "\nVertical reference lines are binomial 95% CIs for observed n values."))
   })
   output$ageHist <- renderPlot(ageHisto(),
                                height = 600)
@@ -1557,16 +1574,9 @@ server <- function(input, output, session) {
                 minAge = min(Age, na.rm = TRUE),
                 maxAge = max(Age, na.rm = TRUE),
                 meanAge = mean(Age, na.rm = TRUE),
+                medianAge = median(Age, na.rm = TRUE),
                 sdAge = sd(Age, na.rm = TRUE),
                 nMissAge = getNNA(Age),
-                nAge11 = sum(Age == 11, na.rm = TRUE),
-                nAge12 = sum(Age == 12, na.rm = TRUE),
-                nAge13 = sum(Age == 13, na.rm = TRUE),
-                nAge14 = sum(Age == 14, na.rm = TRUE),
-                nAge15 = sum(Age == 15, na.rm = TRUE),
-                nAge16 = sum(Age == 16, na.rm = TRUE),
-                nAge17 = sum(Age == 17, na.rm = TRUE),
-                nAge18 = sum(Age == 18, na.rm = TRUE),
                 ### sessions
                 minNsessionsAtt = min(nSessionsAttended, na.rm = TRUE),
                 maxNsessionsAtt = max(nSessionsAttended, na.rm = TRUE),
@@ -1900,6 +1910,8 @@ server <- function(input, output, session) {
                 min = min(scaledChange),
                 max = max(scaledChange)) %>%
       ungroup() -> tmpTibStats
+    
+    print(tmpTib)
     
     suppressWarnings(ggplot(data = tmpTib,
                             aes(x = nSessionsAttended, y = scaledChange)) +
