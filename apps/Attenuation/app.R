@@ -43,7 +43,7 @@ ui <- fluidPage(
       h3("Put your values in here, replacing the existing ones",
          align = "center"),
       numericInput("unattR",
-                   "Unattenuated correlation you are considering: -1 < R < 1",
+                   "Unattenuated correlation, R, that you are considering: -1 < R < 1",
                    value = .65,
                    min = -.1,
                    max = .999999,
@@ -168,13 +168,13 @@ server <- function(input, output, session) {
   ### 
   ### start with validation functions
   ###
-  checkYvalues <- function(minY, maxY){
+  checkYval1LTEval2 <- function(minY, maxY){
     if (maxY <= minY) {
       return(FALSE)
     }
     return(TRUE)
   }
-  checkRvalues <- function(minUnattR, maxUnattR){
+  checkRva1LTEval2 <- function(minUnattR, maxUnattR){
     if (maxUnattR <= minUnattR) {
       return(FALSE)
     }
@@ -266,17 +266,17 @@ server <- function(input, output, session) {
     req(input$minY)
     req(input$maxY)
     validate(
-      need(checkRvalues(input$minUnattR, input$maxUnattR), 
+      need(checkRva1LTEval2(input$minUnattR, input$maxUnattR), 
            "maxUnattR must be greater than minUnattR"),
-      need(checkRvalues(input$unattR, input$maxUnattR),
+      need(checkRva1LTEval2(input$unattR, input$maxUnattR),
            "maxUnattR must be greater than unattR, the unattenuated correlation you entered"),
-      need(checkRvalues(input$minUnattR, input$unattR),
+      need(checkRva1LTEval2(input$minUnattR, input$unattR),
            "minUnattR must be smaller than unattR, the unattenuated correlation you entered"),
-      need(checkRvalues(input$unattR, input$maxY),
+      need(checkRva1LTEval2(input$unattR, input$maxY),
            "maxY must be greater than unattR, the unattenuated correlation you entered"),
-      need(checkRvalues(input$minY, input$unattR),
+      need(checkRva1LTEval2(input$minY, input$unattR),
            "minY must be smaller than unattR, the unattenuated correlation you entered"),
-      need(checkYvalues(input$minY, input$maxY),
+      need(checkYval1LTEval2(input$minY, input$maxY),
            "maxY must be greater than minY"),
     )
     corrPlot()
