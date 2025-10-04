@@ -21,7 +21,7 @@ ui <- fluidPage(
     sidebarPanel(
       h3("Replace the values here with your own", align="center"),
       numericInput("SD",
-                   "This is your baseline score standard deviation (must be positive))",
+                   "This is your baseline score standard deviation (must be positive)",
                    value = 11.1,
                    min = 0,
                    max = 10^9,
@@ -117,6 +117,7 @@ ui <- fluidPage(
                   tabPanel("Background", 
                            p("App created by Chris Evans",
                              a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/"),
+                             "probably 19.ix.23, updated 4.ix.25 to fix it failing with small SD",
                              "licenced under a ",
                              a("Creative Commons, Attribution Licence-ShareAlike",
                                href="http://creativecommons.org/licenses/by-sa/1.0/"),
@@ -180,7 +181,7 @@ server <- function(input, output, session) {
   })
   
   getRCIinterval <- function(SD, rel, n, ci) {
-    CISD <- getCIaroundSD(SD, n, ci)
+    CISD <- getCIaroundSD(SD, n, ci, dp = 8) # set dp high otherwise you get a complaint if SD is small
     lwrLt <- CECPfuns::getRCIfromSDandAlpha(CISD[1], rel, ci)
     uprLt <- CECPfuns::getRCIfromSDandAlpha(CISD[2], rel, ci)
     return(c(lwrLt, uprLt))
