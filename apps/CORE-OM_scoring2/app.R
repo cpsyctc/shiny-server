@@ -22,12 +22,12 @@ ui <- fluidPage(
   setBackgroundColor("#ffff99"),
   h1(HTML("CORE-OM scores for SystmOne users\n\n")),
   
-  p("I have just learned that the ways that",
+  p("I have just learned that the way that",
     a("SystmOne",
       href="https://en.wikipedia.org/wiki/SystmOne"),
-    "scores CORE-OM data re pretty unhelpful.  This app might help.  ",
+    "scores CORE-OM data is pretty unhelpful if people want a total score.  This app might help.  ",
     "For now it assumes that the SystmOne screen returns domain scores as means ",
-    "and this gives the correct total score."),
+    "and this gives the correct total score in mean or 'clinical' scoring."),
   
   # Get input values
   sidebarLayout(
@@ -75,7 +75,7 @@ ui <- fluidPage(
     mainPanel(
       h3("Getting CORE total score from domain mean scores", align="center"),
       verbatimTextOutput("res"),
-      p("This incredibly basic shiny app ...."),
+      p("This incredibly basic shiny app just gets total scores from mean domain scores."),
       p(" "),
       p("App created by Chris Evans",
         a("PSYCTC.org",
