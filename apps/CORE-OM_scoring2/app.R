@@ -141,18 +141,18 @@ server <- function(input, output, session) {
     totR <- 6 * input$Risk
     totAll <- totF + totP + totW + totR
     totNR <- totF + totP + totW
-    meanAll <- round(totAll / 34, 2)
-    meanNR <- round(totNR / 28, 2)
+    meanAll <- totAll / 34
+    meanNR <- totNR / 28
     if (input$MeanClin == 1) {
       retVal <- paste0("The mean total score for those values is ",
-                       meanAll,
+                       round(meanAll, 2),
                        "\nand the mean NR (non-risk) score is ",
-                       meanNR)
+                       round(meanNR, 2))
     } else {
       retVal <- paste0("The 'clinical' total score for those values is ",
-                       meanAll,
+                       round(10 * meanAll, 1),
                        "\nand 'clinical' NR (non-risk) score is ",
-                       meanNR)
+                       round(10 * meanNR, 1))
     }
     retVal
   })
