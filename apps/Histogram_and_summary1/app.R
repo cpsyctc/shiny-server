@@ -28,8 +28,11 @@ ui <- fluidPage(
     "It's largely a test of concept and should be followed by other apps using data from file uploads.",
     "I will probably embellish this app too with a bit more time."),
   p("You input data using the sidebar on the left to select the file format you are using and then to",
-    "choose the file to upload (you should see a file upload dialogue for that).",
-    "You may need to use some of the other sidebar inputs depending on your file format.",
+    "choose the file to upload. You should see a file upload dialogue for that.",
+    "If you don't immediately have data of your own you want to input have a look ",
+    a("here", href="https://www.psyctc.org/psyctc/root/stats/datasets/"),
+    "."),
+  p("You may need to use some of the other sidebar inputs depending on your file format.",
     "The first tab to the right of the sidebar will show you the top rows of the data and allow you to choose your variable.",
     "Once you have selected your variable the next tab show the histogram which you can customise a bit and can download in various formats.",
     "Similarly, the summary tab gives you some summary statistics for your dataset which you can download and the data tab shows the actual variable data."),
@@ -143,7 +146,11 @@ ui <- fluidPage(
                   tabPanel("Background", 
                            p("App created 22.iii.24 by Chris Evans",
                              a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/")),
-                           p("Last updated 5.iv.25 to add control of the decimal places in the summary output."),
+                           p("Updated 5.iv.25 to add control of the decimal places in the summary output."),
+                           p("Updated 8.i.26 to restrict variable selection to numeric variables and add ",
+                             "link to my ",
+                             a("PSYCTC.org datasets", href="https://www.psyctc.org/psyctc/root/stats/datasets/"),
+                             "."),
                            p("Licenced under a ",
                              a("Creative Commons, Attribution Licence-ShareAlike",
                                href="http://creativecommons.org/licenses/by-sa/1.0/"),
@@ -175,16 +182,16 @@ server <- function(input, output, session) {
     # or all rows if selected, will be shown.
     
     if (input$dataType == "csv") {
-      dataInput <- read.csv(fileSelected(),
-                     header = input$header,
-                     sep = input$sep,
-                     quote = input$quote)
+      read.csv(fileSelected(),
+               header = input$header,
+               sep = input$sep,
+               quote = input$quote) %>%
+        as_tibble() -> dataInput
     }
     
     if (input$dataType == "tsv") {
       suppressMessages(dataInput <- read_tsv(fileSelected(),
                             col_names = input$header))
-                            # quote = input$quote)
     }
     
     if (input$dataType == "xls") {
@@ -221,14 +228,22 @@ server <- function(input, output, session) {
   })
   
   varNames <- reactive({
-    colnames(fullData())
+    # colnames(fullData())
+    fullData() %>%
+      select(where(is.numeric)) %>%
+      colnames()
+  })
+  
+  numericData <- reactive({
+    fullData() %>%
+      select(where(is.numeric))
   })
   
   output$dropdownID <- renderUI({
     req(input$file1)
     varSelectInput("var",
                    "Select the variable to analyse",
-                   fullData())
+                   numericData())
   })
   
   selectedData <- reactive({
