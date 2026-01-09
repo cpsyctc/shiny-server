@@ -29,7 +29,18 @@ ui <- fluidPage(
     "choose the file to upload. You should see a file upload dialogue for that.",
     "If you don't immediately have data of your own you want to input you can use ",
     a("TMN_counts.csv", href="https://www.psyctc.org/psyctc/wp-content/uploads/2026/01/TMN_counts.csv"),
-    "."),
+    ".",
+    a("TMN_counts_x20.csv", href="https://www.psyctc.org/psyctc/wp-content/uploads/2026/01/TMN_counts_x20.csv"),
+    ".",
+    "and",
+    a("TMN_counts_sim.csv", href="https://www.psyctc.org/psyctc/wp-content/uploads/2026/01/TMN_counts_sim.csv"),
+    ".",
+    "to give you a sense of what the app is doing."),
+    p("See ",
+    a("https://www.psyctc.org/psyctc/root/stats/datasets/",
+      href = "https://www.psyctc.org/psyctc/root/stats/datasets/"),
+    "for more information about these and other datasets."),
+  
   p("You may need to use some of the other sidebar inputs depending on your particular file format."),
   
   # Sidebar layout with input and output definitions ----
@@ -113,7 +124,7 @@ ui <- fluidPage(
                   
                   tabPanel("Background", 
                            p("App created 8.i.26 by Chris Evans",
-                             a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/")),
+                             a("PSYCTC.org", href="https://www.psyctc.org/psyctc/about-me/")),
                            p("It came from thinking about the ",
                              a("Does brief therapy yield better outcomes?",
                                href="https://therapymeetsnumbers.com/does-brief-therapy-yield-better-outcomes/"),
@@ -121,6 +132,8 @@ ui <- fluidPage(
                              a("Therapy Meets Numbers",
                                href="https://therapymeetsnumbers.com/"),
                              " website."),
+                           p("The Fisher test p value is computed by Monte Carlo simulation ",
+                             "allowing large tables and large total n to be handled"),
                            
                            p("Licenced under a ",
                              a("Creative Commons, Attribution Licence-ShareAlike",
@@ -231,6 +244,7 @@ server <- function(input, output, session) {
   })
   
   forestPlot <- reactive({
+    req(input$textPosn)
     ### start to build the annotation
     tibDat() %>% 
       select(n, nImproved) %>% 
@@ -238,7 +252,8 @@ server <- function(input, output, session) {
     
     chisq.test(matImproved) -> lisChisqImproved 
     
-    fisher.test(matImproved) -> lisFisherImproved
+    fisher.test(matImproved, 
+                simulate.p.value = TRUE) -> lisFisherImproved
     
     tibDat() %>%
       summarise(totN = sum(n),
@@ -270,9 +285,7 @@ server <- function(input, output, session) {
       pull() -> xMax
     
     posnProp <- .95
-    
-    # textPosn <- "topRight"
-    
+
     if (input$textPosn == "topRight") {
       xPos <- xMin + ((xMax - xMin) * posnProp)
       yPos <- posnProp
@@ -298,7 +311,16 @@ server <- function(input, output, session) {
       hJust <- 0
     }
     
-    ggplot(data = tibDat(),
+    ### this deals with trivial out of range CLs
+    tibDat() %>% 
+      mutate(improvedLCL = if_else(improvedUCL < 0,
+                                   0,
+                                   improvedLCL),
+             improvedUCL = if_else(improvedUCL > 1,
+                                   1,
+                                   improvedUCL)) -> tibDat
+    
+    ggplot(data = tibDat, #() using the internal tibDat not the reactive
            aes(x = Year,
                y = improvedEst)) +
       geom_point() +
@@ -314,7 +336,9 @@ server <- function(input, output, session) {
                vjust = vJust,
                hjust = hJust) +
       xlab("Year") +
-      ylim(c(0, 1)) +
+      # coord_cartesian(ylim = c(0, 1),
+      #                 expand = FALSE) +
+      ylim(0, 1) +
       ylab("Proportion improved") +
       ggtitle("Forest plot of proportion improved by year",
               subtitle = "Error bars are 95% CIs, reference line is overall rate")
