@@ -73,7 +73,7 @@ ui <- fluidPage(
       verbatimTextOutput("res"),
       p("App created by Chris Evans",
         a("PSYCTC.org", href = "https://www.psyctc.org/psyctc/about-me/"),
-        "licenced under a ",
+        "7.ii.24, tweak to add that date 17.iv.26.  Licenced under a ",
         a("Creative Commons, Attribution Licence-ShareAlike",
           href = "http://creativecommons.org/licenses/by-sa/1.0/"),
         " Please respect that and put an acknowledgement and link back to here if re-using anything from here."),

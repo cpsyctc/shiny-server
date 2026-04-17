@@ -1,0 +1,4 @@
+#!/bin/bash
+cd /datadisk/Current_share/Current_Data/MyR/shiny.psyctc.org
+cp --preserve=timestamps telemetry.sqlite telemetry.sqlite.bak
+scp -i /datadisk/Current_share/Current_Data/CORE/CORE_website/CST_private root@shiny.psyctc.org:/srv/shiny-server/telemetry.sqlite /datadisk/Current_share/Current_Data/MyR/shiny.psyctc.org/telemetry.sqlite
