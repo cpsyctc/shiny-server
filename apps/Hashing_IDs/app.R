@@ -17,6 +17,12 @@ theme_update(plot.title = element_text(hjust = .5),
 telemetry <- Telemetry$new(app_name = "Hashing_IDs",
                            data_storage = DataStorageSQLite$new(db_path = file.path("../../telemetry.sqlite")))
 
+tmpTxt <- str_c("This run used version ",
+                packageVersion("openssl"),
+                " or the package, dated ",
+                packageDate("openssl"),
+                ".")
+
 # Define UI for data upload app ----
 ui <- fluidPage(
   
@@ -45,6 +51,13 @@ ui <- fluidPage(
         "that you write the key phrase you input here down somewhere so you can use it again."),
       textInput("hashKey", "Hashing key value you want", value = "Whatever you want!"),
       
+      tags$p("It's best to uncheck this next box before uploading your data if your data doesn't contain a header row"),
+      
+      # Input: Checkbox if file has header ----
+      checkboxInput("header", 
+                    "Check this if first row of data gives variable names",
+                    TRUE),
+      
       # Input: file type ----
       radioButtons("dataType", 
                    "What type of file do you want to use?",
@@ -58,12 +71,7 @@ ui <- fluidPage(
                    selected = "csv"),
       
       # Input: Select a file ----
-      fileInput("file1", "Choose file if using file upload"),
-      
-      # Input: Checkbox if file has header ----
-      checkboxInput("header", 
-                    "Check this if first row of data gives variable names",
-                    TRUE),
+      fileInput("file1", "Choose file if using file upload ... when you have done that, go to the 'Select variable' tab on the right."),
       
       numericInput("sheetNum", "If you are inputting a spreadsheet give the number of the worksheet",
                    value = 1,
@@ -90,19 +98,33 @@ ui <- fluidPage(
                                "Double Quote" = '"',
                                "Single Quote" = "'"),
                    selected = '"'),
+      
+      tags$p("Finally, select the hash algorithm (defaults to sha512)"),
+      
+      # Input: Select algorithm ----
+      radioButtons("algorithm", 
+                   "Algorithm",
+                   choices = c("sha512" = 'sha512',
+                               "sha256" = "sha256"),
+                   selected = 'sha512'),
     ),
     
     # Main panel for displaying outputs ----
     mainPanel(
       # Output: Tabset w/ plot, summary, and table ----
       tabsetPanel(type = "tabs",
-                  tabPanel("Select variable", 
+                  tabPanel("Select variable ...", 
                            textOutput("variableName"),
                            
                            uiOutput('dropdownID'),
                            
                            # Output: Data file ----
-                           tableOutput("top20")),
+                           tableOutput("top20"),
+                           
+                           p("If you didn't have a header row and forgot to unselect the header row,",
+                             " you will see a head row starting with 'x.' and the first row of the data",
+                             " If so, just uncheck the header row box on the left!")),
+                  
                   
                   tabPanel("Data with hashed values", 
                            p(" "),
@@ -121,7 +143,14 @@ ui <- fluidPage(
                   tabPanel("Background", 
                            p("App created 05.iv.25 by Chris Evans",
                              a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/")),
-                           p("Last updated 05.iv.25."),
+                           p("Last updated 16.x.26 adding the details about the openssl package shown below and",
+                             " corrected my omission of the choice of sha256 or sha512 hashing!"),
+                           
+                           p("The code uses the hash functions from the openssl package written by Jeroen Ooms, Oliver Keyes. For details see: ",
+                             a("https://jeroen.r-universe.dev/openssl", href = "https://jeroen.r-universe.dev/openssl")),
+                           
+                           p(tmpTxt),
+                           
                            p("Licenced under a ",
                              a("Creative Commons, Attribution Licence-ShareAlike",
                                href="http://creativecommons.org/licenses/by-sa/1.0/"),
@@ -219,8 +248,13 @@ server <- function(input, output, session) {
     req(input$var)
     # fullData() %>%
     #   select(input$var) %>%
-    selectedData() %>%
-      mutate(hashVal = sha256(as.character(!!input$var), input$hashKey))
+    if(input$algorithm == "sha256") {
+      selectedData() %>%
+        mutate(hashVal = sha256(as.character(!!input$var), input$hashKey))
+    } else {
+      selectedData() %>%
+        mutate(hashVal = sha512(as.character(!!input$var), input$hashKey))
+    }
   })
   
   output$top20 <- renderTable({ 
