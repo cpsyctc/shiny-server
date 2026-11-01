@@ -1,0 +1,101 @@
+---
+title: "Find packages used by my shiny apps"
+author: "CE"
+date: "2026-11-01"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+library(tidyverse)
+library(flextable)
+```
+
+This Rmarkdown file checks all the R files and finds where they call packages whether by loading the package or using a "package::function()" call and it gets round a few challenges that could hide packages.  Here is the list of the packages in alphabetic order.
+
+```{r}
+list.files(pattern = "*.R$", recursive = TRUE) %>%
+  as_tibble() %>%
+  rename(file = value) %>%
+  rowwise() %>%
+  mutate(lines = list(readLines(str_c("./", file), warn = FALSE))) %>%
+  unnest_longer(lines) %>%
+  ### we don't need the files
+  select(-file) %>%
+  distinct() -> tmpTib
+
+tmpTib %>% 
+  filter(str_detect(lines, fixed("library("))) %>%
+  ### get rid of "suppressMessages(" as these make parsing harder
+  mutate(lines = str_remove(lines,  fixed("suppressMessages("))) %>%
+  ### ditto "suppressWarnings(" as these make parsing harder
+  mutate(lines = str_remove(lines,  fixed("suppressWarnings("))) %>%
+  mutate(library = str_replace(lines, "^(.*?)library\\((.*?)\\)(.*)$", "\\2")) %>% 
+  select(library) %>%
+  distinct() -> tmpTibLibrary
+
+tmpTib %>%
+  ### don't reanalyse the filter lines
+  filter_out(str_detect(lines, fixed("library("))) %>%
+  filter(str_detect(lines, fixed("::"))) %>%
+  ### get rid of "suppressMessages(" as these make parsing harder
+  mutate(lines = str_remove(lines,  fixed("suppressMessages("))) %>%
+  ### ditto "suppressWarnings(" as these make parsing harder
+  mutate(lines = str_remove(lines,  fixed("suppressWarnings("))) %>%
+  ### now parse simple lines without a RtL assigment
+  mutate(library = str_replace(lines, "^(.*?)\\:\\:(.*)$", "\\1"),
+         library = str_replace(library, "^(.*?)[[:space:]]{1,1}([[:alnum:]]+)", "\\2"),
+         ### now do that again to catch the lines with RtL assigment (and so early spaces)
+         library = str_replace(library, "^(.*?)[[:space:]]{1,1}([[:alnum:]]+)", "\\2"),
+         ### now handle "package::" within allocations to list
+         library = str_remove(library, fixed("list("))) %>%
+  select(-lines) %>%
+  distinct() %>%
+  bind_rows(tmpTibLibrary) %>%
+  distinct() -> tibLibraries
+
+tibLibraries %>%
+  arrange(library) %>%
+  flextable() %>%
+  autofit()
+```
+
+Now it checks whether they are installed on your system and if some are missing it shows you a list of those missings ones.
+
+```{r checkInstalled}
+installed.packages()[, 1] %>%
+  as_tibble() %>%
+  rename(installedLibrary = value) -> tibInstalled
+
+tibLibraries %>%
+  filter(!library %in% tibInstalled$installedLibrary) -> tibMissing
+
+if(nrow(tibMissing) > 0) {
+  tibMissing %>%
+    rename(missingPackage = library) %>%
+    select(missingPackage) %>%
+    pull() -> vecMissingPackages
+  
+  save(vecMissingPackages, file = "vecMissingPackages.Rda")
+  
+  write_csv(tibMissing, file = "missingPackages.csv")
+  
+  tibMissing %>%
+    flextable() %>%
+    autofit()
+}
+```
+
+It created a vector of those package names and saved that in "vecMissingPackages.Rda" which you can load into R with:  
+`load(file = "vecMissingPackages.Rda").  
+
+I've also stored it as a csv file "missingPackages.csv" which should read in with:  
+`read.csv(file = "missingPackages.csv") -> vecMissingPackages`.
+
+You should also be able to install the missing packages with 
+`install.packages(ask = TRUE, checkBuilt = TRUE)`
+
+You may find that some of the missing packages aren't on CRAN, for example my own CECPfuns package.  The instructions to install that, and more about it are at [https://cecpfuns.psyctc.org](https://cecpfuns.psyctc.org).  Others you may have to do a bit of internet searching to discover where they live and how to install them.  If you have problems despite searching, do please [contact me](https://www.psyctc.org/psyctc/contact-me/).
+
+         

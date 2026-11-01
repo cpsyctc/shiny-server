@@ -1,7 +1,7 @@
 ### g_from_d_and_n
 suppressMessages(library(shiny))
 suppressMessages(library(shinyWidgets))
-suppressMessages(library(esc))
+# suppressMessages(library(esc))
 suppressMessages(library(shiny.telemetry))
 
 ### 1. Initialize telemetry with default options (store to a local logfile)
