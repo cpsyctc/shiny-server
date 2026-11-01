@@ -7,3 +7,6 @@ tmp*
 *in_progress*
 *allDat.csv
 *bak
+findPackages.html
+vecMissingPackages.Rda
+missingPackages.csv
