@@ -107,7 +107,7 @@ ui <- fluidPage(
                   tabPanel("Background", 
                            p("App created 13.x.24 by Chris Evans",
                              a("PSYCTC.org",href="https://www.psyctc.org/psyctc/about-me/")),
-                           p("Last updated 13.x.24."),
+                           p("Tweaked 2.xi.26 for site debug, no change in this app."),
                            p("Licenced under a ",
                              a("Creative Commons, Attribution Licence-ShareAlike",
                                href="http://creativecommons.org/licenses/by-sa/1.0/"),
